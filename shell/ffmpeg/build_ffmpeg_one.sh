@@ -27,11 +27,13 @@ fi
 
 uname=`uname`
 if [ $uname = "Darwin" ];then
-  echo "compile on mac"
   COMPILE_PLAT="darwin"
+  CORE_NUM=$(getconf _NPROCESSORS_ONLN)
+  echo "compile on mac, core=$CORE_NUM"
 elif [ $uname = "Linux" ]; then
-  echo "compile on linux"
   COMPILE_PLAT="linux"
+  CORE_NUM=$(nproc)
+  echo "compile on linux, core=$CORE_NUM"
 else
   echo "don't support $uname"
 fi
@@ -40,12 +42,10 @@ export NDK=/Users/xufulong/Library/Android/sdk/ndk-bundle
 export TOOL=$NDK/toolchains/llvm/prebuilt/$COMPILE_PLAT-x86_64
 export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$COMPILE_PLAT-x86_64/bin
 export SYSROOT=$NDK/toolchains/llvm/prebuilt/$COMPILE_PLAT-x86_64/sysroot
-export CROSS_PREFIX=$TOOLCHAIN/$ARCH-linux-$ANDROID-
 export CC=$TOOLCHAIN/$PLATFORM-linux-$ANDROID$API-clang
 export CXX=$TOOLCHAIN/$PLATFORM-linux-$ANDROID$API-clang++
 export PLATFORM_API=$NDK/platforms/android-$API/arch-$PLATFORM_ARCH
 export PREFIX=../ffmpeg-android/$ABI
-export ADDITIONAL_CONFIGURE_FLAG="--cpu=$CPU"
 
 THIRD_LIB=$PREFIX
 export EXTRA_CFLAGS="-Os -fPIC $OPTIMIZE_CFLAGS -I$THIRD_LIB/include"
@@ -55,14 +55,16 @@ function build_one() {
   ./configure \
   --target-os=android \
   --prefix=$PREFIX \
-  --cross-prefix=$CROSS_PREFIX \
+  --cross-prefix=$TOOLCHAIN \
   --enable-cross-compile \
   --arch=$ARCH \
   --cpu=$CPU \
   --cc=$CC \
   --cxx=$CXX \
-  --nm=$TOOLCHAIN/$ARCH-linux-$ANDROID-nm \
-  --strip=$TOOLCHAIN/$ARCH-linux-$ANDROID-strip \
+  --ar=$TOOLCHAIN/llvm-ar \
+  --nm=$TOOLCHAIN/llvm-nm \
+  --ranlib=$TOOLCHAIN/llvm-ranlib \
+  --strip=$TOOLCHAIN/llvm-strip \
   --enable-cross-compile \
   --sysroot=$SYSROOT \
   --enable-hwaccels \
@@ -127,16 +129,16 @@ ssa,ass,dvbsub,dvdsub,pgssub,mov_text,sami,srt,subrip,text,webvtt \
   --enable-demuxer=aac,ac3,alaw,amr,amrnb,amrwb,ape,asf,asf_o,ass,av1,avi,cavsvideo,codec2,concat,dash,dnxhd,eac3,flac,flv,\
 g722,g726,g729,gif,gif_pipe,h263,h264,hevc,hls,image2,image2pipe,jpeg_pipe,lrc,m4v,matroska,webm,mjpeg,mov,mp4,m4a,3gp,mp3,mpeg,\
 mpegts,mpegvideo,mv,mulaw,manifest,ogg,pcm_s16be,pcm_s16le,pcm_s32be,pcm_s32le,pcm_f32be,pcm_f32le,pcm_f64be,pcm_f64le,\
-png_pipe,realtext,rm,rtp,rtsp,sami,sdp,srt,swf,vc1,wav,webm_dash,xmv \
-$ADDITIONAL_CONFIGURE_FLAG
-make
-make install
+png_pipe,realtext,rm,rtp,rtsp,sami,sdp,srt,swf,vc1,wav,webm_dash,xmv
+
+  make -j$CORE_NUM
+  make install
 }
 
 build_one
 
 function link_one_ffmpeg() {
-  $TOOLCHAIN/$ARCH-linux-$ANDROID-ld -rpath-link=$PLATFORM_API/usr/lib -L$PLATFORM_API/usr/lib \
+  $TOOLCHAIN/ld -rpath-link=$PLATFORM_API/usr/lib -L$PLATFORM_API/usr/lib \
   -L$PREFIX/lib -soname libffmpeg.so \
   -shared -Bsymbolic --whole-archive --no-undefined -o $PREFIX/libffmpeg.so \
   $PREFIX/lib/libavcodec.a \
