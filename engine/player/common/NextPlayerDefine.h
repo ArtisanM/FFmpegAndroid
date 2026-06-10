@@ -107,12 +107,13 @@ struct PlayerLink {
     float volume                = 1.0f;
     float play_rate             = 1.0f;
 
+    int width                   = 0;
+    int height                  = 0;
     int error_code              = 0;
     int loop_count              = 0;
     int skip_frame              = 0;
     int nal_length_size         = 0;
     int drop_aframe_count       = 0;
-    int drop_vframe_count       = 0;
     int audio_stream_index      = -1;
     int video_stream_index      = -1;
 

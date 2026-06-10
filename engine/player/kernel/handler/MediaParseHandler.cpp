@@ -245,7 +245,6 @@ void MediaParseHandler::ExecuteTask() {
             playerConfig->dcc.current_high_water_mark_in_ms = playerConfig->dcc.first_high_water_mark_in_ms;
             if (playerConfig->enable_accurate_seek) {
                 mPlayerLink->drop_aframe_count = 0;
-                mPlayerLink->drop_vframe_count = 0;
                 std::unique_lock<std::mutex> lock(mPlayerLink->accurate_seek_mutex);
                 if (mMetaData->video_index >= 0) {
                     if (mPlayerLink->skip_frame < AVDISCARD_NONREF) {
