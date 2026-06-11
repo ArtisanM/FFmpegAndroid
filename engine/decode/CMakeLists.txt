@@ -29,8 +29,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     set(EXTRA_FFMPEG_DIR
             "${EXTRA_DIR}/libs/${CMAKE_ANDROID_ARCH_ABI}")
     set(CMAKE_ANDROID_NDK $ENV{ANDROID_NDK})
-#    set(SRC_LIST ${SRC_LIST}
-#            android/MediacodecDecoder.cpp)
+    set(SRC_LIST ${SRC_LIST}
+            android/MediacodecDecoder.cpp)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "OHOS")
     add_definitions(-D__HARMONY__)
     set(TARGET_PLATFORM harmony)

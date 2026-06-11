@@ -12,7 +12,7 @@ public:
   VideoDecoderFactory();
   ~VideoDecoderFactory();
 
-  static std::unique_ptr<VideoDecoder> CreateVideoDecoder(VideoCodecType codecType, int codecId);
+  static std::unique_ptr<VideoDecoder> createVideoDecoder(VideoCodecType codecType, int codecId);
 
 };
 

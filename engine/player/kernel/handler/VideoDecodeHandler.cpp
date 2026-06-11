@@ -114,7 +114,7 @@ int VideoDecodeHandler::InitInternal() {
         }
     }
 
-    mVideoDecoder = VideoDecoderFactory::CreateVideoDecoder(type, codecId);
+    mVideoDecoder = VideoDecoderFactory::createVideoDecoder(type, codecId);
     if (!mVideoDecoder) {
         NEXT_LOGE(TAG, "Video decoder create error\n");
         NotifyListener(MSG_ON_ERROR, ERROR_DECODE_VIDEO_DEC, ERROR_DECODE_VIDEO_OPEN);
