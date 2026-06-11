@@ -30,9 +30,9 @@ struct AudioCodecConfig {
 
 class AudioDecodeCallback {
 public:
-    virtual int OnDecodedFrame(AVFrame *frame) = 0;
+    virtual int onDecodedFrame(AVFrame *frame) = 0;
 
-    virtual void OnDecodeError(int error) = 0;
+    virtual void onDecodeError(int error) = 0;
 
     virtual ~AudioDecodeCallback() = default;
 };
@@ -42,15 +42,15 @@ public:
 
     virtual ~AudioDecoder() = default;
 
-    virtual int Init(AudioCodecConfig &config) = 0;
+    virtual int init(AudioCodecConfig &config) = 0;
 
-    virtual int Decode(const AVPacket *pkt) = 0;
+    virtual int decode(const AVPacket *pkt) = 0;
 
-    virtual int Flush() = 0;
+    virtual int flush() = 0;
 
-    virtual int Release() = 0;
+    virtual int release() = 0;
 
-    virtual void SetDecodeCallback(AudioDecodeCallback *callback) = 0;
+    virtual void setDecodeCallback(AudioDecodeCallback *callback) = 0;
 
 protected:
     AudioDecodeCallback *mAudioDecodedCallback = nullptr;

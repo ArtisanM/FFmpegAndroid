@@ -62,7 +62,7 @@ int AudioDecodeHandler::Init() {
         NotifyListener(MSG_ON_ERROR, ERROR_DECODE_AUDIO_DEC, ERROR_DECODE_AUDIO_OPEN);
         return ERROR_DECODE_AUDIO_OPEN;
     }
-    mAudioDecoder->SetDecodeCallback(this);
+    mAudioDecoder->setDecodeCallback(this);
     ResetDecoderFormat();
 
     mFrameQueue = std::make_unique<FrameQueue>(SAMPLE_QUEUE_SIZE);
@@ -88,7 +88,7 @@ static void ReleaseFrame(FFmpegBufferContext *context) {
     }
 }
 
-int AudioDecodeHandler::OnDecodedFrame(AVFrame *frame) {
+int AudioDecodeHandler::onDecodedFrame(AVFrame *frame) {
 
     std::unique_ptr<FrameBuffer> buffer(new FrameBuffer());
     if (!buffer) {
@@ -134,7 +134,7 @@ int AudioDecodeHandler::OnDecodedFrame(AVFrame *frame) {
     return RESULT_OK;
 }
 
-void AudioDecodeHandler::OnDecodeError(int error) {}
+void AudioDecodeHandler::onDecodeError(int error) {}
 
 int AudioDecodeHandler::PerformDecode(AVPacket *pkt) {
     int ret = RESULT_OK;
@@ -147,7 +147,7 @@ int AudioDecodeHandler::PerformDecode(AVPacket *pkt) {
             (AVRational) {trackInfo.time_base_num, trackInfo.time_base_den};
     // TODO: check rescale pts/dts
     pkt->pts = av_rescale_q(pkt->pts, srcTimebase, timebase);
-    ret = mAudioDecoder->Decode(pkt);
+    ret = mAudioDecoder->decode(pkt);
 
     if (ret != RESULT_OK) {
         return ERROR_DECODE_AUDIO_DEC;
@@ -173,7 +173,7 @@ int AudioDecodeHandler::PerformFlush() {
     mSerial++;
     bEOF = false;
     if (mAudioDecoder) {
-        mAudioDecoder->Flush();
+        mAudioDecoder->flush();
     }
     if (mFrameQueue) {
         mFrameQueue->Flush();
@@ -196,7 +196,7 @@ int AudioDecodeHandler::ResetDecoderFormat() {
     config.sample_rate    = trackInfo.sample_rate;
     config.extradata      = trackInfo.extra_data;
     config.extradata_size = trackInfo.extra_data_size;
-    mAudioDecoder->Init(config);
+    mAudioDecoder->init(config);
 
     return RESULT_OK;
 }

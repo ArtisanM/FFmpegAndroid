@@ -16,7 +16,7 @@ FFmpegAudioDecoder::~FFmpegAudioDecoder() {
     NEXT_LOGD(FFMPEG_AUDIO_TAG, "~FFmpegAudioDecoder destructor");
 }
 
-int FFmpegAudioDecoder::Init(AudioCodecConfig &config) {
+int FFmpegAudioDecoder::init(AudioCodecConfig &config) {
     int ret = RESULT_OK;
     if (!config.channels || !config.sample_rate) {
         return ERROR_DECODE_INVALID;
@@ -42,7 +42,7 @@ int FFmpegAudioDecoder::Init(AudioCodecConfig &config) {
     if (!codec) {
         NEXT_LOGE(FFMPEG_AUDIO_TAG, "avcodec_find_decoder fail, name=%s",
                 avcodec_get_name(mCodecContext->codec_id));
-        Release();
+        release();
         return ERROR_DECODE_AUDIO_OPEN;
     }
 
@@ -51,7 +51,7 @@ int FFmpegAudioDecoder::Init(AudioCodecConfig &config) {
     if ((ret = avcodec_open2(mCodecContext, codec, nullptr)) < 0) {
         NEXT_LOGE(FFMPEG_AUDIO_TAG, "avcodec_open2 fail, msg=%s", av_err2str(ret));
         av_dict_free(&opts);
-        Release();
+        release();
         return ERROR_DECODE_AUDIO_OPEN;
     }
     av_dict_free(&opts);
@@ -59,7 +59,7 @@ int FFmpegAudioDecoder::Init(AudioCodecConfig &config) {
     return RESULT_OK;
 }
 
-int FFmpegAudioDecoder::Decode(const AVPacket *pkt) {
+int FFmpegAudioDecoder::decode(const AVPacket *pkt) {
     if (!pkt || !mCodecContext || !mAudioDecodedCallback) {
         return ERROR_DECODE_NOT_INIT;
     }
@@ -84,19 +84,19 @@ int FFmpegAudioDecoder::Decode(const AVPacket *pkt) {
         }
     }
 
-    mAudioDecodedCallback->OnDecodedFrame(frame);
+    mAudioDecodedCallback->onDecodedFrame(frame);
 
     return RESULT_OK;
 }
 
-int FFmpegAudioDecoder::Flush() {
+int FFmpegAudioDecoder::flush() {
     if (mCodecContext) {
         avcodec_flush_buffers(mCodecContext);
     }
     return RESULT_OK;
 }
 
-int FFmpegAudioDecoder::Release() {
+int FFmpegAudioDecoder::release() {
     NEXT_LOGI(FFMPEG_AUDIO_TAG, "Release...");
     if (mCodecContext) {
         avcodec_free_context(&mCodecContext);
@@ -105,6 +105,6 @@ int FFmpegAudioDecoder::Release() {
     return RESULT_OK;
 }
 
-void FFmpegAudioDecoder::SetDecodeCallback(AudioDecodeCallback *callback) {
+void FFmpegAudioDecoder::setDecodeCallback(AudioDecodeCallback *callback) {
     mAudioDecodedCallback = callback;
 }

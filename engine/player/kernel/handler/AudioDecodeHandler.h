@@ -28,9 +28,9 @@ public:
 
     int GetSerial();
 
-    int OnDecodedFrame(AVFrame *frame) override;
+    int onDecodedFrame(AVFrame *frame) override;
 
-    void OnDecodeError(int error) override;
+    void onDecodeError(int error) override;
 
     void ResetEof();
 

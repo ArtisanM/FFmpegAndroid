@@ -13,15 +13,15 @@ public:
 
     ~FFmpegAudioDecoder() override;
 
-    int Init(AudioCodecConfig &config) override;
+    int init(AudioCodecConfig &config) override;
 
-    int Decode(const AVPacket *pkt) override;
+    int decode(const AVPacket *pkt) override;
 
-    int Flush() override;
+    int flush() override;
 
-    int Release() override;
+    int release() override;
 
-    void SetDecodeCallback(AudioDecodeCallback *callback) override;
+    void setDecodeCallback(AudioDecodeCallback *callback) override;
 
 private:
     AVCodecContext *mCodecContext;
