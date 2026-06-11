@@ -23,21 +23,17 @@ struct ApplicationContext {
 
 void globalSetInjectCallback(InjectCallback cb);
 
-class RsPlayer;
-
 class PlayerKernel {
 public:
     PlayerKernel() = default;
 
-    PlayerKernel(NotifyCallback notifyCb);
+    explicit PlayerKernel(NotifyCallback notifyCb);
 
     ~PlayerKernel();
 
     int init();
 
     void setDataSource(const std::string &url);
-
-    void setDataSourceFd(int64_t fd);
 
     int prepareAsync();
 
@@ -56,10 +52,6 @@ public:
     int getDuration(int64_t &duration);
 
     void setVolume(float left, float right);
-
-    void setLoop(int count);
-
-    int getLoop();
 
     int setConfig(int type, const std::string &name, const std::string &value);
 
@@ -129,10 +121,7 @@ public:
 private:
     std::string mUrl;
     std::mutex mLock;
-    std::mutex mSurfaceLock;
     std::mutex mNotifyCbLock;
-    std::mutex mAudioStreamLock;
-    std::mutex mVideoStreamLock;
     std::atomic<void *> mInjectOpaque{};
 
     int64_t mFd{-1};
