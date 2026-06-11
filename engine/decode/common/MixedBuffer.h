@@ -124,8 +124,6 @@ struct VideoFormatMetadata {
     HardWareContext *hardware_context = nullptr;
     std::vector<int> items;
 
-    int rotate_degree = 0;
-
     AVColorSpace colorspace;
     AVColorRange color_range;
     AVColorPrimaries color_primaries;
@@ -143,28 +141,28 @@ public:
 
     ~MixedBuffer();
 
-    int GetSize() const;
+    int getSize() const;
 
-    uint8_t *GetData() const;
+    uint8_t *getData() const;
 
-    BufferType GetType() const;
+    BufferType getType() const;
 
-    uint8_t *ObtainData();
+    uint8_t *obtainData();
 
-    VideoFrameMetadata *GetVideoFrameMetadata() const;
+    VideoFrameMetadata *getVideoFrameMetadata() const;
 
-    AudioFrameMetadata *GetAudioFrameMetadata() const;
+    AudioFrameMetadata *getAudioFrameMetadata() const;
 
-    VideoPacketMetadata *GetVideoPacketMetadata() const;
+    VideoPacketMetadata *getVideoPacketMetadata() const;
 
-    AudioPacketMetadata *GetAudioPacketMetadata() const;
+    AudioPacketMetadata *getAudioPacketMetadata() const;
 
-    VideoFormatMetadata *GetVideoFormatMetadata() const;
+    VideoFormatMetadata *getVideoFormatMetadata() const;
 
-    void UpdateBuffer(uint8_t *data, int size, bool ownData);
+    void updateBuffer(uint8_t *data, int size, bool ownData);
 
 private:
-    void InitType(BufferType type);
+    void initType(BufferType type);
 
     int        mSize;
     uint8_t   *mData;

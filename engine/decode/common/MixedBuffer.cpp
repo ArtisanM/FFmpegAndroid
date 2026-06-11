@@ -5,7 +5,7 @@ MixedBuffer::MixedBuffer(BufferType type, uint8_t *data, int size, bool own_data
           mData(data),
           bOwnData(own_data),
           mBufferType(type) {
-    InitType(type);
+    initType(type);
 }
 
 MixedBuffer::MixedBuffer(BufferType type, int capacity)
@@ -13,7 +13,7 @@ MixedBuffer::MixedBuffer(BufferType type, int capacity)
           mData(new uint8_t[capacity]),
           bOwnData(true),
           mBufferType(type) {
-    InitType(type);
+    initType(type);
 }
 
 MixedBuffer::~MixedBuffer() {
@@ -22,7 +22,7 @@ MixedBuffer::~MixedBuffer() {
     }
 }
 
-void MixedBuffer::InitType(BufferType type) {
+void MixedBuffer::initType(BufferType type) {
     switch (type) {
         case BufferType::BUFFER_VIDEO_FRAME:
             mVideoFrameMetadata = std::make_unique<VideoFrameMetadata>();
@@ -44,19 +44,19 @@ void MixedBuffer::InitType(BufferType type) {
     }
 }
 
-int MixedBuffer::GetSize() const {
+int MixedBuffer::getSize() const {
     return mSize;
 }
 
-uint8_t *MixedBuffer::GetData() const {
+uint8_t *MixedBuffer::getData() const {
     return mData;
 }
 
-BufferType MixedBuffer::GetType() const {
+BufferType MixedBuffer::getType() const {
     return mBufferType;
 }
 
-uint8_t *MixedBuffer::ObtainData() {
+uint8_t *MixedBuffer::obtainData() {
     if (bOwnData && mSize > 0) {
         bOwnData = false;
         return mData;
@@ -64,27 +64,27 @@ uint8_t *MixedBuffer::ObtainData() {
     return nullptr;
 }
 
-VideoFrameMetadata *MixedBuffer::GetVideoFrameMetadata() const {
+VideoFrameMetadata *MixedBuffer::getVideoFrameMetadata() const {
     return mVideoFrameMetadata.get();
 }
 
-AudioFrameMetadata *MixedBuffer::GetAudioFrameMetadata() const {
+AudioFrameMetadata *MixedBuffer::getAudioFrameMetadata() const {
     return mAudioFrameMetadata.get();
 }
 
-VideoPacketMetadata *MixedBuffer::GetVideoPacketMetadata() const {
+VideoPacketMetadata *MixedBuffer::getVideoPacketMetadata() const {
     return mVideoPacketMetadata.get();
 }
 
-AudioPacketMetadata *MixedBuffer::GetAudioPacketMetadata() const {
+AudioPacketMetadata *MixedBuffer::getAudioPacketMetadata() const {
     return mAudioPacketMetadata.get();
 }
 
-VideoFormatMetadata *MixedBuffer::GetVideoFormatMetadata() const {
+VideoFormatMetadata *MixedBuffer::getVideoFormatMetadata() const {
     return mVideoFormatMetadata.get();
 }
 
-void MixedBuffer::UpdateBuffer(uint8_t *data, int size, bool ownData) {
+void MixedBuffer::updateBuffer(uint8_t *data, int size, bool ownData) {
     if (bOwnData) {
         delete[] mData;
     }

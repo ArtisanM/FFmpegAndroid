@@ -187,7 +187,7 @@ int VideoDecodeHandler::onDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame
         return RESULT_OK;
     }
 
-    auto meta = decodedFrame->GetVideoFrameMetadata();
+    auto meta = decodedFrame->getVideoFrameMetadata();
     std::unique_ptr<FrameBuffer> buffer(new FrameBuffer());
     if (!buffer) {
         return ERROR_OTHER_OOM;
@@ -197,7 +197,7 @@ int VideoDecodeHandler::onDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame
     AVRational tb = (AVRational) {trackInfo.time_base_num, trackInfo.time_base_den};
     buffer->width   = meta->width;
     buffer->height  = meta->height;
-    buffer->data    = decodedFrame->ObtainData();
+    buffer->data    = decodedFrame->obtainData();
     buffer->pts     = meta->pts * av_q2d(tb) * 1000; // ms
     buffer->serial  = mSerial;
     buffer->yBuffer = meta->buffer_y;

@@ -70,7 +70,7 @@ int FFmpegVideoDecoder::decode(const AVPacket *pkt) {
         std::unique_ptr<MixedBuffer> output_buffer =
                 std::make_unique<MixedBuffer>(BufferType::BUFFER_VIDEO_FRAME, bufferSize);
 
-        VideoFrameMetadata *meta = output_buffer->GetVideoFrameMetadata();
+        VideoFrameMetadata *meta = output_buffer->getVideoFrameMetadata();
         meta->width    = frame->width;
         meta->height   = frame->height;
         meta->stride_y = frame->linesize[0];
