@@ -286,12 +286,12 @@ int PlayerKernel::configInternal() {
 
         if (type == OPTION_TYPE_INT32) {
             *(reinterpret_cast<int32_t *>(dst)) =
-                    static_cast<int32_t>(mPlayerConfig->GetInt64(name, default_i64));
+                    static_cast<int32_t>(mPlayerConfig->getInt64(name, default_i64));
         } else if (type == OPTION_TYPE_INT64) {
             *(reinterpret_cast<int64_t *>(dst)) =
-                    static_cast<int64_t>(mPlayerConfig->GetInt64(name, default_i64));
+                    static_cast<int64_t>(mPlayerConfig->getInt64(name, default_i64));
         } else if (type == OPTION_TYPE_STRING) {
-            std::string str = mPlayerConfig->GetString(name, (std::string *) default_str);
+            std::string str = mPlayerConfig->getString(name, (std::string *) default_str);
             if (!str.empty()) {
                 *(reinterpret_cast<uint8_t **>(dst)) = reinterpret_cast<uint8_t *>(strdup(str.c_str()));
             }
@@ -299,16 +299,16 @@ int PlayerKernel::configInternal() {
     }
 
     /// format config
-    for (size_t i = 0; i < mFormatConfig->GetSize(); ++i) {
+    for (size_t i = 0; i < mFormatConfig->getSize(); ++i) {
         ValueType type = VALUE_TYPE_UNKNOWN;
-        const char *name = mFormatConfig->GetEntryNameAt(i, &type);
+        const char *name = mFormatConfig->getEntryNameAt(i, &type);
         if (!name) {
             continue;
         }
         if (type == VALUE_TYPE_INT64) {
-            av_dict_set_int(&mGeneralConfig->formatConfig, name, mFormatConfig->GetInt64(name, 0), 0);
+            av_dict_set_int(&mGeneralConfig->formatConfig, name, mFormatConfig->getInt64(name, 0), 0);
         } else if (type == VALUE_TYPE_STRING) {
-            av_dict_set(&mGeneralConfig->formatConfig, name, mFormatConfig->GetString(name, nullptr).c_str(), 0);
+            av_dict_set(&mGeneralConfig->formatConfig, name, mFormatConfig->getString(name, nullptr).c_str(), 0);
         }
     }
     if (!av_dict_get(mGeneralConfig->formatConfig, "scan_all_pmts", nullptr, AV_DICT_MATCH_CASE)) {
@@ -322,30 +322,30 @@ int PlayerKernel::configInternal() {
 //                       (uintptr_t) mAppCtx, 0); // todo: deprecated
 
     /// codec config
-    for (size_t i = 0; i < mCodecConfig->GetSize(); ++i) {
+    for (size_t i = 0; i < mCodecConfig->getSize(); ++i) {
         ValueType type = VALUE_TYPE_UNKNOWN;
-        const char *name = mCodecConfig->GetEntryNameAt(i, &type);
+        const char *name = mCodecConfig->getEntryNameAt(i, &type);
         if (!name) {
             continue;
         }
         if (type == VALUE_TYPE_INT64) {
-            av_dict_set_int(&mGeneralConfig->codecConfig, name, mCodecConfig->GetInt64(name, 0), 0);
+            av_dict_set_int(&mGeneralConfig->codecConfig, name, mCodecConfig->getInt64(name, 0), 0);
         } else if (type == VALUE_TYPE_STRING) {
-            av_dict_set(&mGeneralConfig->codecConfig, name, mCodecConfig->GetString(name, nullptr).c_str(), 0);
+            av_dict_set(&mGeneralConfig->codecConfig, name, mCodecConfig->getString(name, nullptr).c_str(), 0);
         }
     }
 
     /// sws config
-    for (size_t i = 0; i < mSwsConfig->GetSize(); ++i) {
+    for (size_t i = 0; i < mSwsConfig->getSize(); ++i) {
         ValueType type = VALUE_TYPE_UNKNOWN;
-        const char *name = mSwsConfig->GetEntryNameAt(i, &type);
+        const char *name = mSwsConfig->getEntryNameAt(i, &type);
         if (!name) {
             continue;
         }
         if (type == VALUE_TYPE_INT64) {
-            av_dict_set_int(&mGeneralConfig->swsConfig, name, mSwsConfig->GetInt64(name, 0), 0);
+            av_dict_set_int(&mGeneralConfig->swsConfig, name, mSwsConfig->getInt64(name, 0), 0);
         } else if (type == VALUE_TYPE_STRING) {
-            av_dict_set(&mGeneralConfig->swsConfig, name, mSwsConfig->GetString(name, nullptr).c_str(), 0);
+            av_dict_set(&mGeneralConfig->swsConfig, name, mSwsConfig->getString(name, nullptr).c_str(), 0);
         }
     }
 
@@ -479,19 +479,19 @@ int PlayerKernel::setConfig(int type, const std::string &name, const std::string
     std::lock_guard<std::mutex> lock(mLock);
     switch (type) {
         case CONFIG_TYPE_FORMAT:
-            mFormatConfig->SetString(name.c_str(), value);
+            mFormatConfig->setString(name.c_str(), value);
             break;
         case CONFIG_TYPE_CODEC:
-            mCodecConfig->SetString(name.c_str(), value);
+            mCodecConfig->setString(name.c_str(), value);
             break;
         case CONFIG_TYPE_SWR:
-            mSwrConfig->SetString(name.c_str(), value);
+            mSwrConfig->setString(name.c_str(), value);
             break;
         case CONFIG_TYPE_SWS:
-            mSwsConfig->SetString(name.c_str(), value);
+            mSwsConfig->setString(name.c_str(), value);
             break;
         case CONFIG_TYPE_PLAYER:
-            mPlayerConfig->SetString(name.c_str(), value);
+            mPlayerConfig->setString(name.c_str(), value);
             break;
         default:
             break;
@@ -503,19 +503,19 @@ int PlayerKernel::setConfig(int type, const std::string &name, int64_t value) {
     std::lock_guard<std::mutex> lock(mLock);
     switch (type) {
         case CONFIG_TYPE_FORMAT:
-            mFormatConfig->SetInt64(name.c_str(), value);
+            mFormatConfig->setInt64(name.c_str(), value);
             break;
         case CONFIG_TYPE_CODEC:
-            mCodecConfig->SetInt64(name.c_str(), value);
+            mCodecConfig->setInt64(name.c_str(), value);
             break;
         case CONFIG_TYPE_SWR:
-            mSwrConfig->SetInt64(name.c_str(), value);
+            mSwrConfig->setInt64(name.c_str(), value);
             break;
         case CONFIG_TYPE_SWS:
-            mSwsConfig->SetInt64(name.c_str(), value);
+            mSwsConfig->setInt64(name.c_str(), value);
             break;
         case CONFIG_TYPE_PLAYER:
-            mPlayerConfig->SetInt64(name.c_str(), value);
+            mPlayerConfig->setInt64(name.c_str(), value);
             break;
         default:
             break;

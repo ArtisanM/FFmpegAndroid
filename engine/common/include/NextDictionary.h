@@ -17,21 +17,21 @@ public:
 
     virtual ~NextDictionary();
 
-    void Clear();
+    void clear();
 
-    void SetInt64(const char *name, int64_t value);
+    void setInt64(const char *name, int64_t value);
 
-    bool FindInt64(const char *name, int64_t *value) const;
+    bool findInt64(const char *name, int64_t *value) const;
 
-    int64_t GetInt64(const char *name, int64_t defaultValue) const;
+    int64_t getInt64(const char *name, int64_t defaultValue) const;
 
-    void SetString(const char *name, const std::string &s);
+    void setString(const char *name, const std::string &s);
 
-    std::string GetString(const char *name, std::string *defaultValue) const;
+    std::string getString(const char *name, std::string *defaultValue) const;
 
-    size_t GetSize() const;
+    size_t getSize() const;
 
-    const char *GetEntryNameAt(size_t index, ValueType *type) const;
+    const char *getEntryNameAt(size_t index, ValueType *type) const;
 
 protected:
     struct Item {
@@ -44,18 +44,18 @@ protected:
         size_t name_len;
         ValueType type;
 
-        void SetName(const char *name, size_t len);
+        void setName(const char *name, size_t len);
     };
 
     std::vector<Item *> m_items;
 
-    Item *AllocateItem(const char *name);
+    Item *allocateItem(const char *name);
 
-    static void FreeItemValue(Item *item);
+    static void freeItemValue(Item *item);
 
-    const Item *FindItem(const char *name, ValueType type) const;
+    const Item *findItem(const char *name, ValueType type) const;
 
-    size_t FindItemIndex(const char *name, size_t len) const;
+    size_t findItemIndex(const char *name, size_t len) const;
 };
 
 #endif

@@ -46,7 +46,7 @@ static char GetLogLevelChar(int lev) {
 }
 #endif
 
-static void FormatLog(int level, const char *tag, int id, char *input_buf,
+static void formatLog(int level, const char *tag, int id, char *input_buf,
                       char *output_buf, int out_buf_size) {
 #if defined(__APPLE__) || defined(__HARMONY__)
     int pid = getpid();
@@ -84,7 +84,7 @@ static void FormatLog(int level, const char *tag, int id, char *input_buf,
 
 }
 
-int LogPrint(int level, const char *tag, const char *fmt, ...) {
+int logPrint(int level, const char *tag, const char *fmt, ...) {
     if (kLogContext.level < level) {
         return 0;
     }
@@ -101,7 +101,7 @@ int LogPrint(int level, const char *tag, const char *fmt, ...) {
         return printed;
     }
 
-    FormatLog(level, tag, 0, print_buf, output_buf, OUTPUT_BUF_SIZE);
+    formatLog(level, tag, 0, print_buf, output_buf, OUTPUT_BUF_SIZE);
     if (kLogContext.callback) {
         kLogContext.callback(kLogContext.userdata, level, output_buf);
         return 0;
@@ -110,11 +110,11 @@ int LogPrint(int level, const char *tag, const char *fmt, ...) {
     return 0;
 }
 
-void SetLogLevel(int level) {
+void setLogLevel(int level) {
     kLogContext.level = level;
 }
 
-void SetLogCallback(void (*callback)(void *, int, const char *), void *userdata) {
+void setLogCallback(void (*callback)(void *, int, const char *), void *userdata) {
     kLogContext.callback = callback;
     kLogContext.userdata = userdata;
 }

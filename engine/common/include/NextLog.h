@@ -8,9 +8,9 @@
 #define AV_LEVEL_DEBUG 8
 
 
-int LogPrint(int level, const char *tag, const char *fmt, ...);
-void SetLogLevel(int level);
-void SetLogCallback(void (*callback)(void *, int, const char *), void *userdata);
+int logPrint(int level, const char *tag, const char *fmt, ...);
+void setLogLevel(int level);
+void setLogCallback(void (*callback)(void *, int, const char *), void *userdata);
 
 typedef struct LogContext {
   int level;
@@ -18,9 +18,9 @@ typedef struct LogContext {
   void (*callback)(void *arg, int level, const char *buf);
 } LogContext;
 
-#define NEXT_LOGD(...) LogPrint(AV_LEVEL_DEBUG, __VA_ARGS__)
-#define NEXT_LOGI(...) LogPrint(AV_LEVEL_INFO, __VA_ARGS__)
-#define NEXT_LOGW(...) LogPrint(AV_LEVEL_WARN, __VA_ARGS__)
-#define NEXT_LOGE(...) LogPrint(AV_LEVEL_ERROR, __VA_ARGS__)
+#define NEXT_LOGD(...) logPrint(AV_LEVEL_DEBUG, __VA_ARGS__)
+#define NEXT_LOGI(...) logPrint(AV_LEVEL_INFO, __VA_ARGS__)
+#define NEXT_LOGW(...) logPrint(AV_LEVEL_WARN, __VA_ARGS__)
+#define NEXT_LOGE(...) logPrint(AV_LEVEL_ERROR, __VA_ARGS__)
 
 #endif
