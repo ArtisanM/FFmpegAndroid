@@ -1,5 +1,5 @@
-#ifndef RS_PLAYER_KERNEL_H
-#define RS_PLAYER_KERNEL_H
+#ifndef PLAYER_KERNEL_H
+#define PLAYER_KERNEL_H
 
 #include "common/NextConfig.h"
 #include "CommonUtil.h"
@@ -149,4 +149,4 @@ private:
     sp<GeneralConfig> mGeneralConfig;
 };
 
-#endif //RS_PLAYER_KERNEL_H
+#endif // PLAYER_KERNEL_H
