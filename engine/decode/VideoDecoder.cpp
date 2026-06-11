@@ -11,6 +11,6 @@ VideoDecoder::VideoDecoder(int codecId)
 
 VideoDecoder::~VideoDecoder() = default;
 
-void VideoDecoder::SetDecodeCallback(VideoDecodeCallback *callback) {
+void VideoDecoder::setDecodeCallback(VideoDecodeCallback *callback) {
     mVideoDecodeCallback = callback;
 }

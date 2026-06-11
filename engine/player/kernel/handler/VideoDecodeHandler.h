@@ -54,9 +54,9 @@ public:
 
     int GetQueueSize();
 
-    int OnDecodedFrame(std::unique_ptr<MixedBuffer> frame) override;
+    int onDecodedFrame(std::unique_ptr<MixedBuffer> frame) override;
 
-    void OnDecodeError(int error, int errorCode) override;
+    void onDecodeError(int error, int errorCode) override;
 
     int Stop();
 

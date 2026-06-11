@@ -18,15 +18,15 @@ public:
 
     ~FFmpegVideoDecoder() override;
 
-    int Init(const MetaData *metadata) override;
+    int init(const MetaData *metadata) override;
 
-    int Decode(const AVPacket *pkt) override;
+    int decode(const AVPacket *pkt) override;
 
-    int Flush() override;
+    int flush() override;
 
-    int SetVideoFormat(const MetaData *metadata) override;
+    int setVideoFormat(const MetaData *metadata) override;
 
-    int Release() override;
+    int release() override;
 
 private:
     bool bFlushState = false;

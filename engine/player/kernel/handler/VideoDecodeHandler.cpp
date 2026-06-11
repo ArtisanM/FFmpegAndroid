@@ -121,13 +121,13 @@ int VideoDecodeHandler::InitInternal() {
         return ERROR_DECODE_VIDEO_OPEN;
     }
 
-    int err = mVideoDecoder->Init(nullptr);
+    int err = mVideoDecoder->init(nullptr);
     if (err != RESULT_OK) {
         NEXT_LOGE(TAG, "Video decoder init error %d\n", err);
         return ERROR_DECODE_VIDEO_OPEN;
     }
 
-    mVideoDecoder->SetDecodeCallback(this);
+    mVideoDecoder->setDecodeCallback(this);
 
     if (mPlayerLink->stat.video_dec_type != OPTION_STR_DECODER_MEDIACODEC) {
         ResetDecoderFormat();
@@ -155,7 +155,7 @@ int VideoDecodeHandler::PerformDecode(AVPacket *pkt) {
     if (bRefreshSession) {
         pkt->flags |= DecodeFlag::DECODE_FLAG_NO_OUT_FRAME;
     }
-    ret = mVideoDecoder->Decode(pkt);
+    ret = mVideoDecoder->decode(pkt);
 
     if (ret == ERROR_DECODE_SESSION) {
         bRefreshSession = true;
@@ -168,7 +168,7 @@ int VideoDecodeHandler::PerformDecode(AVPacket *pkt) {
     return ret;
 }
 
-int VideoDecodeHandler::OnDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame) {
+int VideoDecodeHandler::onDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame) {
 
     PlayerConfig *playerConfig = mGeneralConfig->playerConfig->get();
     mPlayerLink->stat.decode_rate = mSpeedMeter.add();
@@ -323,7 +323,7 @@ int VideoDecodeHandler::OnDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame
     return RESULT_OK;
 }
 
-void VideoDecodeHandler::OnDecodeError(int error, int errorCode) {
+void VideoDecodeHandler::onDecodeError(int error, int errorCode) {
     if (bAbort) {
         return;
     }
@@ -409,7 +409,7 @@ int VideoDecodeHandler::PerformFlush() {
     if (mVideoDecoder &&
         (mInputPacketCount > 0 ||
          mPlayerLink->stat.video_dec_type != OPTION_STR_DECODER_MEDIACODEC)) {
-        mVideoDecoder->Flush();
+        mVideoDecoder->flush();
     }
     mInputPacketCount = 0;
     if (mPlayerLink->pause_req) {
@@ -445,7 +445,7 @@ int VideoDecodeHandler::ResetDecoderFormat() {
         return ERROR_PLAYER_TRY_AGAIN;
     }
 
-    mVideoDecoder->SetVideoFormat(mMetaData.get());
+    mVideoDecoder->setVideoFormat(mMetaData.get());
     return ret;
 }
 
@@ -506,7 +506,7 @@ void VideoDecodeHandler::ExecuteTask() {
                 }
                 if (mVideoDecoder) {
                     HardWareContext *hwContext = new AndroidHardWareContext(mCurNativeWindow);
-                    mVideoDecoder->UpdateHardwareContext(hwContext);
+                    mVideoDecoder->updateHardwareContext(hwContext);
                 }
                 if (mCurNativeWindow) {
                     ResetDecoder();

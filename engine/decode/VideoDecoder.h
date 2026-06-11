@@ -32,9 +32,9 @@ struct CodecContext {
 
 class VideoDecodeCallback {
 public:
-    virtual int OnDecodedFrame(std::unique_ptr<MixedBuffer> frame) = 0;
+    virtual int onDecodedFrame(std::unique_ptr<MixedBuffer> frame) = 0;
 
-    virtual void OnDecodeError(int error, int errorCode) = 0;
+    virtual void onDecodeError(int error, int errorCode) = 0;
 
     virtual ~VideoDecodeCallback() = default;
 };
@@ -45,25 +45,25 @@ public:
 
     virtual ~VideoDecoder();
 
-    virtual int Init(const MetaData *metadata) = 0;
+    virtual int init(const MetaData *metadata) = 0;
 
-    virtual int Decode(const AVPacket *pkt) = 0;
+    virtual int decode(const AVPacket *pkt) = 0;
 
-    void SetDecodeCallback(VideoDecodeCallback *callback);
+    void setDecodeCallback(VideoDecodeCallback *callback);
 
-    virtual int SetVideoFormat(const MetaData *metadata) = 0;
+    virtual int setVideoFormat(const MetaData *metadata) = 0;
 
-    virtual int Flush() = 0;
+    virtual int flush() = 0;
 
-    virtual int SetHardwareContext(HardWareContext *context) {
+    virtual int setHardwareContext(HardWareContext *context) {
         return ERROR_PLAYER_UNSUPPORTED;
     }
 
-    virtual int UpdateHardwareContext(HardWareContext *context) {
+    virtual int updateHardwareContext(HardWareContext *context) {
         return ERROR_PLAYER_UNSUPPORTED;
     }
 
-    virtual int Release() = 0;
+    virtual int release() = 0;
 
 protected:
     int mCodecId = -1;

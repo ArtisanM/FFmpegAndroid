@@ -10,7 +10,7 @@
 
 #define FFMPEG_VIDEO_TAG "FFmpegVideoDec"
 
-static void ReleaseFrame(FFmpegBufferContext *context) {
+static void releaseFrame(FFmpegBufferContext *context) {
     if (context && context->av_frame) {
         auto *frame = reinterpret_cast<AVFrame *>(context->av_frame);
         av_frame_unref(frame);
@@ -25,7 +25,7 @@ FFmpegVideoDecoder::~FFmpegVideoDecoder() {
     NEXT_LOGD(FFMPEG_VIDEO_TAG, "~FFmpegVideoDecoder destructor");
 }
 
-int FFmpegVideoDecoder::Init(const MetaData *metadata) {
+int FFmpegVideoDecoder::init(const MetaData *metadata) {
     mCodecContext = avcodec_alloc_context3(nullptr);
 
     mCodecContext->codec_type   = AVMEDIA_TYPE_VIDEO;
@@ -39,7 +39,7 @@ int FFmpegVideoDecoder::Init(const MetaData *metadata) {
     if (!codec) {
         NEXT_LOGE(FFMPEG_VIDEO_TAG, "avcodec_find_decoder fail, name=%s",
                 avcodec_get_name(mCodecContext->codec_id));
-        Release();
+        release();
         return ERROR_DECODE_VIDEO_OPEN;
     }
 
@@ -48,7 +48,7 @@ int FFmpegVideoDecoder::Init(const MetaData *metadata) {
         NEXT_LOGE(FFMPEG_VIDEO_TAG, "avcodec_open2 fail, name=%s, w=%d, h=%d",
                 avcodec_get_name(mCodecContext->codec_id),
                 mCodecContext->width, mCodecContext->height);
-        Release();
+        release();
         av_dict_free(&opts);
         return ERROR_DECODE_VIDEO_OPEN;
     }
@@ -57,7 +57,7 @@ int FFmpegVideoDecoder::Init(const MetaData *metadata) {
     return RESULT_OK;
 }
 
-int FFmpegVideoDecoder::Decode(const AVPacket *pkt) {
+int FFmpegVideoDecoder::decode(const AVPacket *pkt) {
     if (!mCodecContext || !mVideoDecodeCallback) {
         return ERROR_DECODE_NOT_INIT;
     }
@@ -83,7 +83,7 @@ int FFmpegVideoDecoder::Decode(const AVPacket *pkt) {
 
         meta->buffer_context = reinterpret_cast<void *>(new FFmpegBufferContext{
                 .av_frame = frame,
-                .release_frame = ReleaseFrame,
+                .release_frame = releaseFrame,
         });
 
         switch (frame->format) {
@@ -105,7 +105,7 @@ int FFmpegVideoDecoder::Decode(const AVPacket *pkt) {
         meta->pts = frame->best_effort_timestamp;
         meta->dts = frame->pkt_dts;
 
-        mVideoDecodeCallback->OnDecodedFrame(std::move(output_buffer));
+        mVideoDecodeCallback->onDecodedFrame(std::move(output_buffer));
     } else if (ret == AVERROR_EOF) {
         av_frame_unref(frame);
         av_frame_free(&frame);
@@ -135,7 +135,7 @@ int FFmpegVideoDecoder::Decode(const AVPacket *pkt) {
     return RESULT_OK;
 }
 
-int FFmpegVideoDecoder::SetVideoFormat(const MetaData *metadata) {
+int FFmpegVideoDecoder::setVideoFormat(const MetaData *metadata) {
     if (!metadata || metadata->video_index < 0) {
         NEXT_LOGE(FFMPEG_VIDEO_TAG, "metadata is invalid");
         return ERROR_DECODE_INVALID;
@@ -157,13 +157,13 @@ int FFmpegVideoDecoder::SetVideoFormat(const MetaData *metadata) {
 
     auto *codec = const_cast<AVCodec *>(avcodec_find_decoder(mCodecContext->codec_id));
     if (!codec) {
-        Release();
+        release();
         return ERROR_DECODE_VIDEO_OPEN;
     }
 
     int ret = 0;
     if ((ret = avcodec_close(mCodecContext)) < 0) {
-        Release();
+        release();
         return ERROR_DECODE_VIDEO_OPEN;
     }
 
@@ -173,7 +173,7 @@ int FFmpegVideoDecoder::SetVideoFormat(const MetaData *metadata) {
 
     if ((ret = avcodec_open2(mCodecContext, codec, &opts)) < 0) {
         av_dict_free(&opts);
-        Release();
+        release();
         return ERROR_DECODE_VIDEO_OPEN;
     }
     av_dict_free(&opts);
@@ -181,7 +181,7 @@ int FFmpegVideoDecoder::SetVideoFormat(const MetaData *metadata) {
     return RESULT_OK;
 }
 
-int FFmpegVideoDecoder::Flush() {
+int FFmpegVideoDecoder::flush() {
     bFlushState = false;
     if (mCodecContext) {
         avcodec_flush_buffers(mCodecContext);
@@ -189,7 +189,7 @@ int FFmpegVideoDecoder::Flush() {
     return RESULT_OK;
 }
 
-int FFmpegVideoDecoder::Release() {
+int FFmpegVideoDecoder::release() {
     NEXT_LOGD(FFMPEG_VIDEO_TAG, "Release...");
     if (mCodecContext) {
         avcodec_free_context(&mCodecContext);
