@@ -39,26 +39,26 @@ public:
 
     ~AudioTrackRender() override;
 
-    int OpenAudio(const AudioRenderInfo &expect, AudioRenderInfo &actual,
+    int openAudio(const AudioRenderInfo &expect, AudioRenderInfo &actual,
                   std::unique_ptr<AudioCallback> &audioCallback) override;
 
-    void PauseAudio(bool paused) override;
+    void pauseAudio(bool paused) override;
 
-    void FlushAudio() override;
+    void flushAudio() override;
 
-    double GetDelay() override;
+    double getDelay() override;
 
-    void SetDefaultDelay(double latency) override;
+    void setDefaultDelay(double latency) override;
 
-    int GetAudioCallBack() override;
+    int getAudioCallBack() override;
 
-    void SetPlaybackRate(float playbackRate) override;
+    void setPlaybackRate(float playbackRate) override;
 
-    void SetPlaybackVolume(float volume) override;
+    void setPlaybackVolume(float volume) override;
 
-    int GetAudioSessionId() override;
+    int getAudioSessionId() override;
 
-    void CloseAudio(bool waiting) override;
+    void closeAudio(bool waiting) override;
 
 private:
     static int AudioLoop(AudioTrackRender *pRender);

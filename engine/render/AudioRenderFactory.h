@@ -18,7 +18,7 @@
 
 class AudioRenderFactory {
 public:
-    static std::unique_ptr<AudioRender> CreateAudioRender() {
+    static std::unique_ptr<AudioRender> createAudioRender() {
 #if defined(__ANDROID__)
         return std::unique_ptr<AudioRender>(new AudioTrackRender());
 #endif

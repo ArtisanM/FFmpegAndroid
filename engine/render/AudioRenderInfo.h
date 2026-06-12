@@ -52,7 +52,7 @@ public:
 
     virtual ~AudioCallback() = default;
 
-    virtual void GetBuffer(uint8_t *stream, int len) {}
+    virtual void getBuffer(uint8_t *stream, int len) {}
 
 protected:
     void *mUserData = nullptr;

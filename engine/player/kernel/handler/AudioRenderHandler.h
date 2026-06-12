@@ -31,7 +31,7 @@ public:
 
     ~AudioCallbackClass() override = default;
 
-    void GetBuffer(uint8_t *stream, int len) override {
+    void getBuffer(uint8_t *stream, int len) override {
         if (mCallback) {
             mCallback(mUserData, reinterpret_cast<char *>(stream), len);
         }

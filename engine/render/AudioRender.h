@@ -17,26 +17,26 @@ public:
 
     virtual ~AudioRender() = default;
 
-    virtual int OpenAudio(const AudioRenderInfo &expect, AudioRenderInfo &actual,
+    virtual int openAudio(const AudioRenderInfo &expect, AudioRenderInfo &actual,
                           std::unique_ptr<AudioCallback> &audioCallback) = 0;
 
-    virtual void PauseAudio(bool paused) = 0;
+    virtual void pauseAudio(bool paused) = 0;
 
-    virtual void FlushAudio() = 0;
+    virtual void flushAudio() = 0;
 
-    virtual double GetDelay() = 0;
+    virtual double getDelay() = 0;
 
-    virtual void SetDefaultDelay(double latency) = 0;
+    virtual void setDefaultDelay(double latency) = 0;
 
-    virtual int GetAudioCallBack() = 0;
+    virtual int getAudioCallBack() = 0;
 
-    virtual void SetPlaybackRate(float playbackRate) = 0;
+    virtual void setPlaybackRate(float playbackRate) = 0;
 
-    virtual void SetPlaybackVolume(float volume) = 0;
+    virtual void setPlaybackVolume(float volume) = 0;
 
-    virtual int GetAudioSessionId() = 0;
+    virtual int getAudioSessionId() = 0;
 
-    virtual void CloseAudio(bool waiting) = 0;
+    virtual void closeAudio(bool waiting) = 0;
 
 protected:
     std::unique_ptr<AudioCallback> mAudioCallback = nullptr;

@@ -17,17 +17,17 @@
 
 class AudioTrackJni {
 public:
-    static jclass FindAudioTrack(JNIEnv *env) {
+    static jclass findAudioTrack(JNIEnv *env) {
         return env->FindClass("android/media/AudioTrack");
     }
 
-    static jobject AudioTrackAsGlobalRef(
+    static jobject audioTrackAsGlobalRef(
             JNIEnv *env, jint streamType, jint sampleRate, jint channelConfig,
             jint audioFormat, jint bufferSize, jint mode) {
         if (!env) {
             return nullptr;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID constructorAudioTrack = env->GetMethodID(classAudioTrack, "<init>", "(IIIIII)V");
         jobject ret_value = env->NewObject(
                 classAudioTrack, constructorAudioTrack, streamType,
@@ -45,12 +45,12 @@ public:
         return object_global;
     }
 
-    static jint AudioTrackGetMinBufferSize(JNIEnv *env, jint sampleRate,
+    static jint audioTrackGetMinBufferSize(JNIEnv *env, jint sampleRate,
                                            jint channelConfig, jint audioFormat) {
         if (!env) {
             return -1;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodGetMinBufferSize = env->GetStaticMethodID(classAudioTrack,
                                                                   "getMinBufferSize", "(III)I");
         jint ret_value =
@@ -62,11 +62,11 @@ public:
         return ret_value;
     }
 
-    static void AudioTrackPlay(JNIEnv *env, jobject clazz) {
+    static void audioTrackPlay(JNIEnv *env, jobject clazz) {
         if (!env || !clazz) {
             return;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodPlay = env->GetMethodID(classAudioTrack, "play", "()V");
         env->CallVoidMethod(clazz, methodPlay);
         if (JniCheckExceptionClear(env)) {
@@ -74,11 +74,11 @@ public:
         }
     }
 
-    static void AudioTrackPause(JNIEnv *env, jobject clazz) {
+    static void audioTrackPause(JNIEnv *env, jobject clazz) {
         if (!env || !clazz) {
             return;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodPause = env->GetMethodID(classAudioTrack, "pause", "()V");
         env->CallVoidMethod(clazz, methodPause);
         if (JniCheckExceptionClear(env)) {
@@ -86,11 +86,11 @@ public:
         }
     }
 
-    static void AudioTrackFlush(JNIEnv *env, jobject clazz) {
+    static void audioTrackFlush(JNIEnv *env, jobject clazz) {
         if (!env || !clazz) {
             return;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodFlush = env->GetMethodID(classAudioTrack, "flush", "()V");
         env->CallVoidMethod(clazz, methodFlush);
         if (JniCheckExceptionClear(env)) {
@@ -99,11 +99,11 @@ public:
         }
     }
 
-    static void AudioTrackRelease(JNIEnv *env, jobject clazz) {
+    static void audioTrackRelease(JNIEnv *env, jobject clazz) {
         if (!env || !clazz) {
             return;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodRelease = env->GetMethodID(classAudioTrack, "release", "()V");
         env->CallVoidMethod(clazz, methodRelease);
         if (JniCheckExceptionClear(env)) {
@@ -112,11 +112,11 @@ public:
         }
     }
 
-    static jint AudioTrackWrite(JNIEnv *env, jobject clazz, jbyteArray data, jint offset, jint size) {
+    static jint audioTrackWrite(JNIEnv *env, jobject clazz, jbyteArray data, jint offset, jint size) {
         if (!env || !clazz) {
             return -1;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodWrite = env->GetMethodID(classAudioTrack, "write", "([BII)I");
         jint ret_value = env->CallIntMethod(clazz, methodWrite, data, offset, size);
         if (JniCheckExceptionClear(env)) {
@@ -126,11 +126,11 @@ public:
         return ret_value;
     }
 
-    static jint AudioTrackSetVolume(JNIEnv *env, jobject clazz, jfloat left, jfloat right) {
+    static jint audioTrackSetVolume(JNIEnv *env, jobject clazz, jfloat left, jfloat right) {
         if (!env || !clazz) {
             return -1;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodSetVolume = env->GetMethodID(classAudioTrack, "setStereoVolume", "(FF)I");
         jint ret_value = env->CallIntMethod(clazz, methodSetVolume, left, right);
         if (JniCheckExceptionClear(env)) {
@@ -139,11 +139,11 @@ public:
         return ret_value;
     }
 
-    static jint AudioTrackGetAudioSessionId(JNIEnv *env, jobject clazz) {
+    static jint audioTrackGetAudioSessionId(JNIEnv *env, jobject clazz) {
         if (!env || !clazz) {
             return -1;
         }
-        jclass classAudioTrack = FindAudioTrack(env);
+        jclass classAudioTrack = findAudioTrack(env);
         jmethodID methodGetAudioSessionId = env->GetMethodID(classAudioTrack, "getAudioSessionId", "()I");
         jint ret_value = env->CallIntMethod(clazz, methodGetAudioSessionId);
         if (JniCheckExceptionClear(env)) {
@@ -152,8 +152,8 @@ public:
         return ret_value;
     }
 
-    static void AudioTrackSetSpeed(JNIEnv *env, jobject clazz, jfloat speed) {
-        jclass classAudioTrack = FindAudioTrack(env);
+    static void audioTrackSetSpeed(JNIEnv *env, jobject clazz, jfloat speed) {
+        jclass classAudioTrack = findAudioTrack(env);
         if (JniGetApiLevel() < 23) {
             jmethodID methodGetSampleRate = env->GetMethodID(classAudioTrack, "getSampleRate", "()I");
             jint sample_rate = env->CallIntMethod(clazz, methodGetSampleRate);

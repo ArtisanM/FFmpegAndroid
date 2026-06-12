@@ -50,7 +50,7 @@ void AudioRenderHandler::SetConfig(const sp<GeneralConfig> &config) {
 int AudioRenderHandler::Prepare(sp<MetaData> &metadata) {
     int ret = RESULT_OK;
     mMetaData = metadata;
-    mAudioRender = AudioRenderFactory::CreateAudioRender();
+    mAudioRender = AudioRenderFactory::createAudioRender();
 
     ret = Init();
     if (ret != RESULT_OK) {
@@ -66,7 +66,7 @@ int AudioRenderHandler::Init() {
         return ERROR_PLAYER_NOT_INIT;
     }
     if (bPaused) {
-        mAudioRender->PauseAudio(true);
+        mAudioRender->pauseAudio(true);
     }
 
     int streamIndex = mMetaData->audio_index;
@@ -86,9 +86,9 @@ int AudioRenderHandler::Init() {
             mDesired.samples =
                     std::max(kAudioMinBufferSize,
                              2 << av_log2(mDesired.sample_rate /
-                                          mAudioRender->GetAudioCallBack()));
+                                                  mAudioRender->getAudioCallBack()));
             NEXT_LOGI(TAG,
-                      "OpenAudio wanted channels:%d, sampleRate:%d, format:%s\n",
+                      "openAudio wanted channels:%d, sampleRate:%d, format:%s\n",
                       mDesired.channels, mDesired.sample_rate,
                       av_get_sample_fmt_name(static_cast<AVSampleFormat>(mDesired.format)));
             break;
@@ -97,10 +97,10 @@ int AudioRenderHandler::Init() {
 
     mAudioCallback = std::make_unique<AudioCallbackClass>(
             reinterpret_cast<void *>(this), AudioDataCallback);
-    int ret = mAudioRender->OpenAudio(mDesired, mObtained, mAudioCallback);
+    int ret = mAudioRender->openAudio(mDesired, mObtained, mAudioCallback);
     if (ret < 0) {
         NotifyListener(MSG_ON_ERROR, ERROR_RENDER_AUDIO_INIT, static_cast<int32_t>(ret));
-        NEXT_LOGE(TAG, "OpenAudio error:%d", ret);
+        NEXT_LOGE(TAG, "openAudio error:%d", ret);
         return ERROR_RENDER_AUDIO_INIT;
     }
 
@@ -109,9 +109,9 @@ int AudioRenderHandler::Init() {
     }
     mBytesPerSec = av_samples_get_buffer_size(nullptr, mObtained.channels, mObtained.sample_rate,
                                               (AVSampleFormat) mObtained.format, 1);
-    mAudioRender->SetDefaultDelay(
+    mAudioRender->setDefaultDelay(
             (static_cast<double>(2 * mObtained.size)) / mBytesPerSec);
-    mAudioDelay = mAudioRender->GetDelay();
+    mAudioDelay = mAudioRender->getDelay();
     mCurrentInfo = mObtained;
 
     char buf[256] = {0};
@@ -134,7 +134,7 @@ int AudioRenderHandler::StartRender() {
     mPlayerLink->audio_clock->SetClock(mPlayerLink->audio_clock->GetClock());
     mPlayerLink->audio_clock->SetPause(false);
     if (mAudioRender) {
-        mAudioRender->PauseAudio(false);
+        mAudioRender->pauseAudio(false);
     }
     return RESULT_OK;
 }
@@ -143,7 +143,7 @@ int AudioRenderHandler::PauseRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = true;
     if (mAudioRender) {
-        mAudioRender->PauseAudio(true);
+        mAudioRender->pauseAudio(true);
     }
     mPlayerLink->audio_clock->SetPause(true);
     return RESULT_OK;
@@ -289,7 +289,7 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
         bVolumeChanged = false;
         if (mAudioRender) {
             NEXT_LOGD(TAG, "volume changed %f %f\n", mLeftVolume, mRightVolume);
-            mAudioRender->SetPlaybackVolume((mLeftVolume + mRightVolume) / 2);
+            mAudioRender->setPlaybackVolume((mLeftVolume + mRightVolume) / 2);
         }
     }
 
@@ -323,7 +323,7 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
             mLastReadPos = 0;
             mAudioBufSize = 0;
             if (mAudioRender) {
-                mAudioRender->FlushAudio();
+                mAudioRender->flushAudio();
             }
             return;
         }
@@ -438,7 +438,7 @@ void AudioRenderHandler::Release() {
         }
     }
     if (mAudioRender) {
-        mAudioRender->CloseAudio(true);
+        mAudioRender->closeAudio(true);
     }
     NEXT_LOGD(TAG, "Release end\n");
 }
