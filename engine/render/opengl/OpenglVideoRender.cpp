@@ -26,7 +26,7 @@ OpenGLVideoRender::OpenGLVideoRender()
 }
 
 OpenGLVideoRender::~OpenGLVideoRender() {
-    ReleaseContext();
+    releaseContext();
 }
 
 void PrintString(const char *name, GLenum string) {
@@ -34,7 +34,7 @@ void PrintString(const char *name, GLenum string) {
     NEXT_LOGI(OPENGL_RENDER, "%s = %s \n", name, value);
 }
 
-int OpenGLVideoRender::ReleaseContext() {
+int OpenGLVideoRender::releaseContext() {
     mGLContext.reset();
 #if defined(__APPLE__)
     mRenderGLView = nullptr;
@@ -51,7 +51,7 @@ int OpenGLVideoRender::ReleaseContext() {
 
 #if defined(__ANDROID__)
 
-int OpenGLVideoRender::Init() {
+int OpenGLVideoRender::init() {
     if (mGLContext) {
         mGLContext.reset();
     }
@@ -59,7 +59,7 @@ int OpenGLVideoRender::Init() {
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::SetSurface(ANativeWindow *nativeWindow) {
+int OpenGLVideoRender::setSurface(ANativeWindow *nativeWindow) {
     std::unique_lock<std::mutex> lck(mRenderMutex);
     if (mGLContext == nullptr || nullptr == mGLContext->getEglContext()) {
         NEXT_LOGE(OPENGL_RENDER, "EglContext=nullptr\n");
@@ -135,7 +135,7 @@ UIView *OpenGLVideoRender::getRedRenderView() {
 
 #endif
 
-int OpenGLVideoRender::SetGravity(AspectRatioMode rendererGravity) {
+int OpenGLVideoRender::setGravity(AspectRatioMode rendererGravity) {
     mRendererGravity = rendererGravity;
 
 #if defined(__APPLE__)
@@ -150,7 +150,7 @@ int OpenGLVideoRender::SetGravity(AspectRatioMode rendererGravity) {
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::AttachFilter(VideoFilterType videoFilterType,
+int OpenGLVideoRender::attachFilter(VideoFilterType videoFilterType,
                                     VideoFrameMetaData *inputFrameMetaData) {
     std::unique_lock<std::mutex> lck(mRenderMutex);
 #if defined(__APPLE__)
@@ -160,8 +160,8 @@ int OpenGLVideoRender::AttachFilter(VideoFilterType videoFilterType,
     switch (videoFilterType) {
         case VIDEO_FILTER_OPENGL: {
             if (nullptr == mOpenglFilter) {
-                UpdateInputFrameData(inputFrameMetaData);
-                int ret = CreateOnScreenRender(&mRenderMetaData);
+                updateInputFrameData(inputFrameMetaData);
+                int ret = createOnScreenRender(&mRenderMetaData);
                 if (ret != RESULT_OK) {
                     NEXT_LOGE(OPENGL_RENDER, "CreateScreenRender error\n");
                     return ret;
@@ -179,7 +179,7 @@ int OpenGLVideoRender::AttachFilter(VideoFilterType videoFilterType,
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::OnInputFrame(VideoFrameMetaData *redRenderBuffer) {
+int OpenGLVideoRender::onInputFrame(VideoFrameMetaData *redRenderBuffer) {
     std::unique_lock<std::mutex> lck(mRenderMutex);
 #if defined(__APPLE__)
     if (mRenderGLView && mGLContext->getEaglContext()->isDisplay()) {
@@ -193,7 +193,7 @@ int OpenGLVideoRender::OnInputFrame(VideoFrameMetaData *redRenderBuffer) {
     }
 
 #elif defined(__ANDROID__)
-    int ret = SetInputFrame(redRenderBuffer);
+    int ret = setInputFrame(redRenderBuffer);
     if (ret != RESULT_OK) {
         NEXT_LOGE(OPENGL_RENDER, "SetInputFrame error\n");
         return ret;
@@ -204,7 +204,7 @@ int OpenGLVideoRender::OnInputFrame(VideoFrameMetaData *redRenderBuffer) {
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::OnRender() {
+int OpenGLVideoRender::onRender() {
     std::unique_lock<std::mutex> lock(mRenderMutex);
 #if defined(__APPLE__)
     if (mRenderGLView && mGLContext->getEaglContext()->isDisplay()) {
@@ -213,12 +213,12 @@ int OpenGLVideoRender::OnRender() {
       mGLContext->getEaglContext()->useAsPrev();
     }
 #elif defined(__ANDROID__)
-    OnScreenRender();
+    onScreenRender();
 #endif
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::OnRenderCacheFrame() {
+int OpenGLVideoRender::onRenderCacheFrame() {
 #if defined(__APPLE__)
     std::unique_lock<std::mutex> lock(mRenderMutex);
     if (mRenderGLView && mGLContext->getEaglContext()->isDisplay() &&
@@ -303,7 +303,7 @@ int OpenGLVideoRender::OnRenderCacheFrame() {
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
+int OpenGLVideoRender::setInputFrame(VideoFrameMetaData *inputFrameMetaData) {
     if (inputFrameMetaData == nullptr) {
         NEXT_LOGE(OPENGL_RENDER, "inputFrameMetaData is nullptr\n");
         return ERROR_RENDER_INPUT;
@@ -335,7 +335,7 @@ int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                 mRenderMetaData.frame_width != inputFrameMetaData->frame_width ||
                 mRenderMetaData.frame_height != inputFrameMetaData->frame_height ||
                 mRenderMetaData.linesize[0] != inputFrameMetaData->linesize[0]) {
-                UpdateInputFrameData(inputFrameMetaData);
+                updateInputFrameData(inputFrameMetaData);
                 if (mTextures[0] != -1) {
                     glDeleteTextures(1, &mTextures[0]);
                 }
@@ -362,7 +362,7 @@ int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                 mRenderMetaData.linesize[0] != inputFrameMetaData->linesize[0] ||
                 mRenderMetaData.linesize[1] != inputFrameMetaData->linesize[1] ||
                 mRenderMetaData.linesize[2] != inputFrameMetaData->linesize[2]) {
-                UpdateInputFrameData(inputFrameMetaData);
+                updateInputFrameData(inputFrameMetaData);
                 if (mTextures[0] != -1) {
                     glDeleteTextures(1, &mTextures[0]);
                     glDeleteTextures(1, &mTextures[1]);
@@ -400,7 +400,7 @@ int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                 mRenderMetaData.frame_height != inputFrameMetaData->frame_height ||
                 mRenderMetaData.linesize[0] != inputFrameMetaData->linesize[0] ||
                 mRenderMetaData.linesize[1] != inputFrameMetaData->linesize[1]) {
-                UpdateInputFrameData(inputFrameMetaData);
+                updateInputFrameData(inputFrameMetaData);
                 if (mTextures[0] != -1) {
                     glDeleteTextures(1, &mTextures[0]);
                     glDeleteTextures(1, &mTextures[1]);
@@ -523,7 +523,7 @@ int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                 mRenderMetaData.linesize[0] != inputFrameMetaData->linesize[0] ||
                 mRenderMetaData.linesize[1] != inputFrameMetaData->linesize[1] ||
                 mRenderMetaData.linesize[2] != inputFrameMetaData->linesize[2]) {
-                UpdateInputFrameData(inputFrameMetaData);
+                updateInputFrameData(inputFrameMetaData);
                 if (mTextures[0] != -1) {
                     glDeleteTextures(1, &mTextures[0]);
                     glDeleteTextures(1, &mTextures[1]);
@@ -556,7 +556,7 @@ int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
             break;
     }
 
-    UpdateInputFrameData(inputFrameMetaData);
+    updateInputFrameData(inputFrameMetaData);
 
     if (nullptr == mOpenglFilter ||
         mOpenglFilter->getPixelFormat() != inputFrameMetaData->pixel_format) {
@@ -564,7 +564,7 @@ int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
             mOpenglFilter.reset();
             mOpenglFilter = nullptr;
         }
-        int ret = CreateOnScreenRender(&mRenderMetaData);
+        int ret = createOnScreenRender(&mRenderMetaData);
         if (ret != RESULT_OK) {
             NEXT_LOGE(OPENGL_RENDER, "createScreenRender error\n");
             return ret;
@@ -577,7 +577,7 @@ int OpenGLVideoRender::SetInputFrame(VideoFrameMetaData *inputFrameMetaData) {
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::OnScreenRender() {
+int OpenGLVideoRender::onScreenRender() {
     if (nullptr == mOpenglFilter) {
         NEXT_LOGE(OPENGL_RENDER, "openglFilterDevice is nullptr\n");
         return ERROR_RENDER_VIDEO_INIT;
@@ -642,7 +642,7 @@ int OpenGLVideoRender::OnScreenRender() {
     return RESULT_OK;
 }
 
-int OpenGLVideoRender::CreateOnScreenRender(VideoFrameMetaData *inputFrameMetaData) {
+int OpenGLVideoRender::createOnScreenRender(VideoFrameMetaData *inputFrameMetaData) {
     mOpenglFilter = OpenGLFilter::create(inputFrameMetaData, mGLContext);
     if (nullptr == mOpenglFilter) {
         NEXT_LOGE(OPENGL_RENDER, "openglFilter nullptr\n");
@@ -652,6 +652,6 @@ int OpenGLVideoRender::CreateOnScreenRender(VideoFrameMetaData *inputFrameMetaDa
     return RESULT_OK;
 }
 
-void OpenGLVideoRender::UpdateInputFrameData(VideoFrameMetaData *inputFrameMetaData) {
+void OpenGLVideoRender::updateInputFrameData(VideoFrameMetaData *inputFrameMetaData) {
     mRenderMetaData = *inputFrameMetaData;
 }

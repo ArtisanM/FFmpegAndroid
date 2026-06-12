@@ -127,14 +127,14 @@ int VideoRenderHandler::Init() {
             return ERROR_PLAYER_NOT_INIT;
     }
 
-    mVideoRender = VideoRendererFactory::CreateVideoRenderer(mRenderType);
+    mVideoRender = VideoRendererFactory::createVideoRender(mRenderType);
 
     if (!mVideoRender) {
         NEXT_LOGE(TAG, "mVideoRender create error");
         return ERROR_PLAYER_NOT_INIT;
     }
 
-    int ret = mVideoRender->Init();
+    int ret = mVideoRender->init();
     if (ret != RESULT_OK) {
         lock.unlock();
         NotifyListener(MSG_ON_ERROR, ERROR_RENDER_VIDEO_INIT, ret);
@@ -310,11 +310,11 @@ int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
                         releaseOutputBuffer(&mediaCodecCtx, render);
                     };
             // do rendering video frame
-            int ret = mVideoRender->OnRender(&mVideoRenderBufferContext, true);
+            int ret = mVideoRender->onRender(&mVideoRenderBufferContext, true);
 
             if (ret != RESULT_OK) {
                 NotifyListener(MSG_ON_ERROR, ERROR_RENDER_HANDLE, ret);
-                NEXT_LOGE(TAG, "OnRender error: %d\n", ret);
+                NEXT_LOGE(TAG, "onRender error: %d\n", ret);
             }
             if (buffer->opaque) {
                 delete (MediaCodecBufferContext *) buffer->opaque;
@@ -353,16 +353,16 @@ int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
             mVideoFrameMetaData.view_width   = buffer->width;
             mVideoFrameMetaData.view_height  = buffer->height;
 
-            int ret = mVideoRender->OnInputFrame(&mVideoFrameMetaData);
+            int ret = mVideoRender->onInputFrame(&mVideoFrameMetaData);
             if (ret == RESULT_OK) {
-                ret = mVideoRender->OnRender();
+                ret = mVideoRender->onRender();
                 if (ret != RESULT_OK) {
                     NotifyListener(MSG_ON_ERROR, ERROR_RENDER_HANDLE, ret);
-                    NEXT_LOGE(TAG, "OnRender error\n");
+                    NEXT_LOGE(TAG, "onRender error\n");
                 }
             } else {
                 NotifyListener(MSG_ON_ERROR, ERROR_RENDER_INPUT, ret);
-                NEXT_LOGE(TAG, "OnInputFrame error\n");
+                NEXT_LOGE(TAG, "onInputFrame error\n");
             }
 #if defined(__APPLE__)
             if (buffer->pixel_fmt == FrameBuffer::PIXEL_FMT_VIDEOTOOLBOX && buffer->opaque &&
@@ -502,7 +502,7 @@ void VideoRenderHandler::ExecuteTask() {
         if (mVideoRender && mRenderType == VIDEO_RENDER_OPENGL) {
             if (mSurfaceUpdate.load()) {
                 auto window = mNativeWindow;
-                ret = mVideoRender->SetSurface(window);
+                ret = mVideoRender->setSurface(window);
                 mSurfaceUpdate = false;
                 if (ret != RESULT_OK) {
                     NEXT_LOGE(TAG, "Set surface failed, ret=%d\n", ret);
@@ -531,7 +531,7 @@ void VideoRenderHandler::ExecuteTask() {
             {
                 if (mSurfaceUpdate.load() && mVideoRender && mNativeWindow
                     && mRenderType == VIDEO_RENDER_OPENGL) {
-                    mVideoRender->SetSurface(mNativeWindow);
+                    mVideoRender->setSurface(mNativeWindow);
                     mSurfaceUpdate = false;
                 }
             }
@@ -600,9 +600,9 @@ void VideoRenderHandler::ExecuteTask() {
         }
     }
     if (mVideoRender && (mRenderType == VIDEO_RENDER_OPENGL || mRenderType == VIDEO_RENDER_METAL)) {
-        mVideoRender->Close();
-        mVideoRender->DetachAllFilter();
-        mVideoRender->ReleaseContext();
+        mVideoRender->close();
+        mVideoRender->detachAllFilter();
+        mVideoRender->releaseContext();
     }
 }
 

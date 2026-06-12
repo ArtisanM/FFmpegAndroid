@@ -16,7 +16,7 @@ MediaCodecRender::MediaCodecRender()
 
 MediaCodecRender::~MediaCodecRender() = default;
 
-int MediaCodecRender::OnRender(VideoRenderBufferContext *bufferContext, bool render) {
+int MediaCodecRender::onRender(VideoRenderBufferContext *bufferContext, bool render) {
     if (nullptr == bufferContext || nullptr == bufferContext->release_buffer) {
         NEXT_LOGE("MediaCodecRender", "bufferContext is null");
         return ERROR_RENDER_VIDEO_INIT;

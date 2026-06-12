@@ -22,38 +22,38 @@ public:
 
 #if defined(__ANDROID__)
 
-    virtual int Init() {return RESULT_OK;};
+    virtual int init() {return RESULT_OK;};
 
-    virtual int SetSurface(ANativeWindow *nativeWindow) {return RESULT_OK;};
+    virtual int setSurface(ANativeWindow *nativeWindow) {return RESULT_OK;};
 
 #elif defined(__APPLE__)
 
-    virtual int Init(){return RESULT_OK;};
+    virtual int init(){return RESULT_OK;};
 
-    virtual int InitWithFrame(CGRect cgrect) {return RESULT_OK;};
+    virtual int initWithFrame(CGRect cgrect) {return RESULT_OK;};
 
     virtual UIView *getRedRenderView() {return nil;};
 
 #endif
 
-    virtual int AttachFilter(VideoFilterType videoFilterType,
+    virtual int attachFilter(VideoFilterType videoFilterType,
                              VideoFrameMetaData *inputFrameMetaData) {return RESULT_OK;};
 
-    virtual int DetachFilter(VideoFilterType videoFilterType) {return RESULT_OK;};
+    virtual int detachFilter(VideoFilterType videoFilterType) {return RESULT_OK;};
 
-    virtual int DetachAllFilter() {return RESULT_OK;};
+    virtual int detachAllFilter() {return RESULT_OK;};
 
-    virtual int OnInputFrame(VideoFrameMetaData *redRenderBuffer) {return RESULT_OK;};
+    virtual int onInputFrame(VideoFrameMetaData *redRenderBuffer) {return RESULT_OK;};
 
-    virtual int OnRender() {return RESULT_OK;};
+    virtual int onRender() {return RESULT_OK;};
 
-    virtual int OnRender(VideoRenderBufferContext *bufferContext, bool render) {return RESULT_OK;};
+    virtual int onRender(VideoRenderBufferContext *bufferContext, bool render) {return RESULT_OK;};
 
-    virtual int OnRenderCacheFrame() {return RESULT_OK;};
+    virtual int onRenderCacheFrame() {return RESULT_OK;};
 
-    virtual int ReleaseContext() {return RESULT_OK;};
+    virtual int releaseContext() {return RESULT_OK;};
 
-    virtual void Close() {};
+    virtual void close() {};
 
 };
 

@@ -10,7 +10,7 @@ public:
 
     ~MediaCodecRender() override;
 
-    int OnRender(VideoRenderBufferContext *bufferContext, bool render) override;
+    int onRender(VideoRenderBufferContext *bufferContext, bool render) override;
 };
 
 #endif // MEDIACODEC_RENDER_H

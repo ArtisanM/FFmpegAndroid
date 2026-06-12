@@ -22,13 +22,13 @@ public:
 
     ~OpenGLVideoRender() override;
 
-    int ReleaseContext() override;
+    int releaseContext() override;
 
 #if defined(__ANDROID__)
 
-    int Init() override;
+    int init() override;
 
-    int SetSurface(ANativeWindow *nativeWindow) override;
+    int setSurface(ANativeWindow *nativeWindow) override;
 
 #elif defined(__APPLE__)
 
@@ -40,27 +40,27 @@ public:
 #endif
 
     // filter chain management
-    int AttachFilter(VideoFilterType videoFilterType,
+    int attachFilter(VideoFilterType videoFilterType,
                      VideoFrameMetaData *inputFrameMetaData) override;
 
     // input Frame
-    int OnInputFrame(VideoFrameMetaData *redRenderBuffer) override;
+    int onInputFrame(VideoFrameMetaData *redRenderBuffer) override;
 
     // render
-    int OnRender() override;
+    int onRender() override;
 
-    int OnRenderCacheFrame() override;
+    int onRenderCacheFrame() override;
 
-    int SetGravity(AspectRatioMode rendererGravity);
+    int setGravity(AspectRatioMode rendererGravity);
 
 private:
-    int SetInputFrame(VideoFrameMetaData *inputFrameMetaData);
+    int setInputFrame(VideoFrameMetaData *inputFrameMetaData);
 
-    int OnScreenRender();
+    int onScreenRender();
 
-    int CreateOnScreenRender(VideoFrameMetaData *inputFrameMetaData);
+    int createOnScreenRender(VideoFrameMetaData *inputFrameMetaData);
 
-    void UpdateInputFrameData(VideoFrameMetaData *inputFrameMetaData);
+    void updateInputFrameData(VideoFrameMetaData *inputFrameMetaData);
 
 private:
 

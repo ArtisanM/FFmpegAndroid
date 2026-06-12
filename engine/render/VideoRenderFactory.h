@@ -28,7 +28,7 @@ public:
     ~VideoRendererFactory() = default;
 
     static std::unique_ptr<VideoRender>
-    CreateVideoRenderer(VideoRenderType videoRenderType, const int &sessionID = 0) {
+    createVideoRender(VideoRenderType videoRenderType, const int &sessionID = 0) {
         std::unique_ptr<VideoRender> renderer = nullptr;
 
         switch (videoRenderType) {
