@@ -20,16 +20,16 @@ EglContext::EglContext() {
 }
 
 EglContext::~EglContext() {
-    EGLTerminate();
+    onEGLTerminate();
 }
 
-EGLBoolean EglContext::InitContext(EGLContext eglContext, EGLNativeWindowType window) {
+EGLBoolean EglContext::initContext(EGLContext eglContext, EGLNativeWindowType window) {
     std::unique_lock<std::mutex> lock(mEglMutex);
-    if (IsEglValid()) {
+    if (isEglValid()) {
         return EGL_TRUE;
     }
 
-    EGLTerminate();
+    onEGLTerminate();
     if (nullptr == eglContext) {
         eglContext = EGL_NO_CONTEXT;
     }
@@ -47,7 +47,7 @@ EGLBoolean EglContext::InitContext(EGLContext eglContext, EGLNativeWindowType wi
 
     // 2. config: try version 3 first
     int version = 3;
-    EGLConfig config = GetEGLConfig(version);
+    EGLConfig config = getEglConfig(version);
     if (nullptr != config) {
         EGLint context3Attrib[] = {EGL_CONTEXT_CLIENT_VERSION, version, EGL_NONE};
         // 3. egl context
@@ -56,7 +56,7 @@ EGLBoolean EglContext::InitContext(EGLContext eglContext, EGLNativeWindowType wi
             NEXT_LOGE(EGL_TAG, "eglCreateContext version3: error=%d", eglGetError());
             // try to fallback to version 2
             version = 2;
-            config = GetEGLConfig(version);
+            config = getEglConfig(version);
             if (nullptr != config) {
                 EGLint context2Attrib[] = {EGL_CONTEXT_CLIENT_VERSION, version, EGL_NONE};
                 mEglContext = eglCreateContext(mEglDisplay, config, eglContext, context2Attrib);
@@ -80,9 +80,9 @@ EGLBoolean EglContext::InitContext(EGLContext eglContext, EGLNativeWindowType wi
         }
         mEglWindowType = window;
 
-        EGLBoolean ret = SetSurfaceWithWindow();
+        EGLBoolean ret = setSurfaceWithWindow();
         if (!ret) {
-            NEXT_LOGE(EGL_TAG, "SetSurfaceWithWindow error");
+            NEXT_LOGE(EGL_TAG, "setSurfaceWithWindow error");
             return EGL_FALSE;
         }
         // 5. switch current render thread
@@ -108,14 +108,14 @@ EGLBoolean EglContext::CreateEglSurface(EGLNativeWindowType surface) {
 
     if (mEglWindowType) {
         if (mEglWindowType == surface) {
-            EGLBoolean ret = SetSurfaceWithWindow();
+            EGLBoolean ret = setSurfaceWithWindow();
             if (!ret) {
-                NEXT_LOGE(EGL_TAG, "SetSurfaceWithWindow error, line=%d", __LINE__);
+                NEXT_LOGE(EGL_TAG, "setSurfaceWithWindow error, line=%d", __LINE__);
                 return EGL_FALSE;
             }
 
-            if (!MakeCurrent()) {
-                NEXT_LOGE(EGL_TAG, "MakeCurrent error");
+            if (!makeCurrent()) {
+                NEXT_LOGE(EGL_TAG, "makeCurrent error");
                 return EGL_FALSE;
             }
             return EGL_TRUE;
@@ -144,23 +144,23 @@ EGLBoolean EglContext::CreateEglSurface(EGLNativeWindowType surface) {
         mEglWindowType = surface;
     }
 
-    EGLBoolean ret = SetSurfaceWithWindow();
+    EGLBoolean ret = setSurfaceWithWindow();
     if (!ret) {
-        NEXT_LOGE(EGL_TAG, "SetSurfaceWithWindow error");
+        NEXT_LOGE(EGL_TAG, "setSurfaceWithWindow error");
         return EGL_FALSE;
     }
 
-    if (!MakeCurrent()) {
-        NEXT_LOGE(EGL_TAG, "MakeCurrent error=%d", glGetError());
+    if (!makeCurrent()) {
+        NEXT_LOGE(EGL_TAG, "makeCurrent error=%d", glGetError());
         return EGL_FALSE;
     }
 
     return EGL_TRUE;
 }
 
-EGLBoolean EglContext::MakeCurrent() {
+EGLBoolean EglContext::makeCurrent() {
     if (EGL_NO_DISPLAY == mEglDisplay || EGL_NO_SURFACE == mEglSurface || EGL_NO_CONTEXT == mEglContext) {
-        NEXT_LOGE(EGL_TAG, "MakeCurrent null, display=%p, surface=%p, context=%p",
+        NEXT_LOGE(EGL_TAG, "makeCurrent null, display=%p, surface=%p, context=%p",
                 mEglDisplay, mEglSurface, mEglContext);
         return EGL_FALSE;
     }
@@ -173,14 +173,14 @@ EGLBoolean EglContext::MakeCurrent() {
     return EGL_TRUE;
 }
 
-EGLBoolean EglContext::SetSurfaceSize(int width, int height) {
+EGLBoolean EglContext::setSurfaceSize(int width, int height) {
     std::unique_lock<std::mutex> lock(mEglMutex);
-    if (!IsEglValid()) {
+    if (!isEglValid()) {
         return EGL_FALSE;
     }
 
-    mWidth  = GetSurfaceWidth();
-    mHeight = GetSurfaceHeight();
+    mWidth  = getSurfaceWidth();
+    mHeight = getSurfaceHeight();
 
     if (width != mWidth || height != mHeight) {
         int format = ANativeWindow_getFormat(mEglWindowType);
@@ -190,15 +190,15 @@ EGLBoolean EglContext::SetSurfaceSize(int width, int height) {
             return EGL_FALSE;
         }
 
-        mWidth  = GetSurfaceWidth();
-        mHeight = GetSurfaceHeight();
+        mWidth  = getSurfaceWidth();
+        mHeight = getSurfaceHeight();
         return (mWidth && mHeight) ? EGL_TRUE : EGL_FALSE;
     }
 
     return EGL_TRUE;
 }
 
-int EglContext::GetSurfaceWidth() {
+int EglContext::getSurfaceWidth() {
     EGLint width = 0;
     if (!eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, &width)) {
         return 0;
@@ -207,7 +207,7 @@ int EglContext::GetSurfaceWidth() {
     return width;
 }
 
-int EglContext::GetSurfaceHeight() {
+int EglContext::getSurfaceHeight() {
     EGLint height = 0;
     if (!eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, &height)) {
         return 0;
@@ -216,15 +216,15 @@ int EglContext::GetSurfaceHeight() {
     return height;
 }
 
-EGLBoolean EglContext::SwapBuffers() {
+EGLBoolean EglContext::swapBuffers() {
     if (eglGetCurrentContext() == EGL_NO_CONTEXT ||
         eglGetCurrentDisplay() == EGL_NO_DISPLAY ||
         eglGetCurrentSurface(EGL_DRAW) == EGL_NO_SURFACE) {
-        NEXT_LOGE(EGL_TAG, "SwapBuffers null, error=%d",  eglGetError());
+        NEXT_LOGE(EGL_TAG, "swapBuffers null, error=%d",  eglGetError());
         return EGL_FALSE;
     }
 
-    EGLBoolean ret = MakeCurrent();
+    EGLBoolean ret = makeCurrent();
     if (!ret) {
         return EGL_FALSE;
     }
@@ -238,7 +238,7 @@ EGLBoolean EglContext::SwapBuffers() {
     return EGL_TRUE;
 }
 
-EGLConfig EglContext::GetEGLConfig(int version) {
+EGLConfig EglContext::getEglConfig(int version) {
     int renderType = EGL_OPENGL_ES2_BIT;
     if (version >= 3) {
         renderType |= EGL_OPENGL_ES3_BIT_KHR;
@@ -258,14 +258,14 @@ EGLConfig EglContext::GetEGLConfig(int version) {
     return config;
 }
 
-EGLBoolean EglContext::SetSurfaceWithWindow() {
-    if (!IsEglValid()) {
+EGLBoolean EglContext::setSurfaceWithWindow() {
+    if (!isEglValid()) {
         return EGL_FALSE;
     }
 
     EGLint format = 0;
     if (!eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format)) {
-        EGLTerminate();
+        onEGLTerminate();
         return EGL_FALSE;
     }
 
@@ -274,11 +274,11 @@ EGLBoolean EglContext::SetSurfaceWithWindow() {
     int ret = ANativeWindow_setBuffersGeometry(mEglWindowType, width, height, format);
     if (ret < 0) {
         NEXT_LOGE(EGL_TAG,"ANativeWindow_setBuffersGeometry, error=%d", ret);
-        EGLTerminate();
+        onEGLTerminate();
         return EGL_FALSE;
     }
-    mWidth  = GetSurfaceWidth();
-    mHeight = GetSurfaceHeight();
+    mWidth  = getSurfaceWidth();
+    mHeight = getSurfaceHeight();
 
     if (mWidth && mHeight) {
         return EGL_TRUE;
@@ -287,8 +287,8 @@ EGLBoolean EglContext::SetSurfaceWithWindow() {
     }
 }
 
-void EglContext::EGLTerminate() {
-    if (!IsEglValid()) {
+void EglContext::onEGLTerminate() {
+    if (!isEglValid()) {
         return;
     }
 
@@ -360,7 +360,7 @@ void EglContext::EGLTerminate() {
     }
 }
 
-EGLBoolean EglContext::IsEglValid() {
+EGLBoolean EglContext::isEglValid() {
     if (mEglWindowType && mEglDisplay && mEglSurface && mEglContext) {
         return EGL_TRUE;
     }

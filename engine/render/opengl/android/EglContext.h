@@ -16,29 +16,29 @@ public:
 
     ~EglContext();
 
-    EGLBoolean InitContext(EGLContext eglContext = nullptr, EGLNativeWindowType window = nullptr);
+    EGLBoolean initContext(EGLContext eglContext = nullptr, EGLNativeWindowType window = nullptr);
 
     EGLBoolean CreateEglSurface(EGLNativeWindowType surface);
 
-    EGLBoolean MakeCurrent();
+    EGLBoolean makeCurrent();
 
-    EGLBoolean SetSurfaceSize(int width, int height);
+    EGLBoolean setSurfaceSize(int width, int height);
 
-    int GetSurfaceWidth();
+    int getSurfaceWidth();
 
-    int GetSurfaceHeight();
+    int getSurfaceHeight();
 
-    EGLBoolean SwapBuffers();
+    EGLBoolean swapBuffers();
 
 private:
 
-    EGLConfig GetEGLConfig(int version);
+    EGLConfig getEglConfig(int version);
 
-    EGLBoolean SetSurfaceWithWindow();
+    EGLBoolean setSurfaceWithWindow();
 
-    void EGLTerminate();
+    void onEGLTerminate();
 
-    EGLBoolean IsEglValid();
+    EGLBoolean isEglValid();
 
     EGLint mWidth  = 0;
     EGLint mHeight = 0;

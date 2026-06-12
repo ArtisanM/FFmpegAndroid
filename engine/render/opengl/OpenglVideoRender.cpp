@@ -69,7 +69,7 @@ int OpenGLVideoRender::setSurface(ANativeWindow *nativeWindow) {
         NEXT_LOGE(OPENGL_RENDER, "nativeWindow=nullptr\n");
         return ERROR_RENDER_VIDEO_SUR;
     }
-    if (!mGLContext->getEglContext()->InitContext()) {
+    if (!mGLContext->getEglContext()->initContext()) {
         NEXT_LOGE(OPENGL_RENDER, "init EglContext error\n");
         return ERROR_RENDER_VIDEO_CTX;
     }
@@ -83,8 +83,8 @@ int OpenGLVideoRender::setSurface(ANativeWindow *nativeWindow) {
     PrintString("Renderer", GL_RENDERER);
     PrintString("Extensions", GL_EXTENSIONS);
 
-    mRenderWidth  = mGLContext->getEglContext()->GetSurfaceWidth();
-    mRenderHeight = mGLContext->getEglContext()->GetSurfaceHeight();
+    mRenderWidth  = mGLContext->getEglContext()->getSurfaceWidth();
+    mRenderHeight = mGLContext->getEglContext()->getSurfaceHeight();
 
     return RESULT_OK;
 }
@@ -309,9 +309,9 @@ int OpenGLVideoRender::setInputFrame(VideoFrameMetaData *inputFrameMetaData) {
         return ERROR_RENDER_INPUT;
     }
 #if defined(__ANDROID__)
-    EGLBoolean res = mGLContext->getEglContext()->MakeCurrent();
+    EGLBoolean res = mGLContext->getEglContext()->makeCurrent();
     if (!res) {
-        NEXT_LOGE(OPENGL_RENDER, "SetInputFrame MakeCurrent error\n");
+        NEXT_LOGE(OPENGL_RENDER, "SetInputFrame makeCurrent error\n");
         return ERROR_RENDER_HANDLE;
     }
 #endif
@@ -339,7 +339,7 @@ int OpenGLVideoRender::setInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                 if (mTextures[0] != -1) {
                     glDeleteTextures(1, &mTextures[0]);
                 }
-                mTextures[0] = CreateTexture();
+                mTextures[0] = createTexture();
             }
 
             glBindTexture(GL_TEXTURE_2D, mTextures[0]);
@@ -368,9 +368,9 @@ int OpenGLVideoRender::setInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                     glDeleteTextures(1, &mTextures[1]);
                     glDeleteTextures(1, &mTextures[2]);
                 }
-                mTextures[0] = CreateTexture();
-                mTextures[1] = CreateTexture();
-                mTextures[2] = CreateTexture();
+                mTextures[0] = createTexture();
+                mTextures[1] = createTexture();
+                mTextures[2] = createTexture();
             }
 
             glBindTexture(GL_TEXTURE_2D, mTextures[0]);
@@ -405,8 +405,8 @@ int OpenGLVideoRender::setInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                     glDeleteTextures(1, &mTextures[0]);
                     glDeleteTextures(1, &mTextures[1]);
                 }
-                mTextures[0] = CreateTexture();
-                mTextures[1] = CreateTexture();
+                mTextures[0] = createTexture();
+                mTextures[1] = createTexture();
             }
 
             glBindTexture(GL_TEXTURE_2D, mTextures[0]);
@@ -529,9 +529,9 @@ int OpenGLVideoRender::setInputFrame(VideoFrameMetaData *inputFrameMetaData) {
                     glDeleteTextures(1, &mTextures[1]);
                     glDeleteTextures(1, &mTextures[2]);
                 }
-                mTextures[0] = CreateTexture();
-                mTextures[1] = CreateTexture();
-                mTextures[2] = CreateTexture();
+                mTextures[0] = createTexture();
+                mTextures[1] = createTexture();
+                mTextures[2] = createTexture();
             }
 
             glBindTexture(GL_TEXTURE_2D, mTextures[0]);
@@ -613,9 +613,9 @@ int OpenGLVideoRender::onScreenRender() {
     }
 
 #if defined(__ANDROID__)
-    EGLBoolean res = mGLContext->getEglContext()->MakeCurrent();
+    EGLBoolean res = mGLContext->getEglContext()->makeCurrent();
     if (!res) {
-        NEXT_LOGE(OPENGL_RENDER, "MakeCurrent error\n");
+        NEXT_LOGE(OPENGL_RENDER, "makeCurrent error\n");
         return ERROR_RENDER_VIDEO_CTX;
     }
 #endif

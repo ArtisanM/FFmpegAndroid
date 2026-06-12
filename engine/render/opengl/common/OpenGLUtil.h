@@ -12,10 +12,10 @@
 #import <OpenGLES/ES2/glext.h>
 #endif
 
-GLuint CreateProgram(const std::string &vertexShader, const std::string &fragmentShader);
+GLuint createProgram(const std::string &vertexShader, const std::string &fragmentShader);
 
-GLuint CreateTexture();
+GLuint createTexture();
 
-GLuint CreateFramebuffer(int width, int height, GLuint texture);
+GLuint createFramebuffer(int width, int height, GLuint texture);
 
 #endif //OPENGL_UTIL_H

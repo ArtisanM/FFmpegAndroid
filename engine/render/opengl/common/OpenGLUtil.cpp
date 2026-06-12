@@ -10,7 +10,7 @@
 
 #define OPENGL_TAG "OpenGLUtil"
 
-GLuint CreateProgram(const std::string &vertexShader, const std::string &fragmentShader) {
+GLuint createProgram(const std::string &vertexShader, const std::string &fragmentShader) {
     if (vertexShader.empty()) {
         NEXT_LOGE(OPENGL_TAG, "vertex shader is empty!\n");
         return -1;
@@ -73,7 +73,7 @@ error:
     return program;
 }
 
-GLuint CreateTexture() {
+GLuint createTexture() {
     auto *texture = new GLuint[1];
     glGenTextures(1, texture);
     glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -88,7 +88,7 @@ GLuint CreateTexture() {
     return result;
 }
 
-GLuint CreateFramebuffer(int width, int height, GLuint texture) {
+GLuint createFramebuffer(int width, int height, GLuint texture) {
     auto *frameBuffer = new GLuint[1];
     glGenFramebuffers(1, frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer[0]);

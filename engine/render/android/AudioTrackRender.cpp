@@ -42,7 +42,7 @@ AudioTrackRender::~AudioTrackRender() {
         JniDeleteGlobalRefP(env, reinterpret_cast<jobject *>(&mByteBuffer));
     }
     if (mAudioTrack) {
-        AudioTrackJni::AudioTrackRelease(env, mAudioTrack);
+        AudioTrackJni::audioTrackRelease(env, mAudioTrack);
         JniDeleteGlobalRefP(env, reinterpret_cast<jobject *>(&mAudioTrack));
     }
 }
@@ -60,7 +60,7 @@ void AudioTrackRender::AdjustAudioInfo(const AudioRenderInfo &expect, AudioRende
     }
 }
 
-int AudioTrackRender::OpenAudio(const AudioRenderInfo &expect, AudioRenderInfo &actual,
+int AudioTrackRender::openAudio(const AudioRenderInfo &expect, AudioRenderInfo &actual,
                                 std::unique_ptr<AudioCallback> &audioCallback) {
     AdjustAudioInfo(expect, actual);
     int streamType = AUDIO_STREAM_TYPE_MUSIC;
@@ -79,10 +79,10 @@ int AudioTrackRender::OpenAudio(const AudioRenderInfo &expect, AudioRenderInfo &
     JniEnvPtr jni_env;
     JNIEnv *env = jni_env.Env();
     if (!env) {
-        NEXT_LOGE(AUDIO_TRACK_RENDER, "OpenAudio error, JNIEnv is null!");
+        NEXT_LOGE(AUDIO_TRACK_RENDER, "openAudio error, JNIEnv is null!");
         return -1;
     }
-    int bufferSize = AudioTrackJni::AudioTrackGetMinBufferSize(
+    int bufferSize = AudioTrackJni::audioTrackGetMinBufferSize(
             env, sampleRate, channelConfig, audioFormat);
     if (bufferSize <= 0) {
         NEXT_LOGE(AUDIO_TRACK_RENDER, "invalid buffer size: %d", bufferSize);
@@ -90,11 +90,11 @@ int AudioTrackRender::OpenAudio(const AudioRenderInfo &expect, AudioRenderInfo &
     }
 
     bufferSize *= AUDIO_TRACK_MAX_SPEED;
-    mAudioTrack = AudioTrackJni::AudioTrackAsGlobalRef(
+    mAudioTrack = AudioTrackJni::audioTrackAsGlobalRef(
             env, streamType, sampleRate, channelConfig, audioFormat,
             bufferSize, mode);
     mAudioSessionId =
-            AudioTrackJni::AudioTrackGetAudioSessionId(env, mAudioTrack);
+            AudioTrackJni::audioTrackGetAudioSessionId(env, mAudioTrack);
     mBufferSize = bufferSize;
     actual.size = bufferSize;
     mBuffer = new uint8_t[bufferSize];
@@ -106,7 +106,7 @@ int AudioTrackRender::OpenAudio(const AudioRenderInfo &expect, AudioRenderInfo &
             mAudioThread = new std::thread(AudioLoop, this);
         } catch (const std::system_error &e) {
             mAudioThread = nullptr;
-            NEXT_LOGE(AUDIO_TRACK_RENDER, "OpenAudio error: %s", e.what());
+            NEXT_LOGE(AUDIO_TRACK_RENDER, "openAudio error: %s", e.what());
             return -1;
         }
     }
@@ -119,22 +119,22 @@ int AudioTrackRender::AudioLoop(AudioTrackRender *pRender) {
     JNIEnv *env = jni_env.Env();
 
     if (!pRender->bAbortRequest && !pRender->bIsPaused)
-        AudioTrackJni::AudioTrackPlay(env, pRender->mAudioTrack);
+        AudioTrackJni::audioTrackPlay(env, pRender->mAudioTrack);
 
     while (!pRender->bAbortRequest) {
         {
             std::unique_lock<std::mutex> mutex(pRender->mMutex);
             if (!pRender->bAbortRequest && pRender->bIsPaused) {
-                AudioTrackJni::AudioTrackPause(env, pRender->mAudioTrack);
+                AudioTrackJni::audioTrackPause(env, pRender->mAudioTrack);
                 while (!pRender->bAbortRequest && pRender->bIsPaused) {
                     pRender->mWakeupCond.wait_for(mutex, std::chrono::milliseconds(1000));
                 }
                 if (!pRender->bAbortRequest && !pRender->bIsPaused) {
                     if (pRender->bNeedFlush) {
                         pRender->bNeedFlush = false;
-                        AudioTrackJni::AudioTrackFlush(env, pRender->mAudioTrack);
+                        AudioTrackJni::audioTrackFlush(env, pRender->mAudioTrack);
                     }
-                    AudioTrackJni::AudioTrackPlay(env, pRender->mAudioTrack);
+                    AudioTrackJni::audioTrackPlay(env, pRender->mAudioTrack);
                 } else if (pRender->bAbortRequest) {
                     break;
                 }
@@ -142,24 +142,24 @@ int AudioTrackRender::AudioLoop(AudioTrackRender *pRender) {
 
             if (pRender->bNeedFlush) {
                 pRender->bNeedFlush = false;
-                AudioTrackJni::AudioTrackFlush(env, pRender->mAudioTrack);
+                AudioTrackJni::audioTrackFlush(env, pRender->mAudioTrack);
             }
             if (pRender->bSetVolume) {
                 pRender->bSetVolume = false;
-                AudioTrackJni::AudioTrackSetVolume(
+                AudioTrackJni::audioTrackSetVolume(
                         env, pRender->mAudioTrack, pRender->mLeftVolume, pRender->mRightVolume);
             }
             if (pRender->bChangeSpeed) {
                 pRender->bChangeSpeed = false;
-                AudioTrackJni::AudioTrackSetSpeed(env, pRender->mAudioTrack, pRender->mCurrentSpeed);
+                AudioTrackJni::audioTrackSetSpeed(env, pRender->mAudioTrack, pRender->mCurrentSpeed);
             }
         }
-        pRender->mAudioCallback->GetBuffer(pRender->mBuffer, copySize);
+        pRender->mAudioCallback->getBuffer(pRender->mBuffer, copySize);
         {
             std::unique_lock<std::mutex> mutex(pRender->mMutex);
             if (pRender->bNeedFlush) {
                 pRender->bNeedFlush = false;
-                AudioTrackJni::AudioTrackFlush(env, pRender->mAudioTrack);
+                AudioTrackJni::audioTrackFlush(env, pRender->mAudioTrack);
             }
         }
 
@@ -183,7 +183,7 @@ int AudioTrackRender::AudioLoop(AudioTrackRender *pRender) {
             return -1;
         }
         // write data to AudioTrack
-        int written = AudioTrackJni::AudioTrackWrite(
+        int written = AudioTrackJni::audioTrackWrite(
                 env, pRender->mAudioTrack, pRender->mByteBuffer, 0, copySize);
         if (written != copySize) {
             NEXT_LOGI(AUDIO_TRACK_RENDER, "written=%d, copySize=%d", written, copySize);
@@ -192,7 +192,7 @@ int AudioTrackRender::AudioLoop(AudioTrackRender *pRender) {
     return 0;
 }
 
-void AudioTrackRender::PauseAudio(bool paused) {
+void AudioTrackRender::pauseAudio(bool paused) {
     std::unique_lock<std::mutex> mutex(mMutex);
     bIsPaused = paused;
     if (!bIsPaused) {
@@ -200,43 +200,43 @@ void AudioTrackRender::PauseAudio(bool paused) {
     }
 }
 
-void AudioTrackRender::FlushAudio() {
+void AudioTrackRender::flushAudio() {
     std::unique_lock<std::mutex> mutex(mMutex);
     bNeedFlush = true;
     mWakeupCond.notify_one();
 }
 
-double AudioTrackRender::GetDelay() {
+double AudioTrackRender::getDelay() {
     return mMinLatency;
 }
 
-void AudioTrackRender::SetDefaultDelay(double latency) {
+void AudioTrackRender::setDefaultDelay(double latency) {
     mMinLatency = latency;
 }
 
-int AudioTrackRender::GetAudioCallBack() {
+int AudioTrackRender::getAudioCallBack() {
     return kAudioMaxCallbacksPerSec;
 }
 
-void AudioTrackRender::SetPlaybackRate(float playbackRate) {
+void AudioTrackRender::setPlaybackRate(float playbackRate) {
     std::unique_lock<std::mutex> mutex(mMutex);
     mCurrentSpeed = playbackRate;
     bChangeSpeed  = true;
     mWakeupCond.notify_one();
 }
 
-void AudioTrackRender::SetPlaybackVolume(float volume) {
+void AudioTrackRender::setPlaybackVolume(float volume) {
     std::unique_lock<std::mutex> mutex(mMutex);
     mLeftVolume  = volume;
     mRightVolume = volume;
     bSetVolume   = true;
 }
 
-int AudioTrackRender::GetAudioSessionId() {
+int AudioTrackRender::getAudioSessionId() {
     return mAudioSessionId;
 }
 
-void AudioTrackRender::CloseAudio(bool waiting) {
+void AudioTrackRender::closeAudio(bool waiting) {
     std::unique_lock<std::mutex> mutex(mMutex);
     bAbortRequest = true;
     mWakeupCond.notify_one();
