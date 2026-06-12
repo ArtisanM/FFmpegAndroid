@@ -6,7 +6,7 @@
 
 #include "FFmpegUtil.h"
 
-int64_t GetBitrate(AVCodecParameters *codecpar) {
+int64_t getBitrate(AVCodecParameters *codecpar) {
     int64_t bit_rate;
     int bits_per_sample;
 
@@ -30,7 +30,7 @@ int64_t GetBitrate(AVCodecParameters *codecpar) {
     return bit_rate;
 }
 
-double GetRotation(AVStream *st) {
+double getRotation(AVStream *st) {
     AVDictionaryEntry *rotate_tag = av_dict_get(st->metadata, "rotate", nullptr, 0);
     uint8_t *displaymatrix =
             av_stream_get_side_data(st, AV_PKT_DATA_DISPLAYMATRIX, nullptr);
@@ -57,7 +57,7 @@ double GetRotation(AVStream *st) {
     return theta;
 }
 
-AVDictionary **FindStreamInfoOpts(AVFormatContext *s,
+AVDictionary **findStreamInfoOpts(AVFormatContext *s,
                                   AVDictionary *codec_opts) {
     int i;
     AVDictionary **opts;
@@ -71,7 +71,7 @@ AVDictionary **FindStreamInfoOpts(AVFormatContext *s,
         return nullptr;
     }
     for (i = 0; i < s->nb_streams; i++)
-        opts[i] = FilterCodecOpts(codec_opts, s->streams[i]->codecpar->codec_id,
+        opts[i] = filterCodecOpts(codec_opts, s->streams[i]->codecpar->codec_id,
                                   s, s->streams[i], NULL);
     return opts;
 }
@@ -84,7 +84,7 @@ static int check_stream_specifier(AVFormatContext *s, AVStream *st,
     return ret;
 }
 
-AVDictionary *FilterCodecOpts(AVDictionary *opts, enum AVCodecID codec_id,
+AVDictionary *filterCodecOpts(AVDictionary *opts, enum AVCodecID codec_id,
                               AVFormatContext *s, AVStream *st,
                               AVCodec *codec) {
     AVDictionary *ret = nullptr;

@@ -15,13 +15,13 @@ extern "C" {
 }
 #endif
 
-int64_t GetBitrate(AVCodecParameters *codecpar);
+int64_t getBitrate(AVCodecParameters *codecpar);
 
-double GetRotation(AVStream *st);
+double getRotation(AVStream *st);
 
-AVDictionary **FindStreamInfoOpts(AVFormatContext *s,
+AVDictionary **findStreamInfoOpts(AVFormatContext *s,
                                   AVDictionary *codec_opts);
 
-AVDictionary *FilterCodecOpts(AVDictionary *opts, enum AVCodecID codec_id,
+AVDictionary *filterCodecOpts(AVDictionary *opts, enum AVCodecID codec_id,
                               AVFormatContext *s, AVStream *st, AVCodec *codec);
 #endif

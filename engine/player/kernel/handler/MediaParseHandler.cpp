@@ -206,7 +206,7 @@ void MediaParseHandler::ExecuteTask() {
         av_dict_copy(&opt.codec_opts, mGeneralConfig->codecConfig, 0);
         NEXT_LOGD(TAG, "Open url = %s\n", mUrl.c_str());
 
-        ret = mExtractor->Open(mUrl, opt, mMetaData);
+        ret = mExtractor->open(mUrl, opt, mMetaData);
 
         av_dict_free(&opt.format_opts);
         av_dict_free(&opt.codec_opts);
@@ -214,7 +214,7 @@ void MediaParseHandler::ExecuteTask() {
 
     if (ret != RESULT_OK) {
         NEXT_LOGE(TAG, "Open extractor failed!\n");
-        mExtractor->Close();
+        mExtractor->close();
         if ((errorType = GetErrorType(ret)) == ERROR_OTHER_UNKNOWN) {
             NotifyListener(MSG_ON_ERROR, ERROR_PARSE_OPEN, ret);
         } else {
@@ -231,7 +231,7 @@ void MediaParseHandler::ExecuteTask() {
             ToggleBuffering(true);
             NotifyListener(MSG_BUFFER_UPDATE, 0, 0);
             // TODO: Seek flag
-            ret = mExtractor->Seek(mPlayerLink->seek_pos, 0, 0);
+            ret = mExtractor->seek(mPlayerLink->seek_pos, 0, 0);
             if (ret < 0) {
                 NEXT_LOGI(TAG, "Error while seeking, ret=%d", ret);
             } else {
@@ -296,10 +296,10 @@ void MediaParseHandler::ExecuteTask() {
             }
         }
 
-        ret = mExtractor->ReadPacket(pkt);
+        ret = mExtractor->readPacket(pkt);
 
         if (ret != RESULT_OK || !pkt) {
-            if (ret == AVERROR_EOF || ret == AVERROR_EXIT || mExtractor->GetError()) {
+            if (ret == AVERROR_EOF || ret == AVERROR_EXIT || mExtractor->getError()) {
                 if (!bEOF) {
                     NEXT_LOGI(TAG, "Read EOF!\n");
                     bEOF = true;
@@ -308,8 +308,8 @@ void MediaParseHandler::ExecuteTask() {
 
                 ToggleBuffering(false);
 
-                if (mExtractor->GetError()) {
-                    mPlayerLink->error_code = mExtractor->GetError();
+                if (mExtractor->getError()) {
+                    mPlayerLink->error_code = mExtractor->getError();
                 }
                 if (ret == AVERROR_EXIT) {
                     mPlayerLink->error_code = AVERROR_EXIT;
@@ -366,7 +366,7 @@ void MediaParseHandler::ExecuteTask() {
         av_packet_free(&pkt);
     }
     if (mExtractor) {
-        mExtractor->Close();
+        mExtractor->close();
     }
 }
 
@@ -375,7 +375,7 @@ int MediaParseHandler::Stop() {
     int ret = RESULT_OK;
     bAbort = true;
     if (mExtractor) {
-        mExtractor->SetInterrupt();
+        mExtractor->setInterrupt();
     }
     UpdateCacheStatistic();
     mCond.notify_all();

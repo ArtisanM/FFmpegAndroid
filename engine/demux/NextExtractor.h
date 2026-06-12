@@ -18,25 +18,25 @@ public:
 
     ~NextExtractor() override;
 
-    int Open(const std::string &url, FFmpegOption &opt,
+    int open(const std::string &url, FFmpegOption &opt,
              std::shared_ptr<MetaData> &metadata) override;
 
-    int ReadPacket(AVPacket *pkt) override;
+    int readPacket(AVPacket *pkt) override;
 
-    int Seek(int64_t timestamp, int64_t rel, int seekFlags) override;
+    int seek(int64_t timestamp, int64_t rel, int seekFlags) override;
 
-    int GetError() override;
+    int getError() override;
 
-    int GetStreamType(int streamIndex) override;
+    int getStreamType(int streamIndex) override;
 
-    void SetInterrupt() override;
+    void setInterrupt() override;
 
-    void Close() override;
+    void close() override;
 
 private:
-    static int InterruptCallback(void *opaque);
+    static int interruptCallback(void *opaque);
 
-    void NotifyListener(int32_t what, int32_t arg1 = 0, int32_t arg2 = 0,
+    void notifyListener(int32_t what, int32_t arg1 = 0, int32_t arg2 = 0,
                         void *obj = nullptr, int len = 0);
 
 private:

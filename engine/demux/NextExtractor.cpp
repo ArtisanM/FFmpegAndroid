@@ -16,7 +16,7 @@ NextExtractor::NextExtractor(NotifyCallback &notifyCb)
         : mNotifyCb(notifyCb) {
 
     mFormatCtx = avformat_alloc_context();
-    mFormatCtx->interrupt_callback.callback = InterruptCallback;
+    mFormatCtx->interrupt_callback.callback = interruptCallback;
     mFormatCtx->interrupt_callback.opaque = static_cast<void *>(this);
 }
 
@@ -24,12 +24,12 @@ NextExtractor::~NextExtractor() {
     NEXT_LOGD(EXTRACTOR_TAG, "RsExtractor destructor\n");
 }
 
-static int GetRotationRound(AVStream *st) {
+static int getRotationRound(AVStream *st) {
     if (!st)
         return -1;
 
     int theta = std::abs(static_cast<int>(
-                                 static_cast<int64_t>(round(fabs(GetRotation(st)))) % 360));
+                         static_cast<int64_t>(round(fabs(getRotation(st)))) % 360));
 
     switch (theta) {
         case 0:
@@ -49,7 +49,7 @@ static int GetRotationRound(AVStream *st) {
     return theta;
 }
 
-int NextExtractor::Open(const std::string &url, FFmpegOption &opt,
+int NextExtractor::open(const std::string &url, FFmpegOption &opt,
                       std::shared_ptr<MetaData> &metadata) {
     int ret = 0;
     int streamCount = 0;
@@ -65,9 +65,9 @@ int NextExtractor::Open(const std::string &url, FFmpegOption &opt,
         NEXT_LOGE(EXTRACTOR_TAG, "avformat_open_input error, ret=%d\n", ret);
         return ret;
     }
-    NotifyListener(MSG_OPEN_INPUT);
+    notifyListener(MSG_OPEN_INPUT);
     av_format_inject_global_side_data(mFormatCtx);
-    AVDictionary **opts = FindStreamInfoOpts(mFormatCtx, opt.codec_opts);
+    AVDictionary **opts = findStreamInfoOpts(mFormatCtx, opt.codec_opts);
     streamCount = (int) mFormatCtx->nb_streams;
     do {
         if (av_stristart(url.c_str(), "data:", nullptr) && streamCount > 0) {
@@ -86,7 +86,7 @@ int NextExtractor::Open(const std::string &url, FFmpegOption &opt,
         ret = avformat_find_stream_info(mFormatCtx, opts);
     } while (false);
 
-    NotifyListener(MSG_FIND_STREAM_INFO);
+    notifyListener(MSG_FIND_STREAM_INFO);
 
     for (int i = 0; i < streamCount; i++) {
         av_dict_free(&opts[i]);
@@ -95,7 +95,7 @@ int NextExtractor::Open(const std::string &url, FFmpegOption &opt,
 
     if (ret < 0) {
         NEXT_LOGE(EXTRACTOR_TAG, "find_stream_info error, ret=%d\n", ret);
-        NotifyListener(MSG_ON_ERROR, MSG_FIND_STREAM_INFO, (int32_t) ret);
+        notifyListener(MSG_ON_ERROR, MSG_FIND_STREAM_INFO, (int32_t) ret);
         return ret;
     }
 
@@ -105,7 +105,7 @@ int NextExtractor::Open(const std::string &url, FFmpegOption &opt,
     for (int i = 0; i < mFormatCtx->nb_streams; i++) {
         TrackInfo info;
         AVStream *st = mFormatCtx->streams[i];
-        info.rotation = GetRotationRound(st);
+        info.rotation = getRotationRound(st);
         info.stream_index = st->index;
 
         if (st->codecpar && st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -128,7 +128,7 @@ int NextExtractor::Open(const std::string &url, FFmpegOption &opt,
             info.height          = st->codecpar->height;
             info.sar_num         = st->codecpar->sample_aspect_ratio.num;
             info.sar_den         = st->codecpar->sample_aspect_ratio.den;
-            info.bit_rate        = GetBitrate(st->codecpar);
+            info.bit_rate        = getBitrate(st->codecpar);
             info.codec_id        = st->codecpar->codec_id;
             info.channels        = st->codecpar->ch_layout.nb_channels;
             info.sample_fmt      = st->codecpar->format;
@@ -154,7 +154,7 @@ int NextExtractor::Open(const std::string &url, FFmpegOption &opt,
     return 0;
 }
 
-int NextExtractor::ReadPacket(AVPacket *pkt) {
+int NextExtractor::readPacket(AVPacket *pkt) {
     int ret = -1;
     if (mFormatCtx) {
         ret = av_read_frame(mFormatCtx, pkt);
@@ -162,7 +162,7 @@ int NextExtractor::ReadPacket(AVPacket *pkt) {
     return ret;
 }
 
-int NextExtractor::Seek(int64_t timestamp, int64_t rel, int seekFlags) {
+int NextExtractor::seek(int64_t timestamp, int64_t rel, int seekFlags) {
     if (mFormatCtx->start_time != AV_NOPTS_VALUE) {
         timestamp += mFormatCtx->start_time;
     }
@@ -173,7 +173,7 @@ int NextExtractor::Seek(int64_t timestamp, int64_t rel, int seekFlags) {
     return ret;
 }
 
-int NextExtractor::GetError() {
+int NextExtractor::getError() {
     int ret = 0;
     if (mFormatCtx && mFormatCtx->pb) {
         ret = mFormatCtx->pb->error;
@@ -181,7 +181,7 @@ int NextExtractor::GetError() {
     return ret;
 }
 
-int NextExtractor::GetStreamType(int streamIndex) {
+int NextExtractor::getStreamType(int streamIndex) {
     int ret = -1;
     if (mFormatCtx && mFormatCtx->streams && streamIndex < mFormatCtx->nb_streams) {
         ret = static_cast<int>(mFormatCtx->streams[streamIndex]->codecpar->codec_type);
@@ -189,12 +189,12 @@ int NextExtractor::GetStreamType(int streamIndex) {
     return ret;
 }
 
-void NextExtractor::SetInterrupt() {
+void NextExtractor::setInterrupt() {
     NEXT_LOGD(EXTRACTOR_TAG, "extractor interrupt.\n");
     bAbort.store(true);
 }
 
-void NextExtractor::Close() {
+void NextExtractor::close() {
     NEXT_LOGD(EXTRACTOR_TAG, "close begin\n");
     if (mFormatCtx) {
         avformat_close_input(&mFormatCtx);
@@ -203,12 +203,12 @@ void NextExtractor::Close() {
     NEXT_LOGD(EXTRACTOR_TAG, "close end\n");
 }
 
-int NextExtractor::InterruptCallback(void *opaque) {
+int NextExtractor::interruptCallback(void *opaque) {
     return static_cast<NextExtractor *>(opaque)->bAbort.load(
             std::memory_order_relaxed);
 }
 
-void NextExtractor::NotifyListener(int32_t what, int32_t arg1, int32_t arg2, void *obj, int len) {
+void NextExtractor::notifyListener(int32_t what, int32_t arg1, int32_t arg2, void *obj, int len) {
     if (mNotifyCb) {
         mNotifyCb(what, arg1, arg2, obj, len);
     }

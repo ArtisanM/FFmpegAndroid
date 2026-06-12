@@ -32,20 +32,20 @@ class ExtractorInterface {
 public:
     virtual ~ExtractorInterface() = default;
 
-    virtual int Open(const std::string &url, FFmpegOption &opt,
+    virtual int open(const std::string &url, FFmpegOption &opt,
                      std::shared_ptr<MetaData> &metadata) = 0;
 
-    virtual int ReadPacket(AVPacket *pkt) = 0;
+    virtual int readPacket(AVPacket *pkt) = 0;
 
-    virtual int Seek(int64_t timestamp, int64_t rel = 0, int seekFlags = 0) = 0;
+    virtual int seek(int64_t timestamp, int64_t rel = 0, int seekFlags = 0) = 0;
 
-    virtual int GetError() = 0;
+    virtual int getError() = 0;
 
-    virtual void SetInterrupt() = 0;
+    virtual void setInterrupt() = 0;
 
-    virtual int GetStreamType(int streamIndex) = 0;
+    virtual int getStreamType(int streamIndex) = 0;
 
-    virtual void Close() = 0;
+    virtual void close() = 0;
 };
 
 #endif
