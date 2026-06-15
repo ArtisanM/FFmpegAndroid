@@ -15,15 +15,15 @@ public:
 
     ~FrameQueue() = default;
 
-    int PutFrame(std::unique_ptr<FrameBuffer> &frame);
+    int putFrame(std::unique_ptr<FrameBuffer> &frame);
 
-    int GetFrame(std::unique_ptr<FrameBuffer> &frame);
+    int getFrame(std::unique_ptr<FrameBuffer> &frame);
 
-    int Size();
+    int size();
 
-    void Flush();
+    void flush();
 
-    void Abort();
+    void abort();
 
 private:
     bool bAbort   = false;

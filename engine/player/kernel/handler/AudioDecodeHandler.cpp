@@ -130,7 +130,7 @@ int AudioDecodeHandler::onDecodedFrame(AVFrame *frame) {
     if (CheckAccurateSeek(buffer)) {
         return RESULT_OK;
     }
-    mFrameQueue->PutFrame(buffer);
+    mFrameQueue->putFrame(buffer);
     return RESULT_OK;
 }
 
@@ -176,7 +176,7 @@ int AudioDecodeHandler::PerformFlush() {
         mAudioDecoder->flush();
     }
     if (mFrameQueue) {
-        mFrameQueue->Flush();
+        mFrameQueue->flush();
     }
     return RESULT_OK;
 }
@@ -311,14 +311,14 @@ int AudioDecodeHandler::GetFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mFrameQueue) {
         return ERROR_PLAYER_INIT_FAIL;
     }
-    if (mFrameQueue->Size() <= 0) {
+    if (mFrameQueue->size() <= 0) {
         std::unique_lock<std::mutex> lock(mLock);
         if (bEOF) {
             mPlayerLink->audio_dec_finish = true;
             return ERROR_PLAYER_EOF;
         }
     }
-    return mFrameQueue->GetFrame(buffer);
+    return mFrameQueue->getFrame(buffer);
 }
 
 void AudioDecodeHandler::executeTask() {
@@ -367,7 +367,7 @@ void AudioDecodeHandler::ResetEof() {
     bEOF = false;
     mPlayerLink->audio_dec_finish = false;
     if (mFrameQueue) {
-        mFrameQueue->Flush();
+        mFrameQueue->flush();
     }
     mCond.notify_one();
 }
@@ -383,7 +383,7 @@ int AudioDecodeHandler::Stop() {
     bAbort = true;
     mCond.notify_all();
     if (mFrameQueue) {
-        mFrameQueue->Abort();
+        mFrameQueue->abort();
     }
     return RESULT_OK;
 }
@@ -400,7 +400,7 @@ void AudioDecodeHandler::Release() {
         mThread.join();
     }
     if (mFrameQueue) {
-        mFrameQueue->Flush();
+        mFrameQueue->flush();
     }
     NEXT_LOGD(TAG, "Release end\n");
 }

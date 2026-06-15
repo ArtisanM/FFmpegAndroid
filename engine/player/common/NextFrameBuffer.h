@@ -23,10 +23,10 @@ public:
     FrameBuffer() = default;
 
     ~FrameBuffer() {
-        Release();
+        release();
     }
 
-    void Release() {
+    void release() {
         if (data) {
             delete[] data;
             data = nullptr;

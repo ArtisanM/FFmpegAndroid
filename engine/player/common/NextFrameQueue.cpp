@@ -16,7 +16,7 @@
 FrameQueue::FrameQueue(int capacity)
     : mCapacity(capacity) {}
 
-int FrameQueue::PutFrame(std::unique_ptr<FrameBuffer> &frame) {
+int FrameQueue::putFrame(std::unique_ptr<FrameBuffer> &frame) {
     UNIQUE_LOCK lock(mLock);
     int count = 0;
     while (mCapacity > 0 && mFrameQueue.size() >= mCapacity) {
@@ -36,7 +36,7 @@ int FrameQueue::PutFrame(std::unique_ptr<FrameBuffer> &frame) {
     return RESULT_OK;
 }
 
-int FrameQueue::GetFrame(std::unique_ptr<FrameBuffer> &frame) {
+int FrameQueue::getFrame(std::unique_ptr<FrameBuffer> &frame) {
     UNIQUE_LOCK lock(mLock);
     int count = 0;
     while (mFrameQueue.empty()) {
@@ -57,12 +57,12 @@ int FrameQueue::GetFrame(std::unique_ptr<FrameBuffer> &frame) {
     return RESULT_OK;
 }
 
-int FrameQueue::Size() {
+int FrameQueue::size() {
     UNIQUE_LOCK lock(mLock);
     return static_cast<int>(mFrameQueue.size());
 }
 
-void FrameQueue::Flush() {
+void FrameQueue::flush() {
     UNIQUE_LOCK lock(mLock);
     while (!mFrameQueue.empty()) {
         mFrameQueue.pop();
@@ -70,7 +70,7 @@ void FrameQueue::Flush() {
     mCond.notify_one();
 }
 
-void FrameQueue::Abort() {
+void FrameQueue::abort() {
     UNIQUE_LOCK lock(mLock);
     bAbort = true;
     mCapacity = 0;

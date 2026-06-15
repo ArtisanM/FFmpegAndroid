@@ -319,7 +319,7 @@ int VideoDecodeHandler::onDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame
         bFirstFrameDecoded = true;
         NotifyListener(MSG_VIDEO_DECODE_START);
     }
-    mFrameQueue->PutFrame(buffer);
+    mFrameQueue->putFrame(buffer);
     return RESULT_OK;
 }
 
@@ -387,14 +387,14 @@ int VideoDecodeHandler::GetFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mFrameQueue) {
         return ERROR_PLAYER_INIT_FAIL;
     }
-    if (mFrameQueue->Size() <= 0) {
+    if (mFrameQueue->size() <= 0) {
         std::unique_lock<std::mutex> lock(mLock);
         if (mLastSerial == mSerial) {
             mPlayerLink->video_dec_finish = true;
             return ERROR_PLAYER_EOF;
         }
     }
-    return mFrameQueue->GetFrame(buffer);
+    return mFrameQueue->getFrame(buffer);
 }
 
 int VideoDecodeHandler::PerformFlush() {
@@ -404,7 +404,7 @@ int VideoDecodeHandler::PerformFlush() {
     int ret = RESULT_OK;
     mLastSerial = -1;
     if (mFrameQueue) {
-        mFrameQueue->Flush();
+        mFrameQueue->flush();
     }
     if (mVideoDecoder &&
         (mInputPacketCount > 0 ||
@@ -430,7 +430,7 @@ void VideoDecodeHandler::ResetEof() {
     mLastSerial = -1;
     mPlayerLink->video_dec_finish = false;
     if (mFrameQueue) {
-        mFrameQueue->Flush();
+        mFrameQueue->flush();
     }
     mCond.notify_one();
 }
@@ -451,7 +451,7 @@ int VideoDecodeHandler::ResetDecoderFormat() {
 
 int VideoDecodeHandler::ResetDecoder() {
     if (mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_MEDIACODEC && mFrameQueue) {
-        mFrameQueue->Flush();
+        mFrameQueue->flush();
     }
     return ResetDecoderFormat();
 }
@@ -481,7 +481,7 @@ int VideoDecodeHandler::GetSerial() {
 
 int VideoDecodeHandler::GetQueueSize() {
     std::unique_lock<std::mutex> lock(mLock);
-    return mFrameQueue->Size();
+    return mFrameQueue->size();
 }
 
 // decode thread
@@ -502,7 +502,7 @@ void VideoDecodeHandler::executeTask() {
                 mPendingPkt.reset();
                 mInputPacketCount = 0;
                 if (mFrameQueue) {
-                    mFrameQueue->Flush();
+                    mFrameQueue->flush();
                 }
                 if (mVideoDecoder) {
                     HardWareContext *hwContext = new AndroidHardWareContext(mCurNativeWindow);
@@ -628,7 +628,7 @@ int VideoDecodeHandler::Stop() {
     bAbort = true;
     mCond.notify_all();
     if (mFrameQueue) {
-        mFrameQueue->Abort();
+        mFrameQueue->abort();
     }
     return RESULT_OK;
 }
@@ -645,7 +645,7 @@ void VideoDecodeHandler::Release() {
         mThread.join();
     }
     if (mFrameQueue) {
-        mFrameQueue->Flush();
+        mFrameQueue->flush();
     }
     while (!mPktQueue.empty()) {
         mPktQueue.pop();

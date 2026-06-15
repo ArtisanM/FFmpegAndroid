@@ -31,7 +31,7 @@ AudioRenderHandler::~AudioRenderHandler() {
         mAudioCallback.reset();
     }
     if (mFrameBuffer) {
-        mFrameBuffer->Release();
+        mFrameBuffer->release();
     }
     swr_free(&mSwrContext);
     av_freep(&mAudioNewBuf);
@@ -295,7 +295,7 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
 
     while (left_size > 0 && !bAbort) {
         if (mLastReadPos == 0) {
-            mFrameBuffer->Release();
+            mFrameBuffer->release();
             mAudioBufSize = 0;
 
             std::unique_ptr<FrameBuffer> buffer;
