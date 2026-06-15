@@ -16,7 +16,7 @@ public:
 
     ~AVMessage();
 
-    void Clear();
+    void clear();
 
 public:
     int mWhat     = 0;
@@ -32,19 +32,19 @@ public:
 
     ~MessageQueue();
 
-    int32_t Start();
+    int32_t start();
 
-    int32_t Push(int what, int arg1 = 0, int arg2 = 0, void *obj = nullptr, int len = 0);
+    int32_t push(int what, int arg1 = 0, int arg2 = 0, void *obj = nullptr, int len = 0);
 
-    sp<AVMessage> Pop(bool block);
+    sp<AVMessage> pop(bool block);
 
-    int32_t Flush();
+    int32_t flush();
 
-    int32_t Remove(int what);
+    int32_t remove(int what);
 
-    int32_t Recycle(sp<AVMessage> &msg);
+    int32_t recycle(sp<AVMessage> &msg);
 
-    int32_t Abort();
+    int32_t abort();
 
 private:
     bool mMsgAbort;

@@ -131,8 +131,8 @@ void AudioRenderHandler::executeTask() {
 int AudioRenderHandler::StartRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = false;
-    mPlayerLink->audio_clock->SetClock(mPlayerLink->audio_clock->GetClock());
-    mPlayerLink->audio_clock->SetPause(false);
+    mPlayerLink->audio_clock->setClock(mPlayerLink->audio_clock->getClock());
+    mPlayerLink->audio_clock->setPause(false);
     if (mAudioRender) {
         mAudioRender->pauseAudio(false);
     }
@@ -145,7 +145,7 @@ int AudioRenderHandler::PauseRender() {
     if (mAudioRender) {
         mAudioRender->pauseAudio(true);
     }
-    mPlayerLink->audio_clock->SetPause(true);
+    mPlayerLink->audio_clock->setPause(true);
     return RESULT_OK;
 }
 
@@ -354,9 +354,9 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
     lock.unlock();
 
     if (current_pts > 0) {
-        mPlayerLink->audio_clock->SetClock(current_pts / 1000.0 - mAudioDelay);
-        if (mPlayerLink->audio_clock->GetClockSerial() != mFrameBuffer->serial) {
-            mPlayerLink->audio_clock->SetClockSerial(mFrameBuffer->serial);
+        mPlayerLink->audio_clock->setClock(current_pts / 1000.0 - mAudioDelay);
+        if (mPlayerLink->audio_clock->getClockSerial() != mFrameBuffer->serial) {
+            mPlayerLink->audio_clock->setClockSerial(mFrameBuffer->serial);
         }
     }
 

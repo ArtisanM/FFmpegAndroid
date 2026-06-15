@@ -32,16 +32,16 @@ AVMessage::AVMessage(int what, int arg1, int arg2, void *obj, int len)
 }
 
 AVMessage::~AVMessage() {
-    Clear();
+    clear();
 }
 
-int32_t MessageQueue::Start() {
+int32_t MessageQueue::start() {
     std::lock_guard<std::mutex> lock(mMsgMutex);
     mMsgAbort = false;
     return RESULT_OK;
 }
 
-void AVMessage::Clear() {
+void AVMessage::clear() {
     mWhat = 0;
     mArg1 = 0;
     mArg2 = 0;
@@ -65,7 +65,7 @@ MessageQueue::~MessageQueue() {
     }
 }
 
-int32_t MessageQueue::Push(int what, int arg1, int arg2, void *obj, int len) {
+int32_t MessageQueue::push(int what, int arg1, int arg2, void *obj, int len) {
     std::lock_guard<std::mutex> lock(mMsgMutex);
     sp<AVMessage> msg;
     bool notify = false;
@@ -108,7 +108,7 @@ int32_t MessageQueue::Push(int what, int arg1, int arg2, void *obj, int len) {
     return RESULT_OK;
 }
 
-sp<AVMessage> MessageQueue::Pop(bool block) {
+sp<AVMessage> MessageQueue::pop(bool block) {
     std::unique_lock<std::mutex> lock(mMsgMutex);
     sp<AVMessage> ret;
     while (mMessageQueue.empty()) {
@@ -129,23 +129,23 @@ sp<AVMessage> MessageQueue::Pop(bool block) {
     return ret;
 }
 
-int32_t MessageQueue::Flush() {
+int32_t MessageQueue::flush() {
     std::lock_guard<std::mutex> lock(mMsgMutex);
     while (!mMessageQueue.empty()) {
         auto msg = mMessageQueue.front();
-        msg->Clear();
+        msg->clear();
         mRecycledQueue.push(msg);
         mMessageQueue.pop();
     }
     return RESULT_OK;
 }
 
-int32_t MessageQueue::Remove(int what) {
+int32_t MessageQueue::remove(int what) {
     std::lock_guard<std::mutex> lock(mMsgMutex);
     while (!mMessageQueue.empty()) {
         auto msg = mMessageQueue.front();
         if (msg && msg->mWhat == what) {
-            msg->Clear();
+            msg->clear();
             mRecycledQueue.push(msg);
             mMessageQueue.pop();
             break;
@@ -154,17 +154,17 @@ int32_t MessageQueue::Remove(int what) {
     return RESULT_OK;
 }
 
-int32_t MessageQueue::Recycle(sp<AVMessage> &msg) {
+int32_t MessageQueue::recycle(sp<AVMessage> &msg) {
     std::lock_guard<std::mutex> lock(mMsgMutex);
     if (!msg) {
         return RESULT_OK;
     }
-    msg->Clear();
+    msg->clear();
     mRecycledQueue.push(msg);
     return RESULT_OK;
 }
 
-int32_t MessageQueue::Abort() {
+int32_t MessageQueue::abort() {
     std::lock_guard<std::mutex> lock(mMsgMutex);
     mMsgAbort = true;
     mMsgCondition.notify_one();
