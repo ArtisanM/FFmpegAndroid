@@ -17,21 +17,21 @@ public:
 
     ~NextPacketQueue() = default;
 
-    int PutPacket(std::unique_ptr<NextPacket> &pkt);
+    int putPacket(std::unique_ptr<NextPacket> &pkt);
 
-    int GetPacket(std::unique_ptr<NextPacket> &pkt, bool block);
+    int getPacket(std::unique_ptr<NextPacket> &pkt, bool block);
 
-    bool IsFlushPacket();
+    bool isFlushPacket();
 
-    int PacketCount();
+    int packetCount();
 
-    int64_t ByteCount();
+    int64_t byteCount();
 
-    int64_t Duration();
+    int64_t duration();
 
-    void Flush();
+    void flush();
 
-    void Release();
+    void release();
 
 private:
     int64_t mDuration  = 0;

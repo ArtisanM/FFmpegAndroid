@@ -80,7 +80,7 @@ bool MediaParseHandler::FrontIsFlush(int streamType) {
     if (!queue) {
         return false;
     }
-    return queue->IsFlushPacket();
+    return queue->isFlushPacket();
 }
 
 int MediaParseHandler::PerformFlush() {
@@ -88,7 +88,7 @@ int MediaParseHandler::PerformFlush() {
     if (mPktQueueMap.empty())
         return RESULT_OK;
     for (auto & it : mPktQueueMap) {
-        it.second->Flush();
+        it.second->flush();
     }
     UpdateCacheStatistic();
     return RESULT_OK;
@@ -144,7 +144,7 @@ int MediaParseHandler::GetPacket(std::unique_ptr<NextPacket> &pkt, int streamTyp
     if (!queue) {
         return ERROR_PLAYER_INIT_FAIL;
     }
-    int ret = queue->GetPacket(pkt, block);
+    int ret = queue->getPacket(pkt, block);
     UpdateCacheStatistic();
     return ret;
 }
@@ -170,7 +170,7 @@ int MediaParseHandler::PutPacketByType(PacketOpType type) {
     }
     for (auto & it : mPktQueueMap) {
         std::unique_ptr<NextPacket> pkt(new NextPacket(type));
-        it.second->PutPacket(pkt);
+        it.second->putPacket(pkt);
     }
     return RESULT_OK;
 }
@@ -337,13 +337,13 @@ void MediaParseHandler::executeTask() {
             std::unique_ptr<NextPacket> flushPkt(new NextPacket(pkt, mSerial));
             sp<NextPacketQueue> queue = GetQueueByStreamType(AVMEDIA_TYPE_AUDIO);
             if (queue) {
-                queue->PutPacket(flushPkt);
+                queue->putPacket(flushPkt);
             }
         } else if (pkt->stream_index == mMetaData->video_index && !CheckDropNonRefFrame(pkt)) {
             std::unique_ptr<NextPacket> flushPkt(new NextPacket(pkt, mSerial));
             sp<NextPacketQueue> queue = GetQueueByStreamType(AVMEDIA_TYPE_VIDEO);
             if (queue) {
-                queue->PutPacket(flushPkt);
+                queue->putPacket(flushPkt);
             }
         }
 
@@ -395,7 +395,7 @@ void MediaParseHandler::Release() {
         mThread.join();
     }
     for (auto & it : mPktQueueMap) {
-        it.second->Release();
+        it.second->release();
     }
     NEXT_LOGD(TAG, "%s Release end\n", __func__ );
 }
@@ -527,21 +527,21 @@ void MediaParseHandler::UpdateCacheStatistic() {
                 auto trackInfo = mMetaData->track_info[mMetaData->video_index];
                 AVRational tb =
                         (AVRational) {trackInfo.time_base_num, trackInfo.time_base_den};
-                mPlayerLink->stat.video_cache.duration = videoQueue->Duration() * av_q2d(tb) * 1000;
+                mPlayerLink->stat.video_cache.duration = videoQueue->duration() * av_q2d(tb) * 1000;
             }
         }
-        mPlayerLink->stat.video_cache.bytes   = videoQueue->ByteCount();
-        mPlayerLink->stat.video_cache.packets = videoQueue->PacketCount();
+        mPlayerLink->stat.video_cache.bytes   = videoQueue->byteCount();
+        mPlayerLink->stat.video_cache.packets = videoQueue->packetCount();
     }
     sp<NextPacketQueue> audioQueue = GetQueueByStreamType(AVMEDIA_TYPE_AUDIO);
     if (audioQueue) {
         if (mMetaData && mMetaData->audio_index >= 0) {
             auto trackInfo = mMetaData->track_info[mMetaData->audio_index];
             AVRational tb = (AVRational) {trackInfo.time_base_num, trackInfo.time_base_den};
-            mPlayerLink->stat.audio_cache.duration = audioQueue->Duration() * av_q2d(tb) * 1000;
+            mPlayerLink->stat.audio_cache.duration = audioQueue->duration() * av_q2d(tb) * 1000;
         }
-        mPlayerLink->stat.audio_cache.bytes   = audioQueue->ByteCount();
-        mPlayerLink->stat.audio_cache.packets = audioQueue->PacketCount();
+        mPlayerLink->stat.audio_cache.bytes   = audioQueue->byteCount();
+        mPlayerLink->stat.audio_cache.packets = audioQueue->packetCount();
     }
 }
 

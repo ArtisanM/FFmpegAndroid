@@ -23,20 +23,6 @@ public:
 
     explicit NextPacket(PacketOpType type);
 
-    ~NextPacket();
-
-    AVPacket *GetPacket();
-
-    int GetSerial() const;
-
-    bool IsKeyPacket();
-
-    bool IsFlushPacket();
-
-    bool IsEofPacket();
-
-    bool IsKeyOrIdrPacket(bool is_idr, bool is_hevc);
-
     NextPacket(const NextPacket &) = delete;
 
     NextPacket(NextPacket &&) = delete;
@@ -44,6 +30,20 @@ public:
     NextPacket &operator=(const NextPacket &) = delete;
 
     NextPacket &operator=(NextPacket &&) = delete;
+
+    ~NextPacket();
+
+    AVPacket *getPacket();
+
+    int getSerial() const;
+
+    bool isKeyPacket();
+
+    bool isFlushPacket();
+
+    bool isEofPacket();
+
+    bool isKeyOrIdrPacket(bool is_idr, bool is_hevc);
 
 private:
     int mSerial           = 0;

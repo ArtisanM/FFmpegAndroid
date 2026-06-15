@@ -459,7 +459,8 @@ int VideoDecodeHandler::ResetDecoder() {
 void VideoDecodeHandler::DecodeLastCacheGop() {
     bDecoderRecovery = true;
     if ((!mPktQueue.empty()) &&
-        mPktQueue.front()->IsKeyOrIdrPacket(bIdrIdentified, "hevc" == mPlayerLink->video_codec_name)) {
+            mPktQueue.front()->isKeyOrIdrPacket(bIdrIdentified,
+                                                "hevc" == mPlayerLink->video_codec_name)) {
         NEXT_LOGD(TAG, "DecodeLastCacheGop begin\n");
         while (!mPktQueue.empty()) {
             if (bAbort || FrontIsFlush()) {
@@ -467,7 +468,7 @@ void VideoDecodeHandler::DecodeLastCacheGop() {
             }
             auto cache_pkt = mPktQueue.front();
             mPktQueue.pop();
-            PerformDecode(cache_pkt->GetPacket());
+            PerformDecode(cache_pkt->getPacket());
         }
         NEXT_LOGD(TAG, "DecodeLastCacheGop end\n");
     }
@@ -535,7 +536,7 @@ void VideoDecodeHandler::executeTask() {
             usleep(SLEEP_20MS_CONVERT_US);
             continue;
         }
-        if (pkt->IsFlushPacket()) {
+        if (pkt->isFlushPacket()) {
             PerformFlush();
             mPendingPkt.reset();
             if (mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_VTB &&
@@ -543,7 +544,7 @@ void VideoDecodeHandler::executeTask() {
                 ResetDecoder();
             }
             continue;
-        } else if (pkt->IsEofPacket()) {
+        } else if (pkt->isEofPacket()) {
             // TODO: EOF process
             NEXT_LOGI(TAG, "packet EOF!\n");
             bEOF = true;
@@ -565,8 +566,8 @@ void VideoDecodeHandler::executeTask() {
                 mCond.wait_for(lock, std::chrono::milliseconds(SLEEP_10MS));
             }
             continue;
-        } else if (pkt->GetSerial() != mSerial) {
-            NEXT_LOGI(TAG, "packet serial=%d, current serial=%d\n", pkt->GetSerial(), mSerial);
+        } else if (pkt->getSerial() != mSerial) {
+            NEXT_LOGI(TAG, "packet serial=%d, current serial=%d\n", pkt->getSerial(), mSerial);
             continue;
         }
 
@@ -575,13 +576,13 @@ void VideoDecodeHandler::executeTask() {
         mPlayerLink->video_dec_finish = false;
 
         if (mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_VTB && !mPendingPkt) {
-            if (pkt->IsKeyPacket() || mPktQueue.size() >= MAX_PKT_QUEUE_DEEP) {
+            if (pkt->isKeyPacket() || mPktQueue.size() >= MAX_PKT_QUEUE_DEEP) {
                 bIdrIdentified = false;
                 while (!mPktQueue.empty()) {
                     mPktQueue.pop();
                 }
             }
-            std::shared_ptr<NextPacket> newPkt(new NextPacket(pkt->GetPacket(), pkt->GetSerial()));
+            std::shared_ptr<NextPacket> newPkt(new NextPacket(pkt->getPacket(), pkt->getSerial()));
             mPktQueue.push(newPkt);
         }
 
@@ -591,7 +592,7 @@ void VideoDecodeHandler::executeTask() {
             DecodeLastCacheGop();
             bRefreshSession = false;
         }
-        ret = PerformDecode(pkt->GetPacket());
+        ret = PerformDecode(pkt->getPacket());
         if (ret == ERROR_PLAYER_TRY_AGAIN) {
             mPendingPkt = std::move(pkt);
             continue;

@@ -19,9 +19,9 @@ NextPacketQueue::NextPacketQueue(int type) {
     mByteCount = 0;
 }
 
-int NextPacketQueue::PutPacket(std::unique_ptr<NextPacket> &pkt) {
+int NextPacketQueue::putPacket(std::unique_ptr<NextPacket> &pkt) {
     UNIQUE_LOCK lock(mLock);
-    AVPacket *packet = pkt ? pkt->GetPacket() : nullptr;
+    AVPacket *packet = pkt ? pkt->getPacket() : nullptr;
     mByteCount += packet ? packet->size : 0;
     mDuration  += packet ? std::max(packet->duration, (int64_t) MIN_PKT_DURATION) : 0;
     mPktQueue.push(std::move(pkt));
@@ -29,7 +29,7 @@ int NextPacketQueue::PutPacket(std::unique_ptr<NextPacket> &pkt) {
     return RESULT_OK;
 }
 
-int NextPacketQueue::GetPacket(std::unique_ptr<NextPacket> &pkt, bool block) {
+int NextPacketQueue::getPacket(std::unique_ptr<NextPacket> &pkt, bool block) {
     UNIQUE_LOCK lock(mLock);
     if (mPktQueue.empty() && !block)
         return ERROR_PLAYER_TRY_AGAIN;
@@ -44,14 +44,14 @@ int NextPacketQueue::GetPacket(std::unique_ptr<NextPacket> &pkt, bool block) {
         }
     }
     pkt = std::move(mPktQueue.front());
-    AVPacket *packet = pkt ? pkt->GetPacket() : nullptr;
+    AVPacket *packet = pkt ? pkt->getPacket() : nullptr;
     mByteCount -= packet ? packet->size : 0;
     mDuration  -= packet ? std::max(packet->duration, (int64_t) MIN_PKT_DURATION) : 0;
     mPktQueue.pop();
     return RESULT_OK;
 }
 
-bool NextPacketQueue::IsFlushPacket() {
+bool NextPacketQueue::isFlushPacket() {
     UNIQUE_LOCK lock(mLock);
     if (mPktQueue.empty()) {
         return false;
@@ -59,30 +59,30 @@ bool NextPacketQueue::IsFlushPacket() {
     if (!mPktQueue.front()) {
         return false;
     }
-    return mPktQueue.front()->IsFlushPacket();
+    return mPktQueue.front()->isFlushPacket();
 }
 
-int NextPacketQueue::PacketCount() {
+int NextPacketQueue::packetCount() {
     UNIQUE_LOCK lock(mLock);
     return static_cast<int>(mPktQueue.size());
 }
 
-int64_t NextPacketQueue::ByteCount() {
+int64_t NextPacketQueue::byteCount() {
     UNIQUE_LOCK lock(mLock);
     return mByteCount;
 }
 
-int64_t NextPacketQueue::Duration() {
+int64_t NextPacketQueue::duration() {
     UNIQUE_LOCK lock(mLock);
     return mDuration;
 }
 
-void NextPacketQueue::Flush() {
+void NextPacketQueue::flush() {
     UNIQUE_LOCK lock(mLock);
     int flushCount = 0;
     while (!mPktQueue.empty()) {
         auto pkt = std::move(mPktQueue.front());
-        if (pkt->IsFlushPacket()) {
+        if (pkt->isFlushPacket()) {
             flushCount++;
         }
         mPktQueue.pop();
@@ -96,7 +96,7 @@ void NextPacketQueue::Flush() {
     mByteCount = 0;
 }
 
-void NextPacketQueue::Release() {
+void NextPacketQueue::release() {
     UNIQUE_LOCK lock(mLock);
     while (!mPktQueue.empty()) {
         mPktQueue.pop();

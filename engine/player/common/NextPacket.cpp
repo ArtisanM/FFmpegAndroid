@@ -10,7 +10,7 @@
 #include "NalUnitParser.h"
 
 
-static bool IsIdrPacket(AVPacket *pkt, bool is_hevc) {
+static bool isIdrPacket(AVPacket *pkt, bool is_hevc) {
     if (pkt && pkt->data && pkt->size >= 5) {
         uint32_t offset = 0;
         while (offset >= 0 && offset + 5 <= pkt->size) {
@@ -50,30 +50,30 @@ NextPacket::~NextPacket() {
     }
 }
 
-AVPacket *NextPacket::GetPacket() {
+AVPacket *NextPacket::getPacket() {
     return mPkt;
 }
 
-int NextPacket::GetSerial() const {
+int NextPacket::getSerial() const {
     return mSerial;
 }
 
-bool NextPacket::IsKeyPacket() {
+bool NextPacket::isKeyPacket() {
     return mPkt && mPkt->flags & AV_PKT_FLAG_KEY;
 }
 
-bool NextPacket::IsFlushPacket() {
+bool NextPacket::isFlushPacket() {
     return mPktType == PKT_OP_TYPE_FLUSH;
 }
 
-bool NextPacket::IsEofPacket() {
+bool NextPacket::isEofPacket() {
     return mPktType == PKT_OP_TYPE_EOF;
 }
 
-bool NextPacket::IsKeyOrIdrPacket(bool is_idr, bool is_hevc) {
+bool NextPacket::isKeyOrIdrPacket(bool is_idr, bool is_hevc) {
     if (is_idr) {
-        return IsIdrPacket(mPkt, is_hevc);
+        return isIdrPacket(mPkt, is_hevc);
     } else {
-        return IsKeyPacket();
+        return isKeyPacket();
     }
 }

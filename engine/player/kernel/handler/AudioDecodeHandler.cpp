@@ -332,10 +332,10 @@ void AudioDecodeHandler::executeTask() {
             usleep(SLEEP_20MS_CONVERT_US);
             continue;
         }
-        if (pkt->IsFlushPacket()) {
+        if (pkt->isFlushPacket()) {
             PerformFlush();
             continue;
-        } else if (pkt->IsEofPacket()) {
+        } else if (pkt->isEofPacket()) {
             NEXT_LOGI(TAG, "packet EOF!\n");
             if (mGeneralConfig->playerConfig->get()->enable_accurate_seek) {
                 std::unique_lock<std::mutex> lock(mPlayerLink->accurate_seek_mutex);
@@ -348,12 +348,12 @@ void AudioDecodeHandler::executeTask() {
                 mCond.wait(lock);
             }
             continue;
-        } else if (pkt->GetSerial() != mSerial) {
+        } else if (pkt->getSerial() != mSerial) {
             continue;
         }
         mPlayerLink->audio_dec_finish = false;
         // execute audio decoding
-        PerformDecode(pkt->GetPacket());
+        PerformDecode(pkt->getPacket());
     }
 }
 
