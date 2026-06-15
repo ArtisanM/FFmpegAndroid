@@ -45,35 +45,39 @@ int OpenGLFilter::init(VideoFrameMetaData *inputFrameMetaData,
         case PIXEL_FORMAT_RGB565:
         case PIXEL_FORMAT_RGB888:
         case PIXEL_FORMAT_RGBA8888: {
-            if (!InitWithFragmentShader(GetFragmentShader(), 1)) {
+            if (!initWithFragmentShader(getFragmentShader(), 1)) {
                 error = "init rgb shader error!";
             }
         }
             break;
         case PIXEL_FORMAT_YUV420P: {
-            std::string shader = GetYUV420p2RGBFragmentShader(mInputFrameData->color_range == AVCOL_RANGE_JPEG);
-            if (!InitWithFragmentShader(shader, 3)) {
+            std::string shader = getYuv420P2RgbFragmentShader(
+                    mInputFrameData->color_range == AVCOL_RANGE_JPEG);
+            if (!initWithFragmentShader(shader, 3)) {
                 error = "init yuv420p shader error!";
             }
         }
             break;
         case PIXEL_FORMAT_YUV420SP: {
-            std::string shader = GetYUV420sp2RGBFragmentShader(mInputFrameData->color_range == AVCOL_RANGE_JPEG);
-            if (!InitWithFragmentShader(shader, 2)) {
+            std::string shader = getYuv420Sp2RgbFragmentShader(
+                    mInputFrameData->color_range == AVCOL_RANGE_JPEG);
+            if (!initWithFragmentShader(shader, 2)) {
                 error = "init yuv420sp shader error!";
             }
         }
             break;
         case PIXEL_FORMAT_VIDEOTOOLBOX: {
-            std::string shader = GetYUV420sp2RGBFragmentShader(mInputFrameData->color_range == AVCOL_RANGE_JPEG);
-            if (!InitWithFragmentShader(shader, 2)) {
+            std::string shader = getYuv420Sp2RgbFragmentShader(
+                    mInputFrameData->color_range == AVCOL_RANGE_JPEG);
+            if (!initWithFragmentShader(shader, 2)) {
                 error = "init yuv420sp_vtb shader error!";
             }
         }
             break;
         case PIXEL_FORMAT_YUV420P10LE: {
-            std::string shader = GetYUV420p10le2RGBFragmentShader(mInputFrameData->color_range == AVCOL_RANGE_JPEG);
-            if (!InitWithFragmentShader(shader, 2)) {
+            std::string shader = getYuv420P10Le2RgbFragmentShader(
+                    mInputFrameData->color_range == AVCOL_RANGE_JPEG);
+            if (!initWithFragmentShader(shader, 2)) {
                 error = "init yuv420p10le shader error!";
             }
         }
@@ -90,7 +94,7 @@ int OpenGLFilter::init(VideoFrameMetaData *inputFrameMetaData,
     return RESULT_OK;
 }
 
-int OpenGLFilter::OnRender() {
+int OpenGLFilter::onRender() {
     const float *matrix = nullptr;
     GLint uColorConversion = glGetUniformLocation(mProgram, "uColorConversion");
     switch (mInputFrameData->color_space) {
@@ -129,5 +133,5 @@ int OpenGLFilter::OnRender() {
         }
             break;
     }
-    return BaseFilter::OnRender();
+    return BaseFilter::onRender();
 }

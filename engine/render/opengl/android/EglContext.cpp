@@ -103,7 +103,7 @@ EGLBoolean EglContext::initContext(EGLContext eglContext, EGLNativeWindowType wi
     return EGL_TRUE;
 }
 
-EGLBoolean EglContext::CreateEglSurface(EGLNativeWindowType surface) {
+EGLBoolean EglContext::createEglSurface(EGLNativeWindowType surface) {
     std::unique_lock<std::mutex> lck(mEglMutex);
 
     if (mEglWindowType) {

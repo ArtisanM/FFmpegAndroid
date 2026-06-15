@@ -36,15 +36,15 @@ int BaseFilter::init(VideoFrameMetaData *inputFrameMetaData, std::shared_ptr<Ope
     return RESULT_OK;
 }
 
-bool BaseFilter::InitWithFragmentShader(const std::string &fragmentShader, int inputTexNum) {
+bool BaseFilter::initWithFragmentShader(const std::string &fragmentShader, int inputTexNum) {
     mInputTexNum = inputTexNum;
-    return InitWithShader(GetVertexShaderString(inputTexNum), fragmentShader);
+    return initWithShader(getVertexShaderString(inputTexNum), fragmentShader);
 }
 
-bool BaseFilter::InitWithShader(
+bool BaseFilter::initWithShader(
         const std::string &vertexShader,
         const std::string &fragmentShader) {
-    mProgram = CreateProgram(vertexShader, fragmentShader);
+    mProgram = createProgram(vertexShader, fragmentShader);
     if (mProgram == -1) {
         NEXT_LOGE(OPENGL_FILTER, "create program error!\n");
         return false;
@@ -55,18 +55,18 @@ bool BaseFilter::InitWithShader(
     return true;
 }
 
-int BaseFilter::OnRender() {
+int BaseFilter::onRender() {
 #if defined(__ANDROID__) || defined(__HARMONY__)
-    EGLBoolean res = mGLContext->getEglContext()->MakeCurrent();
+    EGLBoolean res = mGLContext->getEglContext()->makeCurrent();
     if (!res) {
-        NEXT_LOGE(OPENGL_FILTER, "MakeCurrent error\n");
+        NEXT_LOGE(OPENGL_FILTER, "makeCurrent error\n");
         return ERROR_RENDER_HANDLE;
     }
 #endif
     glUseProgram(mProgram);
 #if defined(__ANDROID__) || defined(__HARMONY__)
     glViewport(0, 0, mCurrentWidth, mCurrentHeight);
-    mGLContext->getEglContext()->SetSurfaceSize(mCurrentWidth, mCurrentHeight);
+    mGLContext->getEglContext()->setSurfaceSize(mCurrentWidth, mCurrentHeight);
 #elif defined(__APPLE__)
     mGLContext->getEaglContext()->useAsCurrent();
     mGLContext->getEaglContext()->activeFramebuffer();
@@ -89,17 +89,17 @@ int BaseFilter::OnRender() {
         glEnableVertexAttribArray(texCoordAttribute);
         glVertexAttribPointer(
                 texCoordAttribute, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
-                GetTextureCoordinate(mInputFrameData->rotation_mode));
+                getTextureCoordinate(mInputFrameData->rotation_mode));
     }
 
     GLint uMvp = glGetUniformLocation(mProgram, "uMvp");
     glUniformMatrix4fv(uMvp, 1, GL_FALSE, const_cast<GLfloat *>(ModelViewProjectionMatrix));
     glVertexAttribPointer(mPositionAttribute, 2, GL_FLOAT,
-                          GL_FALSE, 2 * sizeof(float), GetVertexCoordinate());
+                          GL_FALSE, 2 * sizeof(float), getVertexCoordinate());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 #if defined(__ANDROID__) || defined(__HARMONY__)
-    mGLContext->getEglContext()->SwapBuffers();
+    mGLContext->getEglContext()->swapBuffers();
 #elif defined(__APPLE__)
     mGLContext->getEaglContext()->presentBufferForDisplay();
     mGLContext->getEaglContext()->inActiveFramebuffer();
@@ -108,7 +108,7 @@ int BaseFilter::OnRender() {
     return RESULT_OK;
 }
 
-void BaseFilter::UpdateParam() {
+void BaseFilter::updateParam() {
     int width  = mInputFrameData->frame_width;
     int height = mInputFrameData->frame_height;
     if (mInputFrameData->rotation_mode == ROTATION_90 || mInputFrameData->rotation_mode == ROTATION_270) {
@@ -142,7 +142,7 @@ void BaseFilter::UpdateParam() {
         mCurrentWidth  = width;
         mCurrentHeight = height;
 #if defined(__ANDROID__) || defined(__HARMONY__)
-        mTextureId = CreateTexture();
+        mTextureId = createTexture();
 #elif defined(__APPLE__)
         if (getOpenGLFilterBaseType() != VIDEO_FILTER_OPENGL) {
             mTextureId = CreateTexture();
@@ -154,23 +154,23 @@ void BaseFilter::UpdateParam() {
     }
 }
 
-void BaseFilter::SetInputFrameMetaData(
+void BaseFilter::setInputFrameMetaData(
         VideoFrameMetaData *inputFrameMetaData) {
     mInputFrameData = inputFrameMetaData;
 }
 
-void BaseFilter::SetInputTexture(GLuint textureId, int index) {
+void BaseFilter::setInputTexture(GLuint textureId, int index) {
     mTextures[index] = textureId;
 }
 
-const GLfloat *BaseFilter::GetVertexCoordinate() {
-    DefaultVertexCoordinate();
+const GLfloat *BaseFilter::getVertexCoordinate() {
+    defaultVertexCoordinate();
 
     if (mInputFrameData->view_width < 0 ||
         mInputFrameData->view_height < 0 ||
         mInputFrameData->frame_width < 0 ||
         mInputFrameData->frame_height < 0) {
-        NEXT_LOGE(OPENGL_FILTER, "GetVertexCoordinate error, view_w=%d, view_h=%d, frame_w=%d, frame_h=%d",
+        NEXT_LOGE(OPENGL_FILTER, "getVertexCoordinate error, view_w=%d, view_h=%d, frame_w=%d, frame_h=%d",
                   mInputFrameData->view_width,
                   mInputFrameData->view_height,
                   mInputFrameData->frame_width,
@@ -264,17 +264,17 @@ const GLfloat *BaseFilter::GetVertexCoordinate() {
     return mVertexCoordinate;
 }
 
-const GLfloat* BaseFilter::GetTextureCoordinate(const RotationMode &rotationMode) {
+const GLfloat* BaseFilter::getTextureCoordinate(const RotationMode &rotationMode) {
     // TODO: update textureCoordinate when rotate changed
-    UpdateTextureCoordinate(rotationMode);
+    updateTextureCoordinate(rotationMode);
     if (mPaddingPixels > 0) {
         GLfloat cropSize = (GLfloat) mPaddingPixels / (GLfloat) mInputFrameData->linesize[0];
-        CropTextureCoordinate(rotationMode, cropSize);
+        cropTextureCoordinate(rotationMode, cropSize);
     }
     return mTextureCoordinate;
 }
 
-void BaseFilter::UpdateTextureCoordinate(const RotationMode &rotationMode) {
+void BaseFilter::updateTextureCoordinate(const RotationMode &rotationMode) {
     switch (rotationMode) {
         case ROTATION_90:
             memcpy(mTextureCoordinate, TextureRotation90, 8 * sizeof(float));
@@ -298,7 +298,7 @@ void BaseFilter::UpdateTextureCoordinate(const RotationMode &rotationMode) {
     }
 }
 
-void BaseFilter::DefaultVertexCoordinate() {
+void BaseFilter::defaultVertexCoordinate() {
     mVertexCoordinate[0] = -1.0f;
     mVertexCoordinate[1] = -1.0f;
     mVertexCoordinate[2] = 1.0f;
@@ -309,7 +309,7 @@ void BaseFilter::DefaultVertexCoordinate() {
     mVertexCoordinate[7] = 1.0f;
 }
 
-void BaseFilter::CropTextureCoordinate(RotationMode rotationMode, GLfloat cropSize) {
+void BaseFilter::cropTextureCoordinate(RotationMode rotationMode, GLfloat cropSize) {
     switch (rotationMode) {
         case ROTATION_90:
             mTextureCoordinate[0] = mTextureCoordinate[0] - cropSize;

@@ -3,12 +3,12 @@
 
 #include <string>
 
-std::string GetVertexShader();
-std::string GetFragmentShader();
-std::string GetVertexShaderString(int textureNum);
+std::string getVertexShader();
+std::string getFragmentShader();
+std::string getVertexShaderString(int textureNum);
 
-std::string GetYUV420p2RGBFragmentShader(bool fullRange);
-std::string GetYUV420sp2RGBFragmentShader(bool fullRange);
-std::string GetYUV420p10le2RGBFragmentShader(bool fullRange);
+std::string getYuv420P2RgbFragmentShader(bool fullRange);
+std::string getYuv420Sp2RgbFragmentShader(bool fullRange);
+std::string getYuv420P10Le2RgbFragmentShader(bool fullRange);
 
 #endif // SHADER_FACTORY_H

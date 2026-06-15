@@ -25,31 +25,31 @@ public:
 
     virtual int init(VideoFrameMetaData *inputFrameMetaData, std::shared_ptr<OpenGLContext> context);
 
-    virtual bool InitWithFragmentShader(const std::string &fragmentShader, int inputTexNum);
+    virtual bool initWithFragmentShader(const std::string &fragmentShader, int inputTexNum);
 
-    bool InitWithShader(const std::string &vertexShader, const std::string &fragmentShader);
+    bool initWithShader(const std::string &vertexShader, const std::string &fragmentShader);
 
-    void SetInputFrameMetaData(VideoFrameMetaData *inputFrameMetaData);
+    void setInputFrameMetaData(VideoFrameMetaData *inputFrameMetaData);
 
-    void SetInputTexture(GLuint textureId, int index);
+    void setInputTexture(GLuint textureId, int index);
 
-    virtual void UpdateParam();
+    virtual void updateParam();
 
-    virtual int OnRender();
+    virtual int onRender();
 
     int getPixelFormat() const;
 
 protected:
 
-    const GLfloat *GetVertexCoordinate();
+    const GLfloat *getVertexCoordinate();
 
-    const GLfloat *GetTextureCoordinate(const RotationMode &rotationMode);
+    const GLfloat *getTextureCoordinate(const RotationMode &rotationMode);
 
-    void DefaultVertexCoordinate();
+    void defaultVertexCoordinate();
 
-    void UpdateTextureCoordinate(const RotationMode &rotationMode);
+    void updateTextureCoordinate(const RotationMode &rotationMode);
 
-    void CropTextureCoordinate(RotationMode rotationMode, GLfloat cropSize);
+    void cropTextureCoordinate(RotationMode rotationMode, GLfloat cropSize);
 
 protected:
 

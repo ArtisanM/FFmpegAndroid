@@ -18,7 +18,7 @@ public:
 
     EGLBoolean initContext(EGLContext eglContext = nullptr, EGLNativeWindowType window = nullptr);
 
-    EGLBoolean CreateEglSurface(EGLNativeWindowType surface);
+    EGLBoolean createEglSurface(EGLNativeWindowType surface);
 
     EGLBoolean makeCurrent();
 

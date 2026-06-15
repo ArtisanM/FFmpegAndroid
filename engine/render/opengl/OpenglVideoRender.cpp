@@ -73,8 +73,8 @@ int OpenGLVideoRender::setSurface(ANativeWindow *nativeWindow) {
         NEXT_LOGE(OPENGL_RENDER, "init EglContext error\n");
         return ERROR_RENDER_VIDEO_CTX;
     }
-    if (!mGLContext->getEglContext()->CreateEglSurface(nativeWindow)) {
-        NEXT_LOGE(OPENGL_RENDER, "CreateEglSurface error\n");
+    if (!mGLContext->getEglContext()->createEglSurface(nativeWindow)) {
+        NEXT_LOGE(OPENGL_RENDER, "createEglSurface error\n");
         return ERROR_RENDER_VIDEO_CTX;
     }
 
@@ -591,17 +591,17 @@ int OpenGLVideoRender::onScreenRender() {
         case PIXEL_FORMAT_RGB565:
         case PIXEL_FORMAT_RGB888:
         case PIXEL_FORMAT_RGBA8888:
-            mOpenglFilter->SetInputTexture(mTextures[0], 0);
+            mOpenglFilter->setInputTexture(mTextures[0], 0);
             break;
         case PIXEL_FORMAT_YUV420P:
         case PIXEL_FORMAT_YUV420SP:
             for (int i = 0; i < 3; i++) {
-                mOpenglFilter->SetInputTexture(mTextures[i], i);
+                mOpenglFilter->setInputTexture(mTextures[i], i);
             }
             break;
         case PIXEL_FORMAT_VIDEOTOOLBOX:
             for (int i = 0; i < 2; i++) {
-                mOpenglFilter->SetInputTexture(mTextures[i], i);
+                mOpenglFilter->setInputTexture(mTextures[i], i);
             }
             break;
         case PIXEL_FORMAT_YUV420P10LE:
@@ -619,9 +619,9 @@ int OpenGLVideoRender::onScreenRender() {
         return ERROR_RENDER_VIDEO_CTX;
     }
 #endif
-    mOpenglFilter->SetInputFrameMetaData(mInputFrameData);
-    mOpenglFilter->UpdateParam();
-    mOpenglFilter->OnRender();
+    mOpenglFilter->setInputFrameMetaData(mInputFrameData);
+    mOpenglFilter->updateParam();
+    mOpenglFilter->onRender();
 #if defined(__APPLE__)
     mRenderGLTexture[0] = nullptr;
     mRenderGLTexture[1] = nullptr;

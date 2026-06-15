@@ -113,17 +113,17 @@ static const std::string YUV420p10le2RGBFragmentShader =
         }
     );
 
-std::string GetVertexShader() {
+std::string getVertexShader() {
     return CommonVertexShader;
 }
 
-std::string GetFragmentShader() {
+std::string getFragmentShader() {
     return CommonFragmentShader;
 }
 
-std::string GetVertexShaderString(int textureNum)  {
+std::string getVertexShaderString(int textureNum)  {
     if (textureNum <= 1) {
-        return GetVertexShader();
+        return getVertexShader();
     }
 
     std::string shaderStr = "\
@@ -164,14 +164,14 @@ std::string HandleColorRange(const std::string &src, bool fullRange) {
     return src;
 }
 
-std::string GetYUV420p2RGBFragmentShader(bool fullRange) {
+std::string getYuv420P2RgbFragmentShader(bool fullRange) {
     return HandleColorRange(YUV420p2RGBFragmentShader, fullRange);
 }
 
-std::string GetYUV420sp2RGBFragmentShader(bool fullRange) {
+std::string getYuv420Sp2RgbFragmentShader(bool fullRange) {
     return HandleColorRange(YUV420sp2RGBFragmentShader, fullRange);
 }
 
-std::string GetYUV420p10le2RGBFragmentShader(bool fullRange) {
+std::string getYuv420P10Le2RgbFragmentShader(bool fullRange) {
     return HandleColorRange(YUV420p10le2RGBFragmentShader, fullRange);
 }
