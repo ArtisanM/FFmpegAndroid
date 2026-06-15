@@ -15,46 +15,46 @@ MediaClock::MediaClock()
         : mSerial(0),
           bPause(true),
           mSpeed(1.0f) {
-    mLastUpdateTime = GetCurrentTime();
+    mLastUpdateTime = getCurrentTime();
     mPtsDrift = 0 - mLastUpdateTime;
 }
 
-void MediaClock::SetClock(double pts) {
+void MediaClock::setClock(double pts) {
     std::lock_guard<std::mutex> lock(mLock);
-    double now = GetCurrentTime();
+    double now = getCurrentTime();
     mPtsDrift = pts - now;
     mLastUpdateTime = now;
 }
 
-double MediaClock::GetClock() {
+double MediaClock::getClock() {
     std::lock_guard<std::mutex> lock(mLock);
-    double now = GetCurrentTime();
+    double now = getCurrentTime();
     if (bPause)
         now = mLastUpdateTime;
     return mPtsDrift + now - (now - mLastUpdateTime) * (1.0f - mSpeed);
 }
 
-void MediaClock::SetClockSerial(int serial) {
+void MediaClock::setClockSerial(int serial) {
     std::lock_guard<std::mutex> lck(mLock);
     mSerial = serial;
 }
 
-int MediaClock::GetClockSerial() {
+int MediaClock::getClockSerial() {
     std::lock_guard<std::mutex> lock(mLock);
     return mSerial;
 }
 
-void MediaClock::SetSpeed(double speed) {
+void MediaClock::setSpeed(double speed) {
     std::lock_guard<std::mutex> lock(mLock);
     mSpeed = speed;
 }
 
-void MediaClock::SetPause(bool paused) {
+void MediaClock::setPause(bool paused) {
     std::lock_guard<std::mutex> lock(mLock);
     bPause = paused;
 }
 
-double MediaClock::GetCurrentTime() {
+double MediaClock::getCurrentTime() {
     return static_cast<double>(duration_cast<milliseconds >(
             system_clock::now().time_since_epoch()).count()) / 1000.0;
 }

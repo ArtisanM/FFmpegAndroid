@@ -530,8 +530,8 @@ void PlayerKernel::setPlaybackRate(float rate) {
     if (mAudioRenderHandler) {
         mAudioRenderHandler->SetPlaybackRate(rate);
     }
-    mVideoState->audio_clock->SetSpeed(rate);
-    mVideoState->video_clock->SetSpeed(rate);
+    mVideoState->audio_clock->setSpeed(rate);
+    mVideoState->video_clock->setSpeed(rate);
     mVideoState->play_rate = rate;
 }
 

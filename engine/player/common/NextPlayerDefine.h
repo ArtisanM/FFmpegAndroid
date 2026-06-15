@@ -179,13 +179,13 @@ static inline double getMasterClock(std::shared_ptr<PlayerLink> &pLink) {
 
     switch (getMasterSyncType(pLink)) {
         case CLOCK_VIDEO:
-            clock = pLink->video_clock->GetClock();
+            clock = pLink->video_clock->getClock();
             break;
         case CLOCK_AUDIO:
-            clock = pLink->audio_clock->GetClock();
+            clock = pLink->audio_clock->getClock();
             break;
         default:
-            clock = pLink->external_clock->GetClock();
+            clock = pLink->external_clock->getClock();
             break;
     }
     return clock;
@@ -200,13 +200,13 @@ static inline int getMasterClockSerial(std::shared_ptr<PlayerLink> &pLink) {
 
     switch (getMasterSyncType(pLink)) {
         case CLOCK_VIDEO:
-            serial = pLink->video_clock->GetClockSerial();
+            serial = pLink->video_clock->getClockSerial();
             break;
         case CLOCK_AUDIO:
-            serial = pLink->audio_clock->GetClockSerial();
+            serial = pLink->audio_clock->getClockSerial();
             break;
         default:
-            serial = pLink->external_clock->GetClockSerial();
+            serial = pLink->external_clock->getClockSerial();
             break;
     }
     return serial;

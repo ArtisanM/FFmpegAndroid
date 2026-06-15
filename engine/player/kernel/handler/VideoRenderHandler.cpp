@@ -222,15 +222,15 @@ int VideoRenderHandler::UpdateVideoMetaData() {
 int VideoRenderHandler::StartRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = false;
-    mPlayerLink->video_clock->SetClock(mPlayerLink->video_clock->GetClock());
-    mPlayerLink->video_clock->SetPause(false);
+    mPlayerLink->video_clock->setClock(mPlayerLink->video_clock->getClock());
+    mPlayerLink->video_clock->setPause(false);
     return RESULT_OK;
 }
 
 int VideoRenderHandler::PauseRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = true;
-    mPlayerLink->video_clock->SetPause(true);
+    mPlayerLink->video_clock->setPause(true);
     return RESULT_OK;
 }
 
@@ -240,7 +240,7 @@ double VideoRenderHandler::ComputeDelay(double delay) {
     if (!mPlayerLink->audio_clock || !mPlayerLink->video_clock)
         return delay;
     if (getMasterSyncType(mPlayerLink) != CLOCK_VIDEO) {
-        diff = mPlayerLink->video_clock->GetClock() - getMasterClock(mPlayerLink);
+        diff = mPlayerLink->video_clock->getClock() - getMasterClock(mPlayerLink);
         double syncThreshold =
                 std::max(AV_SYNC_THRESHOLD_MIN, std::min(AV_SYNC_THRESHOLD_MAX, delay));
         if (std::abs(diff) < AV_NO_SYNC_THRESHOLD) {
@@ -549,7 +549,7 @@ void VideoRenderHandler::executeTask() {
                     CurrentTimeMs() - lastCheckTime > 1000) {
                     lastCheckTime = CurrentTimeMs();
                     NEXT_LOGI(TAG, "av unsync A: %f, V: %f\n",
-                            getMasterClock(mPlayerLink), mPlayerLink->video_clock->GetClock());
+                            getMasterClock(mPlayerLink), mPlayerLink->video_clock->getClock());
                 }
             }
 
@@ -580,8 +580,8 @@ void VideoRenderHandler::executeTask() {
             mFrameTick.serial   = frameBuffer->serial;
             mFrameTick.duration = duration;
 
-            mPlayerLink->video_clock->SetClock(static_cast<double>(frameBuffer->pts) / 1000.0);
-            mPlayerLink->video_clock->SetClockSerial(frameBuffer->serial);
+            mPlayerLink->video_clock->setClock(static_cast<double>(frameBuffer->pts) / 1000.0);
+            mPlayerLink->video_clock->setClockSerial(frameBuffer->serial);
 
             if (mVideoDecodeHandler->GetQueueSize() > 0) {
                 if ((playerConfig->framedrop > 0 ||

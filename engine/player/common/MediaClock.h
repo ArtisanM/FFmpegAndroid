@@ -13,20 +13,20 @@ class MediaClock {
 public:
     MediaClock();
 
-    void SetClock(double pts);
+    void setClock(double pts);
 
-    double GetClock();
+    double getClock();
 
-    void SetClockSerial(int serial);
+    void setClockSerial(int serial);
 
-    int GetClockSerial();
+    int getClockSerial();
 
-    void SetSpeed(double speed);
+    void setSpeed(double speed);
 
-    void SetPause(bool paused);
+    void setPause(bool paused);
 
 private:
-    static double GetCurrentTime();
+    static double getCurrentTime();
 
 private:
     std::mutex mLock;
