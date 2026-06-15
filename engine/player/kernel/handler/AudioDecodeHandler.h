@@ -20,39 +20,39 @@ public:
 
     void executeTask() override;
 
-    void SetConfig(const sp<GeneralConfig> &config);
+    void setConfig(const sp<GeneralConfig> &config);
 
-    int Prepare(const sp<MetaData> &metadata);
+    int prepare(const sp<MetaData> &metadata);
 
-    int GetFrame(std::unique_ptr<FrameBuffer> &buffer);
+    int getFrame(std::unique_ptr<FrameBuffer> &buffer);
 
-    int GetSerial();
+    int getSerial();
 
     int onDecodedFrame(AVFrame *frame) override;
 
     void onDecodeError(int error) override;
 
-    void ResetEof();
+    void resetEof();
 
-    int Stop();
+    int stop();
 
-    void Release();
+    void release();
 
 private:
 
-    int Init();
+    int init();
 
-    int PerformDecode(AVPacket *pkt);
+    int performDecode(AVPacket *pkt);
 
-    int ReadPacketOrBuffering(std::unique_ptr<NextPacket> &pkt);
+    int readPacketOrBuffering(std::unique_ptr<NextPacket> &pkt);
 
-    int PerformFlush();
+    int performFlush();
 
-    int ResetDecoderFormat();
+    int resetDecoderFormat();
 
-    void NotifyListener(int what, int arg1 = 0, int arg2 = 0);
+    void notifyListener(int what, int arg1 = 0, int arg2 = 0);
 
-    bool CheckAccurateSeek(const std::unique_ptr<FrameBuffer> &buffer);
+    bool checkAccurateSeek(const std::unique_ptr<FrameBuffer> &buffer);
 
 private:
 

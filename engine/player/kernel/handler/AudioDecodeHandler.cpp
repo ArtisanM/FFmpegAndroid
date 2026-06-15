@@ -30,17 +30,17 @@ AudioDecodeHandler::~AudioDecodeHandler() {
     mMetaData.reset();
 }
 
-void AudioDecodeHandler::SetConfig(const sp<GeneralConfig> &config) {
+void AudioDecodeHandler::setConfig(const sp<GeneralConfig> &config) {
     std::lock_guard<std::mutex> lock(mLock);
     mGeneralConfig = config;
 }
 
-int AudioDecodeHandler::Prepare(const sp<MetaData> &metadata) {
+int AudioDecodeHandler::prepare(const sp<MetaData> &metadata) {
     int ret = RESULT_OK;
     mMetaData = metadata;
-    ret = Init();
+    ret = init();
     if (ret != RESULT_OK) {
-        NotifyListener(MSG_ON_ERROR, ERROR_PARSE_STREAM_OPEN);
+        notifyListener(MSG_ON_ERROR, ERROR_PARSE_STREAM_OPEN);
         return ret;
     }
 
@@ -49,7 +49,7 @@ int AudioDecodeHandler::Prepare(const sp<MetaData> &metadata) {
     return ret;
 }
 
-int AudioDecodeHandler::Init() {
+int AudioDecodeHandler::init() {
     if (!mMetaData) {
         return ERROR_PLAYER_NOT_INIT;
     }
@@ -59,11 +59,11 @@ int AudioDecodeHandler::Init() {
     mAudioDecoder = std::make_unique<FFmpegAudioDecoder>();
     if (!mAudioDecoder) {
         NEXT_LOGE(TAG, "Audio decoder create error");
-        NotifyListener(MSG_ON_ERROR, ERROR_DECODE_AUDIO_DEC, ERROR_DECODE_AUDIO_OPEN);
+        notifyListener(MSG_ON_ERROR, ERROR_DECODE_AUDIO_DEC, ERROR_DECODE_AUDIO_OPEN);
         return ERROR_DECODE_AUDIO_OPEN;
     }
     mAudioDecoder->setDecodeCallback(this);
-    ResetDecoderFormat();
+    resetDecoderFormat();
 
     mFrameQueue = std::make_unique<FrameQueue>(SAMPLE_QUEUE_SIZE);
     if (!mFrameQueue) {
@@ -127,7 +127,7 @@ int AudioDecodeHandler::onDecodedFrame(AVFrame *frame) {
     if (bAbort) {
         return RESULT_OK;
     }
-    if (CheckAccurateSeek(buffer)) {
+    if (checkAccurateSeek(buffer)) {
         return RESULT_OK;
     }
     mFrameQueue->putFrame(buffer);
@@ -136,7 +136,7 @@ int AudioDecodeHandler::onDecodedFrame(AVFrame *frame) {
 
 void AudioDecodeHandler::onDecodeError(int error) {}
 
-int AudioDecodeHandler::PerformDecode(AVPacket *pkt) {
+int AudioDecodeHandler::performDecode(AVPacket *pkt) {
     int ret = RESULT_OK;
     if (!mAudioDecoder)
         return ERROR_DECODE_AUDIO_DEC;
@@ -155,7 +155,7 @@ int AudioDecodeHandler::PerformDecode(AVPacket *pkt) {
     return ret;
 }
 
-int AudioDecodeHandler::ReadPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) {
+int AudioDecodeHandler::readPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) {
     if (!mRedSourceController)
         return ERROR_PARSE_NOT_INIT;
     int ret = mRedSourceController->GetPacket(pkt, AVMEDIA_TYPE_AUDIO, false);
@@ -168,7 +168,7 @@ int AudioDecodeHandler::ReadPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) 
     return ret;
 }
 
-int AudioDecodeHandler::PerformFlush() {
+int AudioDecodeHandler::performFlush() {
     std::lock_guard<std::mutex> lock(mLock);
     mSerial++;
     bEOF = false;
@@ -181,7 +181,7 @@ int AudioDecodeHandler::PerformFlush() {
     return RESULT_OK;
 }
 
-int AudioDecodeHandler::ResetDecoderFormat() {
+int AudioDecodeHandler::resetDecoderFormat() {
     if (!mMetaData) {
         return ERROR_PLAYER_TRY_AGAIN;
     }
@@ -201,13 +201,13 @@ int AudioDecodeHandler::ResetDecoderFormat() {
     return RESULT_OK;
 }
 
-void AudioDecodeHandler::NotifyListener(int what, int arg1, int arg2) {
+void AudioDecodeHandler::notifyListener(int what, int arg1, int arg2) {
     if (mNotifyCb) {
         mNotifyCb(what, arg1, arg2, nullptr, 0);
     }
 }
 
-bool AudioDecodeHandler::CheckAccurateSeek(const std::unique_ptr<FrameBuffer> &buffer) {
+bool AudioDecodeHandler::checkAccurateSeek(const std::unique_ptr<FrameBuffer> &buffer) {
     int64_t now           = 0;
     int64_t diff          = 0;
     double audioClock     = 0;
@@ -276,7 +276,7 @@ bool AudioDecodeHandler::CheckAccurateSeek(const std::unique_ptr<FrameBuffer> &b
                         mPlayerLink->audio_accurate_seek_cond.wait_for(
                                 lock, std::chrono::milliseconds(playerConfig->accurate_seek_timeout));
                     } else {
-                        NotifyListener(MSG_ACCURATE_SEEK_COMPLETE, static_cast<int32_t>(audioClock * 1000));
+                        notifyListener(MSG_ACCURATE_SEEK_COMPLETE, static_cast<int32_t>(audioClock * 1000));
                     }
 
                     if (audioSeekPos != mPlayerLink->seek_pos && !bAbort) {
@@ -297,7 +297,7 @@ bool AudioDecodeHandler::CheckAccurateSeek(const std::unique_ptr<FrameBuffer> &b
                 mPlayerLink->audio_accurate_seek_cond.wait_for(
                         lock, std::chrono::milliseconds(playerConfig->accurate_seek_timeout));
             } else {
-                NotifyListener(MSG_ACCURATE_SEEK_COMPLETE,
+                notifyListener(MSG_ACCURATE_SEEK_COMPLETE,
                                static_cast<int32_t>(audioClock * 1000));
             }
         }
@@ -307,7 +307,7 @@ bool AudioDecodeHandler::CheckAccurateSeek(const std::unique_ptr<FrameBuffer> &b
     return false;
 }
 
-int AudioDecodeHandler::GetFrame(std::unique_ptr<FrameBuffer> &buffer) {
+int AudioDecodeHandler::getFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mFrameQueue) {
         return ERROR_PLAYER_INIT_FAIL;
     }
@@ -324,7 +324,7 @@ int AudioDecodeHandler::GetFrame(std::unique_ptr<FrameBuffer> &buffer) {
 void AudioDecodeHandler::executeTask() {
     while (!bAbort) {
         std::unique_ptr<NextPacket> pkt;
-        int ret = ReadPacketOrBuffering(pkt);
+        int ret = readPacketOrBuffering(pkt);
         if (ret != RESULT_OK || !pkt) {
             if (bAbort) {
                 continue;
@@ -333,7 +333,7 @@ void AudioDecodeHandler::executeTask() {
             continue;
         }
         if (pkt->isFlushPacket()) {
-            PerformFlush();
+            performFlush();
             continue;
         } else if (pkt->isEofPacket()) {
             NEXT_LOGI(TAG, "packet EOF!\n");
@@ -353,16 +353,16 @@ void AudioDecodeHandler::executeTask() {
         }
         mPlayerLink->audio_dec_finish = false;
         // execute audio decoding
-        PerformDecode(pkt->getPacket());
+        performDecode(pkt->getPacket());
     }
 }
 
-int AudioDecodeHandler::GetSerial() {
+int AudioDecodeHandler::getSerial() {
     std::unique_lock<std::mutex> lock(mLock);
     return mSerial;
 }
 
-void AudioDecodeHandler::ResetEof() {
+void AudioDecodeHandler::resetEof() {
     std::unique_lock<std::mutex> lock(mLock);
     bEOF = false;
     mPlayerLink->audio_dec_finish = false;
@@ -372,7 +372,7 @@ void AudioDecodeHandler::ResetEof() {
     mCond.notify_one();
 }
 
-int AudioDecodeHandler::Stop() {
+int AudioDecodeHandler::stop() {
     std::unique_lock<std::mutex> lock(mLock);
 
     if (mGeneralConfig->playerConfig->get()->enable_accurate_seek) {
@@ -388,7 +388,7 @@ int AudioDecodeHandler::Stop() {
     return RESULT_OK;
 }
 
-void AudioDecodeHandler::Release() {
+void AudioDecodeHandler::release() {
     NEXT_LOGD(TAG, "Release begin\n");
     bAbort = true;
     if (bReleased) {

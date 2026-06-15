@@ -248,7 +248,7 @@ int PlayerKernel::performConfigs() {
         mVideoDecHandler->SetConfig(mGeneralConfig);
     }
     if (mAudioDecHandler) {
-        mAudioDecHandler->SetConfig(mGeneralConfig);
+        mAudioDecHandler->setConfig(mGeneralConfig);
     }
     if (mVideoRenderHandler) {
         mVideoRenderHandler->SetConfig(mGeneralConfig);
@@ -415,7 +415,7 @@ int PlayerKernel::performFlush() {
         mVideoDecHandler->ResetEof();
     }
     if (mAudioDecHandler) {
-        mAudioDecHandler->ResetEof();
+        mAudioDecHandler->resetEof();
     }
     if (mVideoRenderHandler) {
         mVideoRenderHandler->Flush();
@@ -435,7 +435,7 @@ int PlayerKernel::performStop() {
         mVideoRenderHandler->Stop();
     }
     if (mAudioDecHandler) {
-        mAudioDecHandler->Stop();
+        mAudioDecHandler->stop();
     }
     if (mVideoDecHandler) {
         mVideoDecHandler->Stop();
@@ -459,7 +459,7 @@ void PlayerKernel::release() {
         mVideoDecHandler->Release();
     }
     if (mAudioDecHandler) {
-        mAudioDecHandler->Release();
+        mAudioDecHandler->release();
     }
     if (mVideoRenderHandler) {
         mVideoRenderHandler->Release();
@@ -751,7 +751,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
     }
 
     if (mVideoState->audio_stream_index >= 0 && !playerConfig->audio_disable && mAudioDecHandler) {
-        ret = mAudioDecHandler->Prepare(metadata);
+        ret = mAudioDecHandler->prepare(metadata);
         if (ret == RESULT_OK && mAudioRenderHandler) {
             ret = mAudioRenderHandler->Prepare(metadata);
             if (ret == RESULT_OK) {
@@ -762,7 +762,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
         if (ret != RESULT_OK) {
             NEXT_LOGE(TAG, "%s audio failed\n", __func__);
             mVideoState->audio_stream_index = -1;
-            mAudioDecHandler->Release();
+            mAudioDecHandler->release();
             mAudioRenderHandler->Release();
             mAudioDecHandler.reset();
             mAudioDecHandler.reset();

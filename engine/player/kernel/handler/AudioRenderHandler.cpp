@@ -319,7 +319,7 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
             mAudioBufSize = resampled_data_size;
         }
 
-        if (mFrameBuffer->serial != mAudioDecodeHandler->GetSerial()) {
+        if (mFrameBuffer->serial != mAudioDecodeHandler->getSerial()) {
             mLastReadPos = 0;
             mAudioBufSize = 0;
             if (mAudioRender) {
@@ -384,7 +384,7 @@ void AudioRenderHandler::AudioDataCallback(void *opaque, char *data, int &len) {
 int AudioRenderHandler::ReadFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mAudioDecodeHandler)
         return ERROR_PARSE_NOT_INIT;
-    return mAudioDecodeHandler->GetFrame(buffer);
+    return mAudioDecodeHandler->getFrame(buffer);
 }
 
 void AudioRenderHandler::NotifyListener(int what, int arg1, int arg2) {
