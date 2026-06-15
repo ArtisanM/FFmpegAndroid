@@ -15,7 +15,7 @@ public:
 
     int init(VideoFrameMetaData *inputFrameMetaData, std::shared_ptr<OpenGLContext> context) override;
 
-    int OnRender() override;
+    int onRender() override;
 
 };
 

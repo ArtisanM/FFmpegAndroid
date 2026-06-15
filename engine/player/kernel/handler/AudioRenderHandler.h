@@ -58,7 +58,7 @@ public:
 
     int PauseRender();
 
-    void ExecuteTask() override;
+    void executeTask() override;
 
     void SetPlaybackRate(float rate);
 

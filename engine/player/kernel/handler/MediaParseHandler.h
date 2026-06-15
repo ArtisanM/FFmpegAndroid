@@ -39,7 +39,7 @@ public:
 
     int GetPacket(std::unique_ptr<NextPacket> &pkt, int streamType, bool block);
 
-    void ExecuteTask() override;
+    void executeTask() override;
 
     int Stop();
 

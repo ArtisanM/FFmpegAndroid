@@ -33,7 +33,7 @@ VideoRenderHandler::~VideoRenderHandler() {
 
 int VideoRenderHandler::Prepare(sp<MetaData> &metadata) {
     mMetaData = metadata;
-    this->Start();
+    this->start();
 
     return RESULT_OK;
 }
@@ -472,7 +472,7 @@ void VideoRenderHandler::SetConfig(const sp<GeneralConfig> &config) {
 }
 
 // render thread looping
-void VideoRenderHandler::ExecuteTask() {
+void VideoRenderHandler::executeTask() {
     int ret = Init();
     if (ret != RESULT_OK) {
         NotifyListener(MSG_ON_ERROR, ERROR_RENDER_VIDEO_INIT);

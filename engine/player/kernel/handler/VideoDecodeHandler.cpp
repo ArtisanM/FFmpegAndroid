@@ -63,7 +63,7 @@ int VideoDecodeHandler::Init(sp<MetaData> &metadata) {
         }
     }
 
-    this->Start();
+    this->start();
 
     return ret;
 }
@@ -485,7 +485,7 @@ int VideoDecodeHandler::GetQueueSize() {
 }
 
 // decode thread
-void VideoDecodeHandler::ExecuteTask() {
+void VideoDecodeHandler::executeTask() {
     PlayerConfig *playerConfig = mGeneralConfig->playerConfig->get();
     if (mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_MEDIACODEC &&
         playerConfig->mediacodec_auto_rotate) {

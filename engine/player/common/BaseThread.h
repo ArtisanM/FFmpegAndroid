@@ -11,9 +11,9 @@ public:
 
     virtual ~BaseThread();
 
-    virtual void ExecuteTask() = 0;
+    virtual void executeTask() = 0;
 
-    void Start();
+    void start();
 
 protected:
     int mSerial = 0;
@@ -22,7 +22,7 @@ protected:
     std::string mThreadName;
 
 private:
-    static void* StartThread(void* ptr);
+    static void* startThread(void* ptr);
 
 };
 

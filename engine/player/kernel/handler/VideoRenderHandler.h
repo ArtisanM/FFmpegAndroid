@@ -43,7 +43,7 @@ public:
 
     int PauseRender();
 
-    void ExecuteTask() override;
+    void executeTask() override;
 
     int Flush();
 

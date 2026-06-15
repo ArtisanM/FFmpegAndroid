@@ -46,7 +46,7 @@ public:
 
 #endif
 
-    void ExecuteTask() override;
+    void executeTask() override;
 
     int GetSerial();
 

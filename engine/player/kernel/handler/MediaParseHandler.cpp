@@ -61,7 +61,7 @@ int MediaParseHandler::SetMetaData() {
 }
 
 int MediaParseHandler::PrepareAsync() {
-    this->Start();
+    this->start();
     return RESULT_OK;
 }
 
@@ -176,7 +176,7 @@ int MediaParseHandler::PutPacketByType(PacketOpType type) {
 }
 
 // Parser thread looping
-void MediaParseHandler::ExecuteTask() {
+void MediaParseHandler::executeTask() {
     int ret                     = 0;
     int errorType               = ERROR_OTHER_UNKNOWN;
     bool completed              = false;

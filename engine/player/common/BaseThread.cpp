@@ -25,15 +25,15 @@ BaseThread::~BaseThread() {
     }
 }
 
-void BaseThread::Start() {
+void BaseThread::start() {
     try {
-        mThread = std::thread(StartThread, this);
+        mThread = std::thread(startThread, this);
     } catch (const std::system_error &e) {
         NEXT_LOGE(TAG, "thread exception: %s!\n", e.what());
     }
 }
 
-void* BaseThread::StartThread(void *ptr) {
+void* BaseThread::startThread(void *ptr) {
     auto thread = (BaseThread*) ptr;
 #if defined(__APPLE__)
     pthread_setname_np(thread->mThreadName.c_str());
@@ -41,7 +41,7 @@ void* BaseThread::StartThread(void *ptr) {
     pthread_setname_np(pthread_self(), thread->mThreadName.c_str());
 #endif
     NEXT_LOGI(TAG, "%s thread start...", thread->mThreadName.c_str());
-    thread->ExecuteTask();
+    thread->executeTask();
     NEXT_LOGI(TAG, "%s thread end...", thread->mThreadName.c_str());
     return nullptr;
 }

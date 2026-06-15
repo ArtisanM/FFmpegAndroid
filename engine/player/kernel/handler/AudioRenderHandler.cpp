@@ -124,7 +124,7 @@ int AudioRenderHandler::Init() {
     return RESULT_OK;
 }
 
-void AudioRenderHandler::ExecuteTask() {
+void AudioRenderHandler::executeTask() {
 
 }
 

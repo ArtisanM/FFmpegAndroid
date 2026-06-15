@@ -18,7 +18,7 @@ public:
 
     ~AudioDecodeHandler() override;
 
-    void ExecuteTask() override;
+    void executeTask() override;
 
     void SetConfig(const sp<GeneralConfig> &config);
 

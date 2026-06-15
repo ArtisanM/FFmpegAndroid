@@ -44,7 +44,7 @@ int AudioDecodeHandler::Prepare(const sp<MetaData> &metadata) {
         return ret;
     }
 
-    this->Start();
+    this->start();
 
     return ret;
 }
@@ -321,7 +321,7 @@ int AudioDecodeHandler::GetFrame(std::unique_ptr<FrameBuffer> &buffer) {
     return mFrameQueue->GetFrame(buffer);
 }
 
-void AudioDecodeHandler::ExecuteTask() {
+void AudioDecodeHandler::executeTask() {
     while (!bAbort) {
         std::unique_ptr<NextPacket> pkt;
         int ret = ReadPacketOrBuffering(pkt);
