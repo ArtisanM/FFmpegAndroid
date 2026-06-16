@@ -27,47 +27,47 @@ public:
 
     ~VideoRenderHandler() override;
 
-    void SetConfig(const sp<GeneralConfig> &config);
+    void setConfig(const sp<GeneralConfig> &config);
 
-    int Prepare(sp<MetaData> &metadata);
+    int prepare(sp<MetaData> &metadata);
 
 #if defined(__ANDROID__)
-    int SetVideoSurface(ANativeWindow *surface);
+    int setVideoSurface(ANativeWindow *surface);
 #endif
 
 #if defined(__APPLE__)
     UIView *initWithFrame(int type, CGRect cgrect);
 #endif
 
-    int StartRender();
+    int startRender();
 
-    int PauseRender();
+    int pauseRender();
 
     void executeTask() override;
 
-    int Flush();
+    int flush();
 
-    int Stop();
+    int stop();
 
-    void Release();
+    void release();
 
 private:
 
-    int Init();
+    int init();
 
-    double ComputeDelay(double delay);
+    double computeDelay(double delay);
 
-    double ComputeDuration(std::unique_ptr<FrameBuffer> &buffer) const;
+    double computeDuration(std::unique_ptr<FrameBuffer> &buffer) const;
 
-    int ReadFrame(std::unique_ptr<FrameBuffer> &buffer);
+    int readFrame(std::unique_ptr<FrameBuffer> &buffer);
 
-    int RenderFrame(std::unique_ptr<FrameBuffer> &buffer);
+    int renderFrame(std::unique_ptr<FrameBuffer> &buffer);
 
-    int ConvertPixelFormat(std::unique_ptr<FrameBuffer> &buffer);
+    int convertPixelFormat(std::unique_ptr<FrameBuffer> &buffer);
 
-    int UpdateVideoMetaData();
+    int updateVideoMetaData();
 
-    void NotifyListener(int what, int arg1 = 0, int arg2 = 0);
+    void notifyListener(int what, int arg1 = 0, int arg2 = 0);
 
 private:
     struct FrameTick {

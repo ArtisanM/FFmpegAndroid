@@ -251,7 +251,7 @@ int PlayerKernel::performConfigs() {
         mAudioDecHandler->setConfig(mGeneralConfig);
     }
     if (mVideoRenderHandler) {
-        mVideoRenderHandler->SetConfig(mGeneralConfig);
+        mVideoRenderHandler->setConfig(mGeneralConfig);
     }
     if (mAudioRenderHandler) {
         mAudioRenderHandler->setConfig(mGeneralConfig);
@@ -359,7 +359,7 @@ int PlayerKernel::performStart() {
     mVideoState->pause_req = false;
     mVideoState->paused = false;
     if (mVideoRenderHandler) {
-        mVideoRenderHandler->StartRender();
+        mVideoRenderHandler->startRender();
     }
     if (mAudioRenderHandler) {
         mAudioRenderHandler->startRender();
@@ -398,7 +398,7 @@ int PlayerKernel::performPause() {
     mVideoState->pause_req = true;
     mVideoState->paused = true;
     if (mVideoRenderHandler) {
-        mVideoRenderHandler->PauseRender();
+        mVideoRenderHandler->pauseRender();
     }
     if (mAudioRenderHandler) {
         mAudioRenderHandler->pauseRender();
@@ -418,7 +418,7 @@ int PlayerKernel::performFlush() {
         mAudioDecHandler->resetEof();
     }
     if (mVideoRenderHandler) {
-        mVideoRenderHandler->Flush();
+        mVideoRenderHandler->flush();
     }
     if (mAudioRenderHandler) {
         mAudioRenderHandler->flush();
@@ -432,7 +432,7 @@ int PlayerKernel::performStop() {
         mAudioRenderHandler->stop();
     }
     if (mVideoRenderHandler) {
-        mVideoRenderHandler->Stop();
+        mVideoRenderHandler->stop();
     }
     if (mAudioDecHandler) {
         mAudioDecHandler->stop();
@@ -462,7 +462,7 @@ void PlayerKernel::release() {
         mAudioDecHandler->release();
     }
     if (mVideoRenderHandler) {
-        mVideoRenderHandler->Release();
+        mVideoRenderHandler->release();
     }
     if (mAudioRenderHandler) {
         mAudioRenderHandler->release();
@@ -782,7 +782,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
         parseExtraData(track_info);
         ret = mVideoDecHandler->init(metadata);
         if (ret == RESULT_OK && mVideoRenderHandler) {
-            ret = mVideoRenderHandler->Prepare(metadata);
+            ret = mVideoRenderHandler->prepare(metadata);
             if (ret == RESULT_OK) {
                 if (mVideoState->av_sync_type != CLOCK_AUDIO) {
                     mVideoState->av_sync_type = CLOCK_VIDEO;
@@ -795,7 +795,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
             NEXT_LOGE(TAG, "%s video failed\n", __func__);
             mVideoState->video_stream_index = -1;
             mVideoDecHandler->release();
-            mVideoRenderHandler->Release();
+            mVideoRenderHandler->release();
             mVideoDecHandler.reset();
             mVideoDecHandler.reset();
             mVideoRenderHandler.reset();
@@ -831,7 +831,7 @@ int PlayerKernel::setVideoSurface(ANativeWindow *surface) {
         return ERROR_PLAYER_NOT_INIT;
     }
 
-    mVideoRenderHandler->SetVideoSurface(surface);
+    mVideoRenderHandler->setVideoSurface(surface);
 
     if (mVideoDecHandler->setNativeSurface(surface) == ERROR_RENDER_VIDEO_SUR) {
         int64_t pos = 0;

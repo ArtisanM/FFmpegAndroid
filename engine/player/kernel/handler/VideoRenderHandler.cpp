@@ -31,7 +31,7 @@ VideoRenderHandler::~VideoRenderHandler() {
     sws_freeContext(mSwsContext);
 }
 
-int VideoRenderHandler::Prepare(sp<MetaData> &metadata) {
+int VideoRenderHandler::prepare(sp<MetaData> &metadata) {
     mMetaData = metadata;
     this->start();
 
@@ -39,7 +39,7 @@ int VideoRenderHandler::Prepare(sp<MetaData> &metadata) {
 }
 
 #if defined(__ANDROID__)
-int VideoRenderHandler::SetVideoSurface(ANativeWindow *surface) {
+int VideoRenderHandler::setVideoSurface(ANativeWindow *surface) {
     if (!surface) {
         return ERROR_RENDER_VIDEO_INIT;
     }
@@ -109,7 +109,7 @@ UIView *VideoRenderHandler::initWithFrame(int type, CGRect cgrect) {
 }
 #endif
 
-int VideoRenderHandler::Init() {
+int VideoRenderHandler::init() {
     std::unique_lock<std::mutex> lock(mLock);
 
     switch (mPlayerLink->stat.video_dec_type) {
@@ -137,16 +137,16 @@ int VideoRenderHandler::Init() {
     int ret = mVideoRender->init();
     if (ret != RESULT_OK) {
         lock.unlock();
-        NotifyListener(MSG_ON_ERROR, ERROR_RENDER_VIDEO_INIT, ret);
+        notifyListener(MSG_ON_ERROR, ERROR_RENDER_VIDEO_INIT, ret);
         NEXT_LOGE(TAG, "mVideoRender initInternal error");
         return ERROR_PLAYER_NOT_INIT;
     }
 
-    UpdateVideoMetaData();
+    updateVideoMetaData();
     return RESULT_OK;
 }
 
-int VideoRenderHandler::UpdateVideoMetaData() {
+int VideoRenderHandler::updateVideoMetaData() {
 
     switch (mRenderType) {
         case VIDEO_RENDER_OPENGL:
@@ -219,7 +219,7 @@ int VideoRenderHandler::UpdateVideoMetaData() {
     return RESULT_OK;
 }
 
-int VideoRenderHandler::StartRender() {
+int VideoRenderHandler::startRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = false;
     mPlayerLink->video_clock->setClock(mPlayerLink->video_clock->getClock());
@@ -227,7 +227,7 @@ int VideoRenderHandler::StartRender() {
     return RESULT_OK;
 }
 
-int VideoRenderHandler::PauseRender() {
+int VideoRenderHandler::pauseRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = true;
     mPlayerLink->video_clock->setPause(true);
@@ -235,7 +235,7 @@ int VideoRenderHandler::PauseRender() {
 }
 
 // compute delay of current frame
-double VideoRenderHandler::ComputeDelay(double delay) {
+double VideoRenderHandler::computeDelay(double delay) {
     double diff = 0.0;
     if (!mPlayerLink->audio_clock || !mPlayerLink->video_clock)
         return delay;
@@ -260,7 +260,7 @@ double VideoRenderHandler::ComputeDelay(double delay) {
 }
 
 // compute duration of current frame
-double VideoRenderHandler::ComputeDuration(std::unique_ptr<FrameBuffer> &buffer) const {
+double VideoRenderHandler::computeDuration(std::unique_ptr<FrameBuffer> &buffer) const {
     if (buffer->serial == mFrameTick.serial) {
         double duration = static_cast<double>(buffer->pts) / 1000.0 - mFrameTick.pts;
         if (duration <= FLT_EPSILON || duration > MAX_FRAME_DURATION) {
@@ -273,14 +273,14 @@ double VideoRenderHandler::ComputeDuration(std::unique_ptr<FrameBuffer> &buffer)
     }
 }
 
-int VideoRenderHandler::ReadFrame(std::unique_ptr<FrameBuffer> &buffer) {
+int VideoRenderHandler::readFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mVideoDecodeHandler)
         return ERROR_PARSE_NOT_INIT;
     return mVideoDecodeHandler->getFrame(buffer);
 }
 
-int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
-    if (ConvertPixelFormat(buffer) != RESULT_OK) {
+int VideoRenderHandler::renderFrame(std::unique_ptr<FrameBuffer> &buffer) {
+    if (convertPixelFormat(buffer) != RESULT_OK) {
         return ERROR_RENDER_VIDEO_SWS;
     }
 
@@ -313,7 +313,7 @@ int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
             int ret = mVideoRender->onRender(&mVideoRenderBufferContext, true);
 
             if (ret != RESULT_OK) {
-                NotifyListener(MSG_ON_ERROR, ERROR_RENDER_HANDLE, ret);
+                notifyListener(MSG_ON_ERROR, ERROR_RENDER_HANDLE, ret);
                 NEXT_LOGE(TAG, "onRender error: %d\n", ret);
             }
             if (buffer->opaque) {
@@ -357,11 +357,11 @@ int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
             if (ret == RESULT_OK) {
                 ret = mVideoRender->onRender();
                 if (ret != RESULT_OK) {
-                    NotifyListener(MSG_ON_ERROR, ERROR_RENDER_HANDLE, ret);
+                    notifyListener(MSG_ON_ERROR, ERROR_RENDER_HANDLE, ret);
                     NEXT_LOGE(TAG, "onRender error\n");
                 }
             } else {
-                NotifyListener(MSG_ON_ERROR, ERROR_RENDER_INPUT, ret);
+                notifyListener(MSG_ON_ERROR, ERROR_RENDER_INPUT, ret);
                 NEXT_LOGE(TAG, "onInputFrame error\n");
             }
 #if defined(__APPLE__)
@@ -388,16 +388,16 @@ int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
             NEXT_LOGI(TAG, "video seek complete, cost=%" PRId64 ", serial=%d\n",
                     mPlayerLink->stat.last_seek_time, lastSeekSerial);
             if (getMasterSyncType(mPlayerLink) == CLOCK_VIDEO) {
-                NotifyListener(MSG_VIDEO_SEEK_RENDER_START, 1);
+                notifyListener(MSG_VIDEO_SEEK_RENDER_START, 1);
             } else {
-                NotifyListener(MSG_VIDEO_SEEK_RENDER_START, 0);
+                notifyListener(MSG_VIDEO_SEEK_RENDER_START, 0);
             }
         }
     }
     mPlayerLink->stat.render_rate = mSpeedMeter.add();
     if (!mPlayerLink->first_video_rendered) {
         mPlayerLink->first_video_rendered = true;
-        NotifyListener(MSG_VIDEO_RENDER_START);
+        notifyListener(MSG_VIDEO_RENDER_START);
     }
     if (bPaused) {
         while (bPaused && !bAbort && !mPlayerLink->step_to_next_frame) {
@@ -413,7 +413,7 @@ int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
     return RESULT_OK;
 }
 
-int VideoRenderHandler::ConvertPixelFormat(std::unique_ptr<FrameBuffer> &buffer) {
+int VideoRenderHandler::convertPixelFormat(std::unique_ptr<FrameBuffer> &buffer) {
     int ret = 0;
     if (buffer->pixel_format == PIXEL_FORMAT_YUV420P10LE &&
         mRenderType != VIDEO_RENDER_SAMPLEBUFFER) {
@@ -460,27 +460,27 @@ int VideoRenderHandler::ConvertPixelFormat(std::unique_ptr<FrameBuffer> &buffer)
     return RESULT_OK;
 }
 
-void VideoRenderHandler::NotifyListener(int what, int arg1, int arg2) {
+void VideoRenderHandler::notifyListener(int what, int arg1, int arg2) {
     if (mNotifyCb) {
         mNotifyCb(what, arg1, arg2, nullptr, 0);
     }
 }
 
-void VideoRenderHandler::SetConfig(const sp<GeneralConfig> &config) {
+void VideoRenderHandler::setConfig(const sp<GeneralConfig> &config) {
     std::lock_guard<std::mutex> lock(mLock);
     mGeneralConfig = config;
 }
 
 // render thread looping
 void VideoRenderHandler::executeTask() {
-    int ret = Init();
+    int ret = init();
     if (ret != RESULT_OK) {
-        NotifyListener(MSG_ON_ERROR, ERROR_RENDER_VIDEO_INIT);
+        notifyListener(MSG_ON_ERROR, ERROR_RENDER_VIDEO_INIT);
         mMetaData.reset();
         NEXT_LOGE(TAG, "VideoRender init error, ret=%d\n", ret);
         return;
     }
-    UpdateVideoMetaData();
+    updateVideoMetaData();
 
 #if defined(__APPLE__)
     if (mRenderType == RedRender::VIDEO_RENDER_OPENGL) {
@@ -512,7 +512,7 @@ void VideoRenderHandler::executeTask() {
 #endif
 
         std::unique_ptr<FrameBuffer> frameBuffer;
-        ret = ReadFrame(frameBuffer);
+        ret = readFrame(frameBuffer);
         if (ret == ERROR_PLAYER_EOF) {
             std::unique_lock<std::mutex> lock(mLock);
             if (!bAbort) {
@@ -541,8 +541,8 @@ void VideoRenderHandler::executeTask() {
             }
 
             double time = static_cast<double>(CurrentTimeUs()) / 1000000.0;
-            duration    = ComputeDuration(frameBuffer);
-            delay       = ComputeDelay(duration);
+            duration    = computeDuration(frameBuffer);
+            delay       = computeDelay(duration);
 
             if (!isnan(mPlayerLink->stat.av_diff)) {
                 if (std::abs(mPlayerLink->stat.av_diff) > 1.0 &&
@@ -594,7 +594,7 @@ void VideoRenderHandler::executeTask() {
                 }
             }
 
-            RenderFrame(frameBuffer);
+            renderFrame(frameBuffer);
             bForceRefresh = false;
             break;
         }
@@ -606,20 +606,20 @@ void VideoRenderHandler::executeTask() {
     }
 }
 
-int VideoRenderHandler::Flush() {
+int VideoRenderHandler::flush() {
     std::unique_lock<std::mutex> lock(mLock);
     mCond.notify_one();
     return RESULT_OK;
 }
 
-int VideoRenderHandler::Stop() {
+int VideoRenderHandler::stop() {
     std::unique_lock<std::mutex> lock(mLock);
     bAbort = true;
     mCond.notify_all();
     return RESULT_OK;
 }
 
-void VideoRenderHandler::Release() {
+void VideoRenderHandler::release() {
     NEXT_LOGD(TAG, "%s release begin\n", __func__ );
     if (mThread.joinable()) {
         mThread.join();
