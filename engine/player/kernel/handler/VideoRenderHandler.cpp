@@ -385,7 +385,7 @@ int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
         if (lastSeekSerial == buffer->serial) {
             mPlayerLink->stat.last_seek_time =
                     (CurrentTimeUs() - mPlayerLink->last_seek_load_start) / 1000;
-            NEXT_LOGI(TAG, "video Seek complete, cost=%" PRId64 ", serial=%d\n",
+            NEXT_LOGI(TAG, "video seek complete, cost=%" PRId64 ", serial=%d\n",
                     mPlayerLink->stat.last_seek_time, lastSeekSerial);
             if (getMasterSyncType(mPlayerLink) == CLOCK_VIDEO) {
                 NotifyListener(MSG_VIDEO_SEEK_RENDER_START, 1);

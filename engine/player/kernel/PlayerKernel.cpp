@@ -104,7 +104,7 @@ int PlayerKernel::prepareAsync() {
     }
 
     performConfigs();
-    mParseHandler->Open(mUrl);
+    mParseHandler->open(mUrl);
     return performPrepare();
 }
 
@@ -149,7 +149,7 @@ int PlayerKernel::getCurrentPosition(int64_t &pos) {
         pos = mMetaData->duration / 1000;
         return RESULT_OK;
     } else if (mParseHandler && !mSeeking.load() &&
-               getMasterClockSerial(mVideoState) == mParseHandler->GetSerial()) {
+               getMasterClockSerial(mVideoState) == mParseHandler->getSerial()) {
         double clock = getMasterClock(mVideoState);
         pos = clock > 0.0 ? static_cast<int64_t>(clock) * 1000 : 0;
     } else {
@@ -242,7 +242,7 @@ int PlayerKernel::performConfigs() {
     configInternal();
 
     if (mParseHandler) {
-        mParseHandler->SetConfig(mGeneralConfig);
+        mParseHandler->setConfig(mGeneralConfig);
     }
     if (mVideoDecHandler) {
         mVideoDecHandler->SetConfig(mGeneralConfig);
@@ -373,9 +373,9 @@ int PlayerKernel::performPrepare() {
         return RESULT_OK;
     }
     if (mParseHandler) {
-        mParseHandler->SetPrepareCb(
+        mParseHandler->setPrepareCb(
                 std::bind(&PlayerKernel::preparedCallback, this, std::placeholders::_1));
-        return mParseHandler->PrepareAsync();
+        return mParseHandler->prepareAsync();
     }
     return ERROR_PLAYER_NOT_INIT;
 }
@@ -388,7 +388,7 @@ int PlayerKernel::performSeek(int64_t msec) {
         return ERROR_PLAYER_NOT_INIT;
     }
     mSeeking.store(true);
-    return mParseHandler->Seek(msec);
+    return mParseHandler->seek(msec);
 }
 
 int PlayerKernel::performPause() {
@@ -441,15 +441,15 @@ int PlayerKernel::performStop() {
         mVideoDecHandler->Stop();
     }
     if (mParseHandler) {
-        mParseHandler->Stop();
+        mParseHandler->stop();
     }
     return RESULT_OK;
 }
 
 void PlayerKernel::release() {
     NEXT_LOGD(TAG, "%s Start\n", __func__);
-    mParseHandler->SetPrepareCb(nullptr);
-    mParseHandler->Release();
+    mParseHandler->setPrepareCb(nullptr);
+    mParseHandler->release();
     if (mAppCtx) {
         free(mAppCtx);
         mAppCtx = nullptr;

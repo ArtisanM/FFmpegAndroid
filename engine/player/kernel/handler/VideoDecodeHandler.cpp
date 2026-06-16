@@ -373,12 +373,12 @@ void VideoDecodeHandler::NotifyListener(int what, int arg1, int arg2) {
 int VideoDecodeHandler::ReadPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) {
     if (!mMediaParser)
         return ERROR_PARSE_NOT_INIT;
-    int ret = mMediaParser->GetPacket(pkt, AVMEDIA_TYPE_VIDEO, false);
+    int ret = mMediaParser->getPacket(pkt, AVMEDIA_TYPE_VIDEO, false);
     if (ret == ERROR_PLAYER_TRY_AGAIN && !bEOF) {
         if (mPlayerLink->first_video_rendered) {
-            mMediaParser->ToggleBuffering(true);
+            mMediaParser->toggleBuffering(true);
         }
-        ret = mMediaParser->GetPacket(pkt, AVMEDIA_TYPE_VIDEO, true);
+        ret = mMediaParser->getPacket(pkt, AVMEDIA_TYPE_VIDEO, true);
     }
     return ret;
 }
@@ -421,7 +421,7 @@ int VideoDecodeHandler::PerformFlush() {
 bool VideoDecodeHandler::FrontIsFlush() {
     if (!mMediaParser)
         return false;
-    return mMediaParser->FrontIsFlush(AVMEDIA_TYPE_VIDEO);
+    return mMediaParser->frontIsFlush(AVMEDIA_TYPE_VIDEO);
 }
 
 void VideoDecodeHandler::ResetEof() {
@@ -548,7 +548,7 @@ void VideoDecodeHandler::executeTask() {
             // TODO: EOF process
             NEXT_LOGI(TAG, "packet EOF!\n");
             bEOF = true;
-//            while (!bAbort && !FrontIsFlush() && mVideoDecoder &&
+//            while (!bAbort && !frontIsFlush() && mVideoDecoder &&
 //                   (mInputPacketCount > 0 &&
 //                    mVideoDecoder->GetDelayedFrame() == RESULT_OK)) {
 //            }

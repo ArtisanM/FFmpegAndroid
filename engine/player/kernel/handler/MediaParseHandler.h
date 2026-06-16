@@ -21,51 +21,51 @@ public:
 
     ~MediaParseHandler() override;
 
-    int Open(std::string &url);
+    int open(std::string &url);
 
-    void SetPrepareCb(PrepareCallBack callBack);
+    void setPrepareCb(PrepareCallBack callBack);
 
-    void SetConfig(const sp<GeneralConfig> &config);
+    void setConfig(const sp<GeneralConfig> &config);
 
-    int PrepareAsync();
+    int prepareAsync();
 
-    int Seek(int64_t msec);
+    int seek(int64_t msec);
 
-    bool FrontIsFlush(int streamType);
+    bool frontIsFlush(int streamType);
 
-    void ToggleBuffering(bool buffering);
+    void toggleBuffering(bool buffering);
 
-    int GetSerial();
+    int getSerial();
 
-    int GetPacket(std::unique_ptr<NextPacket> &pkt, int streamType, bool block);
+    int getPacket(std::unique_ptr<NextPacket> &pkt, int streamType, bool block);
 
     void executeTask() override;
 
-    int Stop();
+    int stop();
 
-    void Release();
+    void release();
 
 private:
 
-    int SetMetaData();
+    int setMetaData();
 
-    int PutPacketByType(PacketOpType type); // 1=flush 2=eof
+    int putPacketByType(PacketOpType type); // 1=flush 2=eof
 
-    bool IsBufferFinish();
+    bool isBufferFinish();
 
-    static int GetErrorType(int errorCode);
+    static int getErrorType(int errorCode);
 
-    void NotifyListener(int what, int arg1 = 0, int arg2 = 0);
+    void notifyListener(int what, int arg1 = 0, int arg2 = 0);
 
-    int PerformFlush();
+    int performFlush();
 
-    sp<NextPacketQueue> GetQueueByStreamType(int streamType);
+    sp<NextPacketQueue> getQueueByStreamType(int streamType);
 
-    void CheckBuffering();
+    void checkBuffering();
 
-    void UpdateCacheStatistic();
+    void updateCacheStatistic();
 
-    bool CheckDropNonRefFrame(AVPacket *pkt);
+    bool checkDropNonRefFrame(AVPacket *pkt);
 
 private:
     int mMaxBufferSize{MAX_QUEUE_SIZE};

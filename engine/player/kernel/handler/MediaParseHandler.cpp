@@ -26,22 +26,22 @@ MediaParseHandler::~MediaParseHandler() {
     NEXT_LOGD(TAG, "MediaParseHandler destructor\n");
 }
 
-int MediaParseHandler::Open(std::string &url) {
+int MediaParseHandler::open(std::string &url) {
     std::unique_lock<std::mutex> lock(mLock);
     mUrl = std::move(url);
     return RESULT_OK;
 }
 
-void MediaParseHandler::SetPrepareCb(PrepareCallBack callBack) {
+void MediaParseHandler::setPrepareCb(PrepareCallBack callBack) {
     mPrepareCb = std::move(callBack);
 }
 
-void MediaParseHandler::SetConfig(const sp<GeneralConfig> &config) {
+void MediaParseHandler::setConfig(const sp<GeneralConfig> &config) {
     std::unique_lock<std::mutex> lock(mLock);
     mGeneralConfig = config;
 }
 
-int MediaParseHandler::SetMetaData() {
+int MediaParseHandler::setMetaData() {
     std::unique_lock<std::mutex> lock(mLock);
     for (auto & it : mMetaData->track_info) {
         if (it.stream_type == AVMEDIA_TYPE_AUDIO && mMetaData->audio_index == -1) {
@@ -60,12 +60,12 @@ int MediaParseHandler::SetMetaData() {
     return RESULT_OK;
 }
 
-int MediaParseHandler::PrepareAsync() {
+int MediaParseHandler::prepareAsync() {
     this->start();
     return RESULT_OK;
 }
 
-int MediaParseHandler::Seek(int64_t msec) {
+int MediaParseHandler::seek(int64_t msec) {
     std::unique_lock<std::mutex> lock(mLock);
     if (!mPlayerLink->seek_req) {
         mPlayerLink->seek_pos = msec * 1000;
@@ -75,27 +75,27 @@ int MediaParseHandler::Seek(int64_t msec) {
     return RESULT_OK;
 }
 
-bool MediaParseHandler::FrontIsFlush(int streamType) {
-    sp<NextPacketQueue> queue = GetQueueByStreamType(streamType);
+bool MediaParseHandler::frontIsFlush(int streamType) {
+    sp<NextPacketQueue> queue = getQueueByStreamType(streamType);
     if (!queue) {
         return false;
     }
     return queue->isFlushPacket();
 }
 
-int MediaParseHandler::PerformFlush() {
+int MediaParseHandler::performFlush() {
     ++mSerial;
     if (mPktQueueMap.empty())
         return RESULT_OK;
     for (auto & it : mPktQueueMap) {
         it.second->flush();
     }
-    UpdateCacheStatistic();
+    updateCacheStatistic();
     return RESULT_OK;
 }
 
 // Decide whether the buffer has reached to resume play
-bool MediaParseHandler::IsBufferFinish() {
+bool MediaParseHandler::isBufferFinish() {
     return (!mPlayerLink->seek_req &&
              (mPlayerLink->stat.audio_cache.bytes + mPlayerLink->stat.video_cache.bytes > mMaxBufferSize) &&
              (mPlayerLink->stat.audio_cache.bytes > AUDIO_CACHE_64K || mMetaData->audio_index < 0) &&
@@ -105,14 +105,14 @@ bool MediaParseHandler::IsBufferFinish() {
 }
 
 // Update buffer state
-void MediaParseHandler::ToggleBuffering(bool buffering) {
+void MediaParseHandler::toggleBuffering(bool buffering) {
     std::unique_lock<std::mutex> lock(mLock);
     // 1=seek 2=network 3=decode
     int bufferType = -1;
     bool bSeekBuffering{false};
 
     if (buffering && !bBuffering && !bEOF && !mPlayerLink->pause_req) {
-        NEXT_LOGI(TAG, "ToggleBuffering begin...\n");
+        NEXT_LOGI(TAG, "toggleBuffering begin...\n");
         bBuffering = true;
         mBufferingPercent = 0;
         if (mPlayerLink->seek_req ||
@@ -121,39 +121,39 @@ void MediaParseHandler::ToggleBuffering(bool buffering) {
             bSeekBuffering = true;
             bufferType = 1;
         }
-        NotifyListener(MSG_BUFFER_START, bufferType);
+        notifyListener(MSG_BUFFER_START, bufferType);
     } else if (!buffering && bBuffering) {
-        NEXT_LOGI(TAG, "ToggleBuffering end...\n");
+        NEXT_LOGI(TAG, "toggleBuffering end...\n");
         bBuffering = false;
         if (bSeekBuffering || mPlayerLink->last_audio_seek_serial >= 0 ||
             mPlayerLink->last_video_seek_serial >= 0) {
             bSeekBuffering = false;
             bufferType = 1;
         }
-        NotifyListener(MSG_BUFFER_END, bufferType);
+        notifyListener(MSG_BUFFER_END, bufferType);
     }
 }
 
-int MediaParseHandler::GetSerial() {
+int MediaParseHandler::getSerial() {
     std::unique_lock<std::mutex> lock(mLock);
     return mSerial;
 }
 
-int MediaParseHandler::GetPacket(std::unique_ptr<NextPacket> &pkt, int streamType, bool block) {
-    sp<NextPacketQueue> queue = GetQueueByStreamType(streamType);
+int MediaParseHandler::getPacket(std::unique_ptr<NextPacket> &pkt, int streamType, bool block) {
+    sp<NextPacketQueue> queue = getQueueByStreamType(streamType);
     if (!queue) {
         return ERROR_PLAYER_INIT_FAIL;
     }
     int ret = queue->getPacket(pkt, block);
-    UpdateCacheStatistic();
+    updateCacheStatistic();
     return ret;
 }
 
-void MediaParseHandler::NotifyListener(int what, int arg1, int arg2) {
+void MediaParseHandler::notifyListener(int what, int arg1, int arg2) {
     mNotifyCb(what, arg1, arg2, nullptr, 0);
 }
 
-sp<NextPacketQueue> MediaParseHandler::GetQueueByStreamType(int streamType) {
+sp<NextPacketQueue> MediaParseHandler::getQueueByStreamType(int streamType) {
     sp<NextPacketQueue> queue;
     auto it = mPktQueueMap.begin();
     if ((it = mPktQueueMap.find(streamType)) != mPktQueueMap.end()) {
@@ -163,7 +163,7 @@ sp<NextPacketQueue> MediaParseHandler::GetQueueByStreamType(int streamType) {
 }
 
 // 1=flush 2=eof
-int MediaParseHandler::PutPacketByType(PacketOpType type) {
+int MediaParseHandler::putPacketByType(PacketOpType type) {
     if (mPktQueueMap.empty()) {
         NEXT_LOGE(TAG, "PktQueue not init!\n");
         return ERROR_PLAYER_INIT_FAIL;
@@ -199,7 +199,7 @@ void MediaParseHandler::executeTask() {
         mMetaData  = std::make_shared<MetaData>();
         if (!mExtractor || !mMetaData) {
             NEXT_LOGE(TAG, "Create extractor failed!\n");
-            NotifyListener(MSG_ON_ERROR, ERROR_OTHER_OOM);
+            notifyListener(MSG_ON_ERROR, ERROR_OTHER_OOM);
             return;
         }
         av_dict_copy(&opt.format_opts, mGeneralConfig->formatConfig, 0);
@@ -215,28 +215,28 @@ void MediaParseHandler::executeTask() {
     if (ret != RESULT_OK) {
         NEXT_LOGE(TAG, "Open extractor failed!\n");
         mExtractor->close();
-        if ((errorType = GetErrorType(ret)) == ERROR_OTHER_UNKNOWN) {
-            NotifyListener(MSG_ON_ERROR, ERROR_PARSE_OPEN, ret);
+        if ((errorType = getErrorType(ret)) == ERROR_OTHER_UNKNOWN) {
+            notifyListener(MSG_ON_ERROR, ERROR_PARSE_OPEN, ret);
         } else {
-            NotifyListener(MSG_ON_ERROR, errorType, ret);
+            notifyListener(MSG_ON_ERROR, errorType, ret);
         }
         return;
     } else {
-        SetMetaData();
+        setMetaData();
     }
 
     while (!bAbort) {
         if (mPlayerLink->seek_req) {
             bEOF = false;
-            ToggleBuffering(true);
-            NotifyListener(MSG_BUFFER_UPDATE, 0, 0);
-            // TODO: Seek flag
+            toggleBuffering(true);
+            notifyListener(MSG_BUFFER_UPDATE, 0, 0);
+            // TODO: seek flag
             ret = mExtractor->seek(mPlayerLink->seek_pos, 0, 0);
             if (ret < 0) {
                 NEXT_LOGI(TAG, "Error while seeking, ret=%d", ret);
             } else {
-                PerformFlush();
-                PutPacketByType(PKT_OP_TYPE_FLUSH);
+                performFlush();
+                putPacketByType(PKT_OP_TYPE_FLUSH);
                 mPlayerLink->last_video_seek_serial = mSerial;
                 mPlayerLink->last_audio_seek_serial = mSerial;
                 mPlayerLink->last_seek_load_start   = CurrentTimeUs();
@@ -259,16 +259,16 @@ void MediaParseHandler::executeTask() {
                 mPlayerLink->audio_accurate_seek_cond.notify_one();
                 mPlayerLink->video_accurate_seek_cond.notify_one();
             }
-            NotifyListener(MSG_SEEK_COMPLETE, static_cast<int>(mPlayerLink->seek_pos) / 1000);
+            notifyListener(MSG_SEEK_COMPLETE, static_cast<int>(mPlayerLink->seek_pos) / 1000);
             completed = false;
-            ToggleBuffering(true);
+            toggleBuffering(true);
             continue;
         }
 
-        UpdateCacheStatistic();
+        updateCacheStatistic();
 
-        if (IsBufferFinish()) {
-            ToggleBuffering(false);
+        if (isBufferFinish()) {
+            toggleBuffering(false);
             usleep(SLEEP_10MS_CONVERT_US);
             continue;
         }
@@ -285,13 +285,13 @@ void MediaParseHandler::executeTask() {
                 }
             } else {
                 completed = true;
-                ToggleBuffering(false);
+                toggleBuffering(false);
                 NEXT_LOGE(TAG, "Completed, error %d\n", mPlayerLink->error_code);
                 if (mPlayerLink->error_code != 0) {
-                    NotifyListener(REQUEST_KERNEL_PAUSE);
-                    NotifyListener(MSG_ON_ERROR, ERROR_PARSE_READ_FRAME, mPlayerLink->error_code);
+                    notifyListener(REQUEST_KERNEL_PAUSE);
+                    notifyListener(MSG_ON_ERROR, ERROR_PARSE_READ_FRAME, mPlayerLink->error_code);
                 } else {
-                    NotifyListener(MSG_ON_COMPLETED);
+                    notifyListener(MSG_ON_COMPLETED);
                 }
             }
         }
@@ -303,10 +303,10 @@ void MediaParseHandler::executeTask() {
                 if (!bEOF) {
                     NEXT_LOGI(TAG, "Read EOF!\n");
                     bEOF = true;
-                    PutPacketByType(PKT_OP_TYPE_EOF);
+                    putPacketByType(PKT_OP_TYPE_EOF);
                 }
 
-                ToggleBuffering(false);
+                toggleBuffering(false);
 
                 if (mExtractor->getError()) {
                     mPlayerLink->error_code = mExtractor->getError();
@@ -322,10 +322,10 @@ void MediaParseHandler::executeTask() {
                 continue;
             } else {
                 NEXT_LOGE(TAG, "Read frame error: %d, %s\n", ret, av_err2str(ret));
-                if ((errorType = GetErrorType(ret)) == ERROR_OTHER_UNKNOWN) {
-                    NotifyListener(MSG_ON_ERROR, ERROR_PARSE_READ_FRAME, ret);
+                if ((errorType = getErrorType(ret)) == ERROR_OTHER_UNKNOWN) {
+                    notifyListener(MSG_ON_ERROR, ERROR_PARSE_READ_FRAME, ret);
                 } else {
-                    NotifyListener(MSG_ON_ERROR, errorType, ret);
+                    notifyListener(MSG_ON_ERROR, errorType, ret);
                 }
                 continue;
             }
@@ -335,29 +335,29 @@ void MediaParseHandler::executeTask() {
         }
         if (pkt->stream_index == mMetaData->audio_index) {
             std::unique_ptr<NextPacket> flushPkt(new NextPacket(pkt, mSerial));
-            sp<NextPacketQueue> queue = GetQueueByStreamType(AVMEDIA_TYPE_AUDIO);
+            sp<NextPacketQueue> queue = getQueueByStreamType(AVMEDIA_TYPE_AUDIO);
             if (queue) {
                 queue->putPacket(flushPkt);
             }
-        } else if (pkt->stream_index == mMetaData->video_index && !CheckDropNonRefFrame(pkt)) {
+        } else if (pkt->stream_index == mMetaData->video_index && !checkDropNonRefFrame(pkt)) {
             std::unique_ptr<NextPacket> flushPkt(new NextPacket(pkt, mSerial));
-            sp<NextPacketQueue> queue = GetQueueByStreamType(AVMEDIA_TYPE_VIDEO);
+            sp<NextPacketQueue> queue = getQueueByStreamType(AVMEDIA_TYPE_VIDEO);
             if (queue) {
                 queue->putPacket(flushPkt);
             }
         }
 
-        UpdateCacheStatistic();
+        updateCacheStatistic();
         bufferCheckTime = CurrentTimeMs();
         if ((!mPlayerLink->first_video_rendered && mMetaData->video_index >= 0) ||
             (!mPlayerLink->first_audio_rendered && mMetaData->audio_index >= 0)) {
             prevBufferCheckTime = bufferCheckTime;
             playerConfig->dcc.current_high_water_mark_in_ms = playerConfig->dcc.first_high_water_mark_in_ms;
-            CheckBuffering();
+            checkBuffering();
         } else {
             if (std::abs(bufferCheckTime - prevBufferCheckTime) > BUFFERING_CHECK_PERIOD) {
                 prevBufferCheckTime = bufferCheckTime;
-                CheckBuffering();
+                checkBuffering();
             }
         }
         av_packet_unref(pkt);
@@ -370,19 +370,19 @@ void MediaParseHandler::executeTask() {
     }
 }
 
-int MediaParseHandler::Stop() {
+int MediaParseHandler::stop() {
     std::unique_lock<std::mutex> lock(mLock);
     int ret = RESULT_OK;
     bAbort = true;
     if (mExtractor) {
         mExtractor->setInterrupt();
     }
-    UpdateCacheStatistic();
+    updateCacheStatistic();
     mCond.notify_all();
     return ret;
 }
 
-void MediaParseHandler::Release() {
+void MediaParseHandler::release() {
     NEXT_LOGD(TAG, "%s Release Start\n", __func__ );
     if (bReleased.load()) {
         NEXT_LOGD(TAG, "already released\n");
@@ -401,7 +401,7 @@ void MediaParseHandler::Release() {
 }
 
 // mapping from ffmpeg error code
-int MediaParseHandler::GetErrorType(int errorCode) {
+int MediaParseHandler::getErrorType(int errorCode) {
     switch (errorCode) {
         case AVERROR_HTTP_BAD_REQUEST:
         case AVERROR_HTTP_UNAUTHORIZED:
@@ -420,7 +420,7 @@ int MediaParseHandler::GetErrorType(int errorCode) {
     }
 }
 
-void MediaParseHandler::CheckBuffering() {
+void MediaParseHandler::checkBuffering() {
     PlayerConfig *playerConfig = mGeneralConfig->playerConfig->get();
     if (!playerConfig->packet_buffering) {
         return;
@@ -493,7 +493,7 @@ void MediaParseHandler::CheckBuffering() {
     }
     if (bufPercent) {
         if (bufPercent - mBufferingPercent >= MIN_BUFFER_NOTIFY) {
-            NotifyListener(MSG_BUFFER_UPDATE, bufPercent, 0);
+            notifyListener(MSG_BUFFER_UPDATE, bufPercent, 0);
             mBufferingPercent = bufPercent;
         }
     }
@@ -514,13 +514,13 @@ void MediaParseHandler::CheckBuffering() {
              mMetaData->audio_index < 0) &&
             (mPlayerLink->stat.video_cache.packets >= MIN_MIN_FRAMES ||
              mMetaData->video_index < 0)) {
-            ToggleBuffering(false);
+            toggleBuffering(false);
         }
     }
 }
 
-void MediaParseHandler::UpdateCacheStatistic() {
-    sp<NextPacketQueue> videoQueue = GetQueueByStreamType(AVMEDIA_TYPE_VIDEO);
+void MediaParseHandler::updateCacheStatistic() {
+    sp<NextPacketQueue> videoQueue = getQueueByStreamType(AVMEDIA_TYPE_VIDEO);
     if (videoQueue) {
         if (mMetaData) {
             if (mMetaData->video_index >= 0) {
@@ -533,7 +533,7 @@ void MediaParseHandler::UpdateCacheStatistic() {
         mPlayerLink->stat.video_cache.bytes   = videoQueue->byteCount();
         mPlayerLink->stat.video_cache.packets = videoQueue->packetCount();
     }
-    sp<NextPacketQueue> audioQueue = GetQueueByStreamType(AVMEDIA_TYPE_AUDIO);
+    sp<NextPacketQueue> audioQueue = getQueueByStreamType(AVMEDIA_TYPE_AUDIO);
     if (audioQueue) {
         if (mMetaData && mMetaData->audio_index >= 0) {
             auto trackInfo = mMetaData->track_info[mMetaData->audio_index];
@@ -546,7 +546,7 @@ void MediaParseHandler::UpdateCacheStatistic() {
 }
 
 // Accurate seek：check if non reference frames need drop
-bool MediaParseHandler::CheckDropNonRefFrame(AVPacket *pkt) {
+bool MediaParseHandler::checkDropNonRefFrame(AVPacket *pkt) {
     PlayerConfig *playerConfig = mGeneralConfig->playerConfig->get();
     if (!mMetaData || mMetaData->video_index < 0) {
         return false;

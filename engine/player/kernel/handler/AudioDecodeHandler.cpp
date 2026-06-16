@@ -158,12 +158,12 @@ int AudioDecodeHandler::performDecode(AVPacket *pkt) {
 int AudioDecodeHandler::readPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) {
     if (!mRedSourceController)
         return ERROR_PARSE_NOT_INIT;
-    int ret = mRedSourceController->GetPacket(pkt, AVMEDIA_TYPE_AUDIO, false);
+    int ret = mRedSourceController->getPacket(pkt, AVMEDIA_TYPE_AUDIO, false);
     if (ret == ERROR_PLAYER_TRY_AGAIN && !bEOF) {
         if (mPlayerLink->first_audio_rendered) {
-            mRedSourceController->ToggleBuffering(true);
+            mRedSourceController->toggleBuffering(true);
         }
-        ret = mRedSourceController->GetPacket(pkt, AVMEDIA_TYPE_AUDIO, true);
+        ret = mRedSourceController->getPacket(pkt, AVMEDIA_TYPE_AUDIO, true);
     }
     return ret;
 }
@@ -244,7 +244,7 @@ bool AudioDecodeHandler::checkAccurateSeek(const std::unique_ptr<FrameBuffer> &b
                     now = CurrentTimeMs();
                     if ((now - mPlayerLink->accurate_seek_start) <=
                         playerConfig->accurate_seek_timeout) {
-                        return true; // drop some old frame when do accurate Seek
+                        return true; // drop some old frame when do accurate seek
                     } else {
                         accurateSeekFail = true;
                     }
