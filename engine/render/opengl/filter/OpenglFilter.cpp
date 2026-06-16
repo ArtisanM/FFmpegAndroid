@@ -28,7 +28,7 @@ OpenGLFilter::create(VideoFrameMetaData *inputFrameMetaData,
 
     int ret = ptr->init(inputFrameMetaData, context);
     if (ret != RESULT_OK) {
-        NEXT_LOGE(OPENGL_FILTER, "OpenGL Filter InitInternal error, ret=%d\n", ret);
+        NEXT_LOGE(OPENGL_FILTER, "OpenGL Filter initInternal error, ret=%d\n", ret);
         return nullptr;
     }
 

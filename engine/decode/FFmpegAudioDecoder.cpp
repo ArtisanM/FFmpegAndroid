@@ -97,7 +97,7 @@ int FFmpegAudioDecoder::flush() {
 }
 
 int FFmpegAudioDecoder::release() {
-    NEXT_LOGI(FFMPEG_AUDIO_TAG, "Release...");
+    NEXT_LOGI(FFMPEG_AUDIO_TAG, "release...");
     if (mCodecContext) {
         avcodec_free_context(&mCodecContext);
         mCodecContext = nullptr;

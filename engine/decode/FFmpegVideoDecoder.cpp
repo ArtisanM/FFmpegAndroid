@@ -190,7 +190,7 @@ int FFmpegVideoDecoder::flush() {
 }
 
 int FFmpegVideoDecoder::release() {
-    NEXT_LOGD(FFMPEG_VIDEO_TAG, "Release...");
+    NEXT_LOGD(FFMPEG_VIDEO_TAG, "release...");
     if (mCodecContext) {
         avcodec_free_context(&mCodecContext);
         mCodecContext = nullptr;

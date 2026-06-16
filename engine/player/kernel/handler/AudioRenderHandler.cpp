@@ -62,7 +62,7 @@ int AudioRenderHandler::prepare(sp<MetaData> &metadata) {
 
 int AudioRenderHandler::init() {
     if (!mAudioRender) {
-        NEXT_LOGE(TAG, "Init failed, audio render is null\n");
+        NEXT_LOGE(TAG, "init failed, audio render is null\n");
         return ERROR_PLAYER_NOT_INIT;
     }
     if (bPaused) {
@@ -428,7 +428,7 @@ int AudioRenderHandler::stop() {
 }
 
 void AudioRenderHandler::release() {
-    NEXT_LOGD(TAG, "Release begin\n");
+    NEXT_LOGD(TAG, "release begin\n");
     int streamIndex = mMetaData->audio_index;
     for (auto & it : mMetaData->track_info) {
         if (it.stream_type == AVMEDIA_TYPE_AUDIO && it.stream_index == streamIndex
@@ -440,5 +440,5 @@ void AudioRenderHandler::release() {
     if (mAudioRender) {
         mAudioRender->closeAudio(true);
     }
-    NEXT_LOGD(TAG, "Release end\n");
+    NEXT_LOGD(TAG, "release end\n");
 }

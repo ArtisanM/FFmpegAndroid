@@ -383,7 +383,7 @@ int MediaParseHandler::stop() {
 }
 
 void MediaParseHandler::release() {
-    NEXT_LOGD(TAG, "%s Release Start\n", __func__ );
+    NEXT_LOGD(TAG, "%s release Start\n", __func__ );
     if (bReleased.load()) {
         NEXT_LOGD(TAG, "already released\n");
         return;
@@ -397,7 +397,7 @@ void MediaParseHandler::release() {
     for (auto & it : mPktQueueMap) {
         it.second->release();
     }
-    NEXT_LOGD(TAG, "%s Release end\n", __func__ );
+    NEXT_LOGD(TAG, "%s release end\n", __func__ );
 }
 
 // mapping from ffmpeg error code

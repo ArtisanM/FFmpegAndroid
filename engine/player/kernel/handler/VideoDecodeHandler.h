@@ -34,54 +34,54 @@ public:
 
     ~VideoDecodeHandler() override;
 
-    void SetConfig(const sp<GeneralConfig> &config);
+    void setConfig(const sp<GeneralConfig> &config);
 
-    int Init(sp<MetaData> &metadata);
+    int init(sp<MetaData> &metadata);
 
-    int GetFrame(std::unique_ptr<FrameBuffer> &buffer);
+    int getFrame(std::unique_ptr<FrameBuffer> &buffer);
 
 #if defined(__ANDROID__)
 
-    int SetNativeSurface(ANativeWindow *surface);
+    int setNativeSurface(ANativeWindow *surface);
 
 #endif
 
     void executeTask() override;
 
-    int GetSerial();
+    int getSerial();
 
-    void ResetEof();
+    void resetEof();
 
-    int GetQueueSize();
+    int getQueueSize();
 
     int onDecodedFrame(std::unique_ptr<MixedBuffer> frame) override;
 
     void onDecodeError(int error, int errorCode) override;
 
-    int Stop();
+    int stop();
 
-    void Release();
+    void release();
 
 private:
     VideoDecodeHandler() = default;
 
-    int InitInternal();
+    int initInternal();
 
-    int PerformDecode(AVPacket *pkt);
+    int performDecode(AVPacket *pkt);
 
-    int ReadPacketOrBuffering(std::unique_ptr<NextPacket> &pkt);
+    int readPacketOrBuffering(std::unique_ptr<NextPacket> &pkt);
 
-    int PerformFlush();
+    int performFlush();
 
-    int ResetDecoder();
+    int resetDecoder();
 
-    int ResetDecoderFormat();
+    int resetDecoderFormat();
 
-    void DecodeLastCacheGop();
+    void decodeLastCacheGop();
 
-    void NotifyListener(int what, int arg1 = 0, int arg2 = 0);
+    void notifyListener(int what, int arg1 = 0, int arg2 = 0);
 
-    bool FrontIsFlush();
+    bool frontIsFlush();
 
 private:
 

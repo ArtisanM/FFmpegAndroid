@@ -38,7 +38,7 @@ VideoDecodeHandler::~VideoDecodeHandler() {
 #endif
 }
 
-int VideoDecodeHandler::Init(sp<MetaData> &metadata) {
+int VideoDecodeHandler::init(sp<MetaData> &metadata) {
     int ret = RESULT_OK;
     size_t queueSize = VIDEO_PICTURE_QUEUE_SIZE_DEFAULT;
     mMetaData = metadata;
@@ -52,13 +52,13 @@ int VideoDecodeHandler::Init(sp<MetaData> &metadata) {
         NEXT_LOGE(TAG, "Video frame queue create error\n");
         return ERROR_PLAYER_INIT_FAIL;
     }
-    ret = InitInternal();
+    ret = initInternal();
     if (ret != RESULT_OK) {
         playerConfig->enable_vtb     = false;
         playerConfig->enable_ndkvdec = false;
-        ret = InitInternal();
+        ret = initInternal();
         if (ret != RESULT_OK) {
-            NotifyListener(MSG_ON_ERROR, ERROR_PARSE_STREAM_OPEN);
+            notifyListener(MSG_ON_ERROR, ERROR_PARSE_STREAM_OPEN);
             return ret;
         }
     }
@@ -68,9 +68,9 @@ int VideoDecodeHandler::Init(sp<MetaData> &metadata) {
     return ret;
 }
 
-int VideoDecodeHandler::InitInternal() {
+int VideoDecodeHandler::initInternal() {
     if (!mMetaData) {
-        NEXT_LOGE(TAG, "InitInternal, null metadata\n");
+        NEXT_LOGE(TAG, "initInternal, null metadata\n");
         return ERROR_PLAYER_INIT_FAIL;
     }
 
@@ -97,7 +97,7 @@ int VideoDecodeHandler::InitInternal() {
             mPlayerLink->stat.video_dec_type = OPTION_STR_DECODER_MEDIACODEC;
             codecType = MEDIACODEC_MODULE_NAME;
             if (!mCurNativeWindow) {
-                NEXT_LOGE(TAG, "Init decoder with null surface\n");
+                NEXT_LOGE(TAG, "init decoder with null surface\n");
             }
         }
 #elif defined(__HARMONY__)
@@ -117,7 +117,7 @@ int VideoDecodeHandler::InitInternal() {
     mVideoDecoder = VideoDecoderFactory::createVideoDecoder(type, codecId);
     if (!mVideoDecoder) {
         NEXT_LOGE(TAG, "Video decoder create error\n");
-        NotifyListener(MSG_ON_ERROR, ERROR_DECODE_VIDEO_DEC, ERROR_DECODE_VIDEO_OPEN);
+        notifyListener(MSG_ON_ERROR, ERROR_DECODE_VIDEO_DEC, ERROR_DECODE_VIDEO_OPEN);
         return ERROR_DECODE_VIDEO_OPEN;
     }
 
@@ -130,7 +130,7 @@ int VideoDecodeHandler::InitInternal() {
     mVideoDecoder->setDecodeCallback(this);
 
     if (mPlayerLink->stat.video_dec_type != OPTION_STR_DECODER_MEDIACODEC) {
-        ResetDecoderFormat();
+        resetDecoderFormat();
     }
 
     if (mMetaData->track_info[mMetaData->video_index].pixel_fmt != AV_PIX_FMT_NONE) {
@@ -141,12 +141,12 @@ int VideoDecodeHandler::InitInternal() {
     mPlayerLink->video_codec_type = codecType;
     NEXT_LOGI(TAG, "Video decoder created, name=%s, type=%s\n", codecName.c_str(), codecType.c_str());
 
-    NotifyListener(MSG_VIDEO_DECODER_OPEN, static_cast<int>(type), -1);
+    notifyListener(MSG_VIDEO_DECODER_OPEN, static_cast<int>(type), -1);
 
     return RESULT_OK;
 }
 
-int VideoDecodeHandler::PerformDecode(AVPacket *pkt) {
+int VideoDecodeHandler::performDecode(AVPacket *pkt) {
     int ret = RESULT_OK;
     if (!mVideoDecoder)
         return ERROR_DECODE_VIDEO_OPEN;
@@ -162,7 +162,7 @@ int VideoDecodeHandler::PerformDecode(AVPacket *pkt) {
     } else if (ret != RESULT_OK) {
         mDecodeErrorCount++;
         if (mPlayerLink->stat.video_dec_type != OPTION_STR_DECODER_AVCODEC) {
-            NotifyListener(MSG_ON_ERROR, ERROR_DECODE_VIDEO_DEC, ret);
+            notifyListener(MSG_ON_ERROR, ERROR_DECODE_VIDEO_DEC, ret);
         }
     }
     return ret;
@@ -183,7 +183,7 @@ int VideoDecodeHandler::onDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame
     if (bDecoderRecovery) {
         return RESULT_OK;
     }
-    if (FrontIsFlush()) {
+    if (frontIsFlush()) {
         return RESULT_OK;
     }
 
@@ -312,12 +312,12 @@ int VideoDecodeHandler::onDecodedFrame(std::unique_ptr<MixedBuffer> decodedFrame
     if (mWidth != buffer->width || mHeight != buffer->height) {
         mWidth  = buffer->width;
         mHeight = buffer->height;
-        NotifyListener(MSG_VIDEO_SIZE_CHANGED, meta->width, meta->height);
+        notifyListener(MSG_VIDEO_SIZE_CHANGED, meta->width, meta->height);
     }
 
     if (!bFirstFrameDecoded) {
         bFirstFrameDecoded = true;
-        NotifyListener(MSG_VIDEO_DECODE_START);
+        notifyListener(MSG_VIDEO_DECODE_START);
     }
     mFrameQueue->putFrame(buffer);
     return RESULT_OK;
@@ -338,20 +338,20 @@ void VideoDecodeHandler::onDecodeError(int error, int errorCode) {
         default:
             mDecodeErrorCount++;
             if (mPlayerLink->stat.video_dec_type != OPTION_STR_DECODER_AVCODEC) {
-                NotifyListener(MSG_ON_ERROR, ERROR_DECODE_VIDEO_DEC,
+                notifyListener(MSG_ON_ERROR, ERROR_DECODE_VIDEO_DEC,
                                -(static_cast<int32_t>(error)));
             }
             break;
     }
 }
 
-void VideoDecodeHandler::SetConfig(const sp<GeneralConfig> &config) {
+void VideoDecodeHandler::setConfig(const sp<GeneralConfig> &config) {
     std::lock_guard<std::mutex> lock(mLock);
     mGeneralConfig = config;
 }
 
 #if defined(__ANDROID__)
-int VideoDecodeHandler::SetNativeSurface(ANativeWindow *surface) {
+int VideoDecodeHandler::setNativeSurface(ANativeWindow *surface) {
     if (!surface) {
         return ERROR_RENDER_VIDEO_INIT;
     }
@@ -366,11 +366,11 @@ int VideoDecodeHandler::SetNativeSurface(ANativeWindow *surface) {
 }
 #endif
 
-void VideoDecodeHandler::NotifyListener(int what, int arg1, int arg2) {
+void VideoDecodeHandler::notifyListener(int what, int arg1, int arg2) {
     mNotifyCb(what, arg1, arg2, nullptr, 0);
 }
 
-int VideoDecodeHandler::ReadPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) {
+int VideoDecodeHandler::readPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) {
     if (!mMediaParser)
         return ERROR_PARSE_NOT_INIT;
     int ret = mMediaParser->getPacket(pkt, AVMEDIA_TYPE_VIDEO, false);
@@ -383,7 +383,7 @@ int VideoDecodeHandler::ReadPacketOrBuffering(std::unique_ptr<NextPacket> &pkt) 
     return ret;
 }
 
-int VideoDecodeHandler::GetFrame(std::unique_ptr<FrameBuffer> &buffer) {
+int VideoDecodeHandler::getFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mFrameQueue) {
         return ERROR_PLAYER_INIT_FAIL;
     }
@@ -397,7 +397,7 @@ int VideoDecodeHandler::GetFrame(std::unique_ptr<FrameBuffer> &buffer) {
     return mFrameQueue->getFrame(buffer);
 }
 
-int VideoDecodeHandler::PerformFlush() {
+int VideoDecodeHandler::performFlush() {
     std::lock_guard<std::mutex> lock(mLock);
     mSerial++;
     bEOF = false;
@@ -418,13 +418,13 @@ int VideoDecodeHandler::PerformFlush() {
     return ret;
 }
 
-bool VideoDecodeHandler::FrontIsFlush() {
+bool VideoDecodeHandler::frontIsFlush() {
     if (!mMediaParser)
         return false;
     return mMediaParser->frontIsFlush(AVMEDIA_TYPE_VIDEO);
 }
 
-void VideoDecodeHandler::ResetEof() {
+void VideoDecodeHandler::resetEof() {
     std::unique_lock<std::mutex> lock(mLock);
     bEOF = false;
     mLastSerial = -1;
@@ -435,7 +435,7 @@ void VideoDecodeHandler::ResetEof() {
     mCond.notify_one();
 }
 
-int VideoDecodeHandler::ResetDecoderFormat() {
+int VideoDecodeHandler::resetDecoderFormat() {
     int ret = RESULT_OK;
     if (!mVideoDecoder) {
         return ERROR_DECODE_VIDEO_OPEN;
@@ -449,38 +449,38 @@ int VideoDecodeHandler::ResetDecoderFormat() {
     return ret;
 }
 
-int VideoDecodeHandler::ResetDecoder() {
+int VideoDecodeHandler::resetDecoder() {
     if (mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_MEDIACODEC && mFrameQueue) {
         mFrameQueue->flush();
     }
-    return ResetDecoderFormat();
+    return resetDecoderFormat();
 }
 
-void VideoDecodeHandler::DecodeLastCacheGop() {
+void VideoDecodeHandler::decodeLastCacheGop() {
     bDecoderRecovery = true;
     if ((!mPktQueue.empty()) &&
             mPktQueue.front()->isKeyOrIdrPacket(bIdrIdentified,
                                                 "hevc" == mPlayerLink->video_codec_name)) {
-        NEXT_LOGD(TAG, "DecodeLastCacheGop begin\n");
+        NEXT_LOGD(TAG, "decodeLastCacheGop begin\n");
         while (!mPktQueue.empty()) {
-            if (bAbort || FrontIsFlush()) {
+            if (bAbort || frontIsFlush()) {
                 break;
             }
             auto cache_pkt = mPktQueue.front();
             mPktQueue.pop();
-            PerformDecode(cache_pkt->getPacket());
+            performDecode(cache_pkt->getPacket());
         }
-        NEXT_LOGD(TAG, "DecodeLastCacheGop end\n");
+        NEXT_LOGD(TAG, "decodeLastCacheGop end\n");
     }
     bDecoderRecovery = false;
 }
 
-int VideoDecodeHandler::GetSerial() {
+int VideoDecodeHandler::getSerial() {
     std::unique_lock<std::mutex> lock(mLock);
     return mSerial;
 }
 
-int VideoDecodeHandler::GetQueueSize() {
+int VideoDecodeHandler::getQueueSize() {
     std::unique_lock<std::mutex> lock(mLock);
     return mFrameQueue->size();
 }
@@ -490,9 +490,9 @@ void VideoDecodeHandler::executeTask() {
     PlayerConfig *playerConfig = mGeneralConfig->playerConfig->get();
     if (mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_MEDIACODEC &&
         playerConfig->mediacodec_auto_rotate) {
-        NotifyListener(MSG_ROTATION_CHANGED, 0);
+        notifyListener(MSG_ROTATION_CHANGED, 0);
     } else {
-        NotifyListener(MSG_ROTATION_CHANGED,
+        notifyListener(MSG_ROTATION_CHANGED,
                        mMetaData->track_info[mMetaData->video_index].rotation);
     }
     while (!bAbort) {
@@ -510,7 +510,7 @@ void VideoDecodeHandler::executeTask() {
                     mVideoDecoder->updateHardwareContext(hwContext);
                 }
                 if (mCurNativeWindow) {
-                    ResetDecoder();
+                    resetDecoder();
                 }
                 mSurfaceUpdated.store(false);
             }
@@ -524,10 +524,10 @@ void VideoDecodeHandler::executeTask() {
 
         std::unique_ptr<NextPacket> pkt;
         int32_t ret = RESULT_OK;
-        if (mPendingPkt && !FrontIsFlush()) {
+        if (mPendingPkt && !frontIsFlush()) {
             pkt = std::move(mPendingPkt);
         } else {
-            ret = ReadPacketOrBuffering(pkt);
+            ret = readPacketOrBuffering(pkt);
         }
         if (ret != RESULT_OK || !pkt) {
             if (bAbort) {
@@ -537,11 +537,11 @@ void VideoDecodeHandler::executeTask() {
             continue;
         }
         if (pkt->isFlushPacket()) {
-            PerformFlush();
+            performFlush();
             mPendingPkt.reset();
             if (mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_VTB &&
                 mDecodeErrorCount >= playerConfig->vtb_max_error_count) {
-                ResetDecoder();
+                resetDecoder();
             }
             continue;
         } else if (pkt->isEofPacket()) {
@@ -552,7 +552,7 @@ void VideoDecodeHandler::executeTask() {
 //                   (mInputPacketCount > 0 &&
 //                    mVideoDecoder->GetDelayedFrame() == RESULT_OK)) {
 //            }
-            if (FrontIsFlush()) {
+            if (frontIsFlush()) {
                 continue;
             }
             if (playerConfig->enable_accurate_seek) {
@@ -562,7 +562,7 @@ void VideoDecodeHandler::executeTask() {
             }
             std::unique_lock<std::mutex> lock(mLock);
             mLastSerial = mSerial;
-            while (!bAbort && !FrontIsFlush()) {
+            while (!bAbort && !frontIsFlush()) {
                 mCond.wait_for(lock, std::chrono::milliseconds(SLEEP_10MS));
             }
             continue;
@@ -588,11 +588,11 @@ void VideoDecodeHandler::executeTask() {
 
         if (bRefreshSession &&
             mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_VTB) {
-            ResetDecoder();
-            DecodeLastCacheGop();
+            resetDecoder();
+            decodeLastCacheGop();
             bRefreshSession = false;
         }
-        ret = PerformDecode(pkt->getPacket());
+        ret = performDecode(pkt->getPacket());
         if (ret == ERROR_PLAYER_TRY_AGAIN) {
             mPendingPkt = std::move(pkt);
             continue;
@@ -604,21 +604,21 @@ void VideoDecodeHandler::executeTask() {
             mPlayerLink->stat.video_dec_type == OPTION_STR_DECODER_VTB &&
             mDecodeErrorCount > playerConfig->vtb_max_error_count) {
             playerConfig->enable_vtb = 0;
-            ret = InitInternal();
+            ret = initInternal();
             if (ret != RESULT_OK) {
                 break;
             }
-            DecodeLastCacheGop();
+            decodeLastCacheGop();
         }
         mInputPacketCount++;
         if (!bFirstPacketReceived) {
             bFirstPacketReceived = true;
-            NotifyListener(MSG_VIDEO_FIRST_PACKET);
+            notifyListener(MSG_VIDEO_FIRST_PACKET);
         }
     }
 }
 
-int VideoDecodeHandler::Stop() {
+int VideoDecodeHandler::stop() {
     std::unique_lock<std::mutex> lock(mLock);
 
     if (mGeneralConfig->playerConfig->get()->enable_accurate_seek) {
@@ -634,8 +634,8 @@ int VideoDecodeHandler::Stop() {
     return RESULT_OK;
 }
 
-void VideoDecodeHandler::Release() {
-    NEXT_LOGD(TAG, "Release begin\n");
+void VideoDecodeHandler::release() {
+    NEXT_LOGD(TAG, "release begin\n");
     if (bReleased.load()) {
         NEXT_LOGD(TAG, "Already released\n");
         return;
@@ -651,5 +651,5 @@ void VideoDecodeHandler::Release() {
     while (!mPktQueue.empty()) {
         mPktQueue.pop();
     }
-    NEXT_LOGD(TAG, "Release end\n");
+    NEXT_LOGD(TAG, "release end\n");
 }

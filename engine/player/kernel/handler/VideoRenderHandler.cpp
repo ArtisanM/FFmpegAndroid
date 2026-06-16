@@ -138,7 +138,7 @@ int VideoRenderHandler::Init() {
     if (ret != RESULT_OK) {
         lock.unlock();
         NotifyListener(MSG_ON_ERROR, ERROR_RENDER_VIDEO_INIT, ret);
-        NEXT_LOGE(TAG, "mVideoRender InitInternal error");
+        NEXT_LOGE(TAG, "mVideoRender initInternal error");
         return ERROR_PLAYER_NOT_INIT;
     }
 
@@ -276,7 +276,7 @@ double VideoRenderHandler::ComputeDuration(std::unique_ptr<FrameBuffer> &buffer)
 int VideoRenderHandler::ReadFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mVideoDecodeHandler)
         return ERROR_PARSE_NOT_INIT;
-    return mVideoDecodeHandler->GetFrame(buffer);
+    return mVideoDecodeHandler->getFrame(buffer);
 }
 
 int VideoRenderHandler::RenderFrame(std::unique_ptr<FrameBuffer> &buffer) {
@@ -523,7 +523,7 @@ void VideoRenderHandler::executeTask() {
             usleep(SLEEP_20MS_CONVERT_US);
             continue;
         }
-        if (frameBuffer->serial != mVideoDecodeHandler->GetSerial()) {
+        if (frameBuffer->serial != mVideoDecodeHandler->getSerial()) {
             continue;
         }
         while (!bAbort) {
@@ -536,7 +536,7 @@ void VideoRenderHandler::executeTask() {
                 }
             }
 #endif
-            if (frameBuffer->serial != mVideoDecodeHandler->GetSerial()) {
+            if (frameBuffer->serial != mVideoDecodeHandler->getSerial()) {
                 break;
             }
 
@@ -583,7 +583,7 @@ void VideoRenderHandler::executeTask() {
             mPlayerLink->video_clock->setClock(static_cast<double>(frameBuffer->pts) / 1000.0);
             mPlayerLink->video_clock->setClockSerial(frameBuffer->serial);
 
-            if (mVideoDecodeHandler->GetQueueSize() > 0) {
+            if (mVideoDecodeHandler->getQueueSize() > 0) {
                 if ((playerConfig->framedrop > 0 ||
                      (/*framedrop &&*/getMasterSyncType(mPlayerLink) != CLOCK_VIDEO)) && time > mFrameTick.time + duration) {
                     NEXT_LOGI(TAG,
@@ -620,9 +620,9 @@ int VideoRenderHandler::Stop() {
 }
 
 void VideoRenderHandler::Release() {
-    NEXT_LOGD(TAG, "%s Release begin\n", __func__ );
+    NEXT_LOGD(TAG, "%s release begin\n", __func__ );
     if (mThread.joinable()) {
         mThread.join();
     }
-    NEXT_LOGD(TAG, "%s Release end\n", __func__ );
+    NEXT_LOGD(TAG, "%s release end\n", __func__ );
 }

@@ -389,7 +389,7 @@ int AudioDecodeHandler::stop() {
 }
 
 void AudioDecodeHandler::release() {
-    NEXT_LOGD(TAG, "Release begin\n");
+    NEXT_LOGD(TAG, "release begin\n");
     bAbort = true;
     if (bReleased) {
         NEXT_LOGD(TAG, "Already released!\n");
@@ -402,5 +402,5 @@ void AudioDecodeHandler::release() {
     if (mFrameQueue) {
         mFrameQueue->flush();
     }
-    NEXT_LOGD(TAG, "Release end\n");
+    NEXT_LOGD(TAG, "release end\n");
 }

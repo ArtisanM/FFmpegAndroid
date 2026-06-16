@@ -70,7 +70,7 @@ struct VideoFrameMetadata {
     uint8_t *buffer_v = nullptr;
 
     VideoPixelFormat pixel_format;
-    void *buffer_context = nullptr;  // Release buffer
+    void *buffer_context = nullptr;  // release buffer
 
 };
 
@@ -85,7 +85,7 @@ struct AudioFrameMetadata {
     AVChannelLayout *channel_layout;
 
     uint8_t *channel[MAX_PLANAR];
-    void *buffer_context = nullptr; // Release buffer
+    void *buffer_context = nullptr; // release buffer
 };
 
 enum VideoPacketFormat {

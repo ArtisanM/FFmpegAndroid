@@ -245,7 +245,7 @@ int PlayerKernel::performConfigs() {
         mParseHandler->setConfig(mGeneralConfig);
     }
     if (mVideoDecHandler) {
-        mVideoDecHandler->SetConfig(mGeneralConfig);
+        mVideoDecHandler->setConfig(mGeneralConfig);
     }
     if (mAudioDecHandler) {
         mAudioDecHandler->setConfig(mGeneralConfig);
@@ -412,7 +412,7 @@ int PlayerKernel::performFlush() {
     }
 
     if (mVideoDecHandler) {
-        mVideoDecHandler->ResetEof();
+        mVideoDecHandler->resetEof();
     }
     if (mAudioDecHandler) {
         mAudioDecHandler->resetEof();
@@ -438,7 +438,7 @@ int PlayerKernel::performStop() {
         mAudioDecHandler->stop();
     }
     if (mVideoDecHandler) {
-        mVideoDecHandler->Stop();
+        mVideoDecHandler->stop();
     }
     if (mParseHandler) {
         mParseHandler->stop();
@@ -456,7 +456,7 @@ void PlayerKernel::release() {
     }
 
     if (mVideoDecHandler) {
-        mVideoDecHandler->Release();
+        mVideoDecHandler->release();
     }
     if (mAudioDecHandler) {
         mAudioDecHandler->release();
@@ -780,7 +780,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
     if (mVideoState->video_stream_index >= 0 && !playerConfig->video_disable && mVideoDecHandler) {
         TrackInfo track_info = metadata->track_info[mVideoState->video_stream_index];
         parseExtraData(track_info);
-        ret = mVideoDecHandler->Init(metadata);
+        ret = mVideoDecHandler->init(metadata);
         if (ret == RESULT_OK && mVideoRenderHandler) {
             ret = mVideoRenderHandler->Prepare(metadata);
             if (ret == RESULT_OK) {
@@ -794,7 +794,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
         if (ret != RESULT_OK) {
             NEXT_LOGE(TAG, "%s video failed\n", __func__);
             mVideoState->video_stream_index = -1;
-            mVideoDecHandler->Release();
+            mVideoDecHandler->release();
             mVideoRenderHandler->Release();
             mVideoDecHandler.reset();
             mVideoDecHandler.reset();
@@ -833,7 +833,7 @@ int PlayerKernel::setVideoSurface(ANativeWindow *surface) {
 
     mVideoRenderHandler->SetVideoSurface(surface);
 
-    if (mVideoDecHandler->SetNativeSurface(surface) == ERROR_RENDER_VIDEO_SUR) {
+    if (mVideoDecHandler->setNativeSurface(surface) == ERROR_RENDER_VIDEO_SUR) {
         int64_t pos = 0;
         getCurrentPosition(pos);
         if (surface && pos >= 0 &&
