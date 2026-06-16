@@ -178,7 +178,7 @@ int PlayerKernel::getDuration(int64_t &duration) {
 }
 
 void PlayerKernel::setVolume(const float left, const float right) {
-    mAudioRenderHandler->SetVolume(left, right);
+    mAudioRenderHandler->setVolume(left, right);
     mVideoState->volume = (left + right) / 2;
 }
 
@@ -254,7 +254,7 @@ int PlayerKernel::performConfigs() {
         mVideoRenderHandler->SetConfig(mGeneralConfig);
     }
     if (mAudioRenderHandler) {
-        mAudioRenderHandler->SetConfig(mGeneralConfig);
+        mAudioRenderHandler->setConfig(mGeneralConfig);
     }
     return RESULT_OK;
 }
@@ -362,7 +362,7 @@ int PlayerKernel::performStart() {
         mVideoRenderHandler->StartRender();
     }
     if (mAudioRenderHandler) {
-        mAudioRenderHandler->StartRender();
+        mAudioRenderHandler->startRender();
     }
 
     return RESULT_OK;
@@ -401,7 +401,7 @@ int PlayerKernel::performPause() {
         mVideoRenderHandler->PauseRender();
     }
     if (mAudioRenderHandler) {
-        mAudioRenderHandler->PauseRender();
+        mAudioRenderHandler->pauseRender();
     }
     return RESULT_OK;
 }
@@ -421,7 +421,7 @@ int PlayerKernel::performFlush() {
         mVideoRenderHandler->Flush();
     }
     if (mAudioRenderHandler) {
-        mAudioRenderHandler->Flush();
+        mAudioRenderHandler->flush();
     }
 
     return RESULT_OK;
@@ -429,7 +429,7 @@ int PlayerKernel::performFlush() {
 
 int PlayerKernel::performStop() {
     if (mAudioRenderHandler) {
-        mAudioRenderHandler->Stop();
+        mAudioRenderHandler->stop();
     }
     if (mVideoRenderHandler) {
         mVideoRenderHandler->Stop();
@@ -465,7 +465,7 @@ void PlayerKernel::release() {
         mVideoRenderHandler->Release();
     }
     if (mAudioRenderHandler) {
-        mAudioRenderHandler->Release();
+        mAudioRenderHandler->release();
     }
     if (mFd >= 0) {
         close(static_cast<int>(mFd));
@@ -528,7 +528,7 @@ void PlayerKernel::setPlaybackRate(float rate) {
         return;
     }
     if (mAudioRenderHandler) {
-        mAudioRenderHandler->SetPlaybackRate(rate);
+        mAudioRenderHandler->setPlaybackRate(rate);
     }
     mVideoState->audio_clock->setSpeed(rate);
     mVideoState->video_clock->setSpeed(rate);
@@ -753,7 +753,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
     if (mVideoState->audio_stream_index >= 0 && !playerConfig->audio_disable && mAudioDecHandler) {
         ret = mAudioDecHandler->prepare(metadata);
         if (ret == RESULT_OK && mAudioRenderHandler) {
-            ret = mAudioRenderHandler->Prepare(metadata);
+            ret = mAudioRenderHandler->prepare(metadata);
             if (ret == RESULT_OK) {
                 mVideoState->av_sync_type = CLOCK_AUDIO;
                 NEXT_LOGI(TAG, "prepare audio stream success\n");
@@ -763,7 +763,7 @@ void PlayerKernel::prepareStream(sp<MetaData> &metadata) {
             NEXT_LOGE(TAG, "%s audio failed\n", __func__);
             mVideoState->audio_stream_index = -1;
             mAudioDecHandler->release();
-            mAudioRenderHandler->Release();
+            mAudioRenderHandler->release();
             mAudioDecHandler.reset();
             mAudioDecHandler.reset();
             mAudioRenderHandler.reset();

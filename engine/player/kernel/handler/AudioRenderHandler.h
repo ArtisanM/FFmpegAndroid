@@ -50,41 +50,41 @@ public:
 
     ~AudioRenderHandler() override;
 
-    void SetConfig(const sp<GeneralConfig> &config);
+    void setConfig(const sp<GeneralConfig> &config);
 
-    int Prepare(sp<MetaData> &metadata);
+    int prepare(sp<MetaData> &metadata);
 
-    int StartRender();
+    int startRender();
 
-    int PauseRender();
+    int pauseRender();
 
     void executeTask() override;
 
-    void SetPlaybackRate(float rate);
+    void setPlaybackRate(float rate);
 
-    void SetVolume(float leftVolume, float rightVolume);
+    void setVolume(float leftVolume, float rightVolume);
 
-    void SetMute(bool mute);
+    void setMute(bool mute);
 
-    int Flush();
+    int flush();
 
-    int Stop();
+    int stop();
 
-    void Release();
+    void release();
 
 private:
 
-    int Init();
+    int init();
 
-    int ReadFrame(std::unique_ptr<FrameBuffer> &buffer);
+    int readFrame(std::unique_ptr<FrameBuffer> &buffer);
 
-    static void AudioDataCallback(void *opaque, char *data, int &len);
+    static void audioDataCallback(void *opaque, char *data, int &len);
 
-    void GetAudioData(char *data, int &len);
+    void getAudioData(char *data, int &len);
 
-    void NotifyListener(int what, int arg1 = 0, int arg2 = 0);
+    void notifyListener(int what, int arg1 = 0, int arg2 = 0);
 
-    int ResampleAudioData(std::unique_ptr<FrameBuffer> &buffer);
+    int resampleAudioData(std::unique_ptr<FrameBuffer> &buffer);
 
 private:
 

@@ -42,25 +42,25 @@ AudioRenderHandler::~AudioRenderHandler() {
     mMetaData.reset();
 }
 
-void AudioRenderHandler::SetConfig(const sp<GeneralConfig> &config) {
+void AudioRenderHandler::setConfig(const sp<GeneralConfig> &config) {
     std::unique_lock<std::mutex> lock(mLock);
     mGeneralConfig = config;
 }
 
-int AudioRenderHandler::Prepare(sp<MetaData> &metadata) {
+int AudioRenderHandler::prepare(sp<MetaData> &metadata) {
     int ret = RESULT_OK;
     mMetaData = metadata;
     mAudioRender = AudioRenderFactory::createAudioRender();
 
-    ret = Init();
+    ret = init();
     if (ret != RESULT_OK) {
-        NotifyListener(MSG_ON_ERROR, ERROR_RENDER_AUDIO_INIT);
+        notifyListener(MSG_ON_ERROR, ERROR_RENDER_AUDIO_INIT);
         return ret;
     }
     return ret;
 }
 
-int AudioRenderHandler::Init() {
+int AudioRenderHandler::init() {
     if (!mAudioRender) {
         NEXT_LOGE(TAG, "Init failed, audio render is null\n");
         return ERROR_PLAYER_NOT_INIT;
@@ -96,10 +96,10 @@ int AudioRenderHandler::Init() {
     }
 
     mAudioCallback = std::make_unique<AudioCallbackClass>(
-            reinterpret_cast<void *>(this), AudioDataCallback);
+            reinterpret_cast<void *>(this), audioDataCallback);
     int ret = mAudioRender->openAudio(mDesired, mObtained, mAudioCallback);
     if (ret < 0) {
-        NotifyListener(MSG_ON_ERROR, ERROR_RENDER_AUDIO_INIT, static_cast<int32_t>(ret));
+        notifyListener(MSG_ON_ERROR, ERROR_RENDER_AUDIO_INIT, static_cast<int32_t>(ret));
         NEXT_LOGE(TAG, "openAudio error:%d", ret);
         return ERROR_RENDER_AUDIO_INIT;
     }
@@ -128,7 +128,7 @@ void AudioRenderHandler::executeTask() {
 
 }
 
-int AudioRenderHandler::StartRender() {
+int AudioRenderHandler::startRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = false;
     mPlayerLink->audio_clock->setClock(mPlayerLink->audio_clock->getClock());
@@ -139,7 +139,7 @@ int AudioRenderHandler::StartRender() {
     return RESULT_OK;
 }
 
-int AudioRenderHandler::PauseRender() {
+int AudioRenderHandler::pauseRender() {
     std::unique_lock<std::mutex> lock(mLock);
     bPaused = true;
     if (mAudioRender) {
@@ -149,7 +149,7 @@ int AudioRenderHandler::PauseRender() {
     return RESULT_OK;
 }
 
-int AudioRenderHandler::ResampleAudioData(std::unique_ptr<FrameBuffer> &buffer) {
+int AudioRenderHandler::resampleAudioData(std::unique_ptr<FrameBuffer> &buffer) {
     int dataSize = 0;
     int resampledSize = 0;
     int wanted_nb_samples;
@@ -266,12 +266,12 @@ int AudioRenderHandler::ResampleAudioData(std::unique_ptr<FrameBuffer> &buffer) 
     }
     if (!bFirstFrameDecoded) {
         bFirstFrameDecoded = true;
-        NotifyListener(MSG_AUDIO_DECODE_START);
+        notifyListener(MSG_AUDIO_DECODE_START);
     }
     return resampledSize;
 }
 
-void AudioRenderHandler::GetAudioData(char *data, int &len) {
+void AudioRenderHandler::getAudioData(char *data, int &len) {
     if (!data || len <= 0) {
         return;
     }
@@ -300,13 +300,13 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
 
             std::unique_ptr<FrameBuffer> buffer;
             lock.unlock();
-            int32_t ret = ReadFrame(buffer);
+            int32_t ret = readFrame(buffer);
             if (ret != RESULT_OK || !buffer) {
                 return;
             }
 
             // resample
-            int resampled_data_size = ResampleAudioData(buffer);
+            int resampled_data_size = resampleAudioData(buffer);
             if (resampled_data_size <= 0) {
                 NEXT_LOGW(TAG, "Failed to resample audio data, ret=%d\n", resampled_data_size);
                 return;
@@ -362,7 +362,7 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
 
     if (!mPlayerLink->first_audio_rendered) {
         mPlayerLink->first_audio_rendered = true;
-        NotifyListener(MSG_AUDIO_RENDER_START);
+        notifyListener(MSG_AUDIO_RENDER_START);
     }
 
     if (mFrameBuffer->serial >= 0 &&
@@ -371,36 +371,36 @@ void AudioRenderHandler::GetAudioData(char *data, int &len) {
                 mPlayerLink->last_audio_seek_serial.exchange(-1, std::memory_order_seq_cst);
         if (latest_audio_seek_load_serial == mFrameBuffer->serial) {
             bool is_master_audio = (getMasterSyncType(mPlayerLink) == CLOCK_AUDIO);
-            NotifyListener(MSG_AUDIO_SEEK_RENDER_START, is_master_audio ? 1 : 0);
+            notifyListener(MSG_AUDIO_SEEK_RENDER_START, is_master_audio ? 1 : 0);
         }
     }
 }
 
-void AudioRenderHandler::AudioDataCallback(void *opaque, char *data, int &len) {
+void AudioRenderHandler::audioDataCallback(void *opaque, char *data, int &len) {
     auto *thiz = reinterpret_cast<AudioRenderHandler *>(opaque);
-    thiz->GetAudioData(data, len);
+    thiz->getAudioData(data, len);
 }
 
-int AudioRenderHandler::ReadFrame(std::unique_ptr<FrameBuffer> &buffer) {
+int AudioRenderHandler::readFrame(std::unique_ptr<FrameBuffer> &buffer) {
     if (!mAudioDecodeHandler)
         return ERROR_PARSE_NOT_INIT;
     return mAudioDecodeHandler->getFrame(buffer);
 }
 
-void AudioRenderHandler::NotifyListener(int what, int arg1, int arg2) {
+void AudioRenderHandler::notifyListener(int what, int arg1, int arg2) {
     if (mNotifyCb) {
         mNotifyCb(what, arg1, arg2, nullptr, 0);
     }
 }
 
-void AudioRenderHandler::SetPlaybackRate(const float rate) {
+void AudioRenderHandler::setPlaybackRate(const float rate) {
     if (std::abs(rate - 0.0) > FLT_EPSILON &&
         std::abs(mPlaybackRate - rate) > FLT_EPSILON) {
         mPlaybackRate = rate;
     }
 }
 
-void AudioRenderHandler::SetVolume(const float leftVolume, const float rightVolume) {
+void AudioRenderHandler::setVolume(const float leftVolume, const float rightVolume) {
     if (std::abs(mLeftVolume - leftVolume) < FLT_EPSILON &&
         std::abs(mRightVolume - rightVolume) < FLT_EPSILON) {
         return;
@@ -410,24 +410,24 @@ void AudioRenderHandler::SetVolume(const float leftVolume, const float rightVolu
     bVolumeChanged = true;
 }
 
-void AudioRenderHandler::SetMute(bool mute) {
+void AudioRenderHandler::setMute(bool mute) {
     mMute.store(mute);
 }
 
-int AudioRenderHandler::Flush() {
+int AudioRenderHandler::flush() {
     std::unique_lock<std::mutex> lock(mLock);
     mCond.notify_one();
     return RESULT_OK;
 }
 
-int AudioRenderHandler::Stop() {
+int AudioRenderHandler::stop() {
     std::unique_lock<std::mutex> lock(mLock);
     bAbort = true;
     mCond.notify_all();
     return RESULT_OK;
 }
 
-void AudioRenderHandler::Release() {
+void AudioRenderHandler::release() {
     NEXT_LOGD(TAG, "Release begin\n");
     int streamIndex = mMetaData->audio_index;
     for (auto & it : mMetaData->track_info) {
