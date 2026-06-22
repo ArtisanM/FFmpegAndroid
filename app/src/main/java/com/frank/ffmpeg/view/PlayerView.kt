@@ -131,6 +131,8 @@ class PlayerView : FrameLayout {
             }
             setRenderView(renderView)
         }
+        // print log from native
+        setLogCallback()
     }
 
     private fun bindSurfaceHolder(mp: IPlayer?, holder: ISurfaceHolder?) {
@@ -411,6 +413,30 @@ class PlayerView : FrameLayout {
 
     fun setSpeed(speed: Float) {
         mStudioPlayer?.setSpeed(speed)
+    }
+
+    fun setLogCallback() {
+        NextPlayer.setNativeLogCallback(object : NextPlayer.NativeLogCallback {
+            override fun onLogOutput(
+                logLevel: Int,
+                tag: String?,
+                log: String?) {
+                when (logLevel) {
+                    48 -> { // debug
+                        Log.d(tag, log!!)
+                    }
+                    32 -> { // info
+                        Log.i(tag, log!!)
+                    }
+                    24 -> { // warning
+                        Log.w(tag, log!!)
+                    }
+                    16 -> { // error
+                        Log.e(tag, log!!)
+                    }
+                }
+            }
+        })
     }
 
 }
