@@ -1,5 +1,6 @@
 
 #include "NextPlayer.h"
+#include <android/log.h>
 
 #define TAG "NextPlayer"
 
@@ -21,6 +22,10 @@ static void logCallbackReport(void *ptr, int level, const char *fmt, va_list lis
 
     if (level > AV_LOG_INFO)
         return;
+    // ignore log of hls opening
+    if (strstr(fmt, "Opening") != nullptr) {
+        return;
+    }
 
     va_copy(temp, list);
     av_log_format_line(ptr, level, fmt, temp, line, sizeof(line), &print_prefix);
