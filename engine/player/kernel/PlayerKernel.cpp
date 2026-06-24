@@ -18,7 +18,7 @@ extern "C" {
 
 static InjectCallback s_inject_callback;
 
-int inject_callback(void *opaque, int type, void *data) {
+int injectCallback(void *opaque, int type, void *data) {
     if (s_inject_callback)
         return s_inject_callback(opaque, type, data);
     return 0;
@@ -37,7 +37,7 @@ static int app_func_event(ApplicationContext *h, int message, void *data) {
     if (!core->getInjectOpaque() || !state)
         return 0;
 
-    return inject_callback(core->getInjectOpaque(), message, data);
+    return injectCallback(core->getInjectOpaque(), message, data);
 }
 
 PlayerKernel::PlayerKernel(NotifyCallback notify_cb)
@@ -194,7 +194,6 @@ void PlayerKernel::notifyListener(int what, int arg1, int arg2, void *obj, int l
                     what = REQUEST_SEEK;
                     arg1 = 0;
                     mVideoState->loop_count++;
-                    mNotifyCb(MSG_SEEK_LOOP_START, mVideoState->loop_count, 0, nullptr, 0);
                 }
                 break;
             }

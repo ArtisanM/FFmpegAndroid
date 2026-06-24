@@ -42,12 +42,10 @@ enum PlayerMsg {
 
     MSG_VIDEO_SEEK_RENDER_START = 3000,
     MSG_AUDIO_SEEK_RENDER_START = 3001,
-    MSG_SEEK_LOOP_START         = 3002, // arg1 = loop count
-    MSG_SEEK_COMPLETE           = 3003, // arg1 = seek position
-    MSG_ACCURATE_SEEK_COMPLETE  = 3004,
-    MSG_PLAY_STATE_CHANGED      = 3005,
-    MSG_PLAY_URL_CHANGED        = 3006,
-    MSG_SUBTITLE_UPDATE         = 3007
+    MSG_SEEK_COMPLETE           = 3002, // arg1 = seek position
+    MSG_ACCURATE_SEEK_COMPLETE  = 3003,
+    MSG_PLAY_STATE_CHANGED      = 3004,
+    MSG_SUBTITLE_UPDATE         = 3005
 
 };
 

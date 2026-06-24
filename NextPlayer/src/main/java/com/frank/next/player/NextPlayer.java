@@ -355,12 +355,8 @@ public class NextPlayer extends BasePlayer {
                     return;
 
                 case MSG_MEDIA_INFO:
-                    switch (msg.arg1) {
-                        case MSG_VIDEO_RENDER_START:
-                            break;
-                        case MSG_PLAY_URL_CHANGED:
-                            player.onInfo(msg.arg1, (Integer) msg.obj);
-                            return;
+                    if (msg.arg1 == MSG_VIDEO_RENDER_START) {
+                        Log.i(TAG, "videoRenderStart...");
                     }
                     player.onInfo(msg.arg1, msg.arg2);
                     return;
@@ -371,7 +367,9 @@ public class NextPlayer extends BasePlayer {
                     player.onVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
                             player.mVideoSarNum, player.mVideoSarDen);
                     break;
-
+                case MSG_PLAY_STATE_CHANGED:
+                    Log.i(TAG, "onPlayStateChanged, old=" + msg.arg1 + " new=" + msg.arg2);
+                    break;
                 default:
                     break;
             }

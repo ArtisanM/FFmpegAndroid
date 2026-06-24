@@ -15,7 +15,6 @@ public interface IPlayer {
 
     /**********************************message begin**********************************/
 
-    int MSG_COMPONENT_OPEN     = 1000;
     int MSG_OPEN_INPUT         = 1001;
     int MSG_FIND_STREAM_INFO   = 1002;
     int MSG_VIDEO_FIRST_PACKET = 1004;
@@ -38,7 +37,7 @@ public interface IPlayer {
     int MSG_BUFFER_END         = 2004;
 
     int MSG_SEEK_COMPLETED     = 3003;
-    int MSG_PLAY_URL_CHANGED   = 3006;
+    int MSG_PLAY_STATE_CHANGED = 3006;
 
     /*******************************PlayControl begin*********************************/
 
