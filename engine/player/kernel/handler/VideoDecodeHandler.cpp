@@ -80,9 +80,6 @@ int VideoDecodeHandler::initInternal() {
     std::string codecName      = avcodec_get_name((AVCodecID) codecId);
     PlayerConfig *playerConfig = mGeneralConfig->playerConfig->get();
 
-    // TODO: enable mediacodec
-    playerConfig->enable_ndkvdec = 0;
-
     if (playerConfig) {
         if (playerConfig->enable_vtb) {
             mPlayerLink->hw_decode = true;

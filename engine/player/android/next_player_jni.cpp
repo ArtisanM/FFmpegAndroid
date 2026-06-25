@@ -554,9 +554,8 @@ static void nativeSetEnableMediaCodec(JNIEnv *env, jobject thiz, jboolean enable
     sp<NextPlayer> mp = getPlayer(env, thiz);
     JNI_CHECK_RET_VOID(mp, "setEnableMediaCodec: player is nullptr");
 
-    mp->setConfig(CONFIG_TYPE_PLAYER, "mediacodec-all-videos",
-                  static_cast<int64_t>(enable));
-    mp->setConfig(CONFIG_TYPE_PLAYER, "enable-ndkvdec", static_cast<int64_t>(enable));
+    mp->setConfig(CONFIG_TYPE_PLAYER, "mediacodec-all-videos", static_cast<int64_t>(enable));
+    mp->setConfig(CONFIG_TYPE_PLAYER, "enable-mediacodec", static_cast<int64_t>(enable));
 }
 
 static void nativeSetCacheDir(JNIEnv *env, jobject thiz, jstring dir) {
