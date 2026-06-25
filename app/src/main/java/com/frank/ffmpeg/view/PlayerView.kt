@@ -69,6 +69,7 @@ class PlayerView : FrameLayout {
     private var mOnSeekCompleteListener: IPlayer.OnSeekCompleteListener? = null
     private var mOnBufferingUpdateListener: IPlayer.OnBufferUpdateListener? = null
     private var mOnVideoSizeChangedListener: IPlayer.OnVideoSizeChangedListener? = null
+    private var mOnVideoRenderStartListener: IPlayer.OnVideoRenderStartListener? = null
 
     constructor(context: Context) : super(context) {
         initVideoView(context)
@@ -183,6 +184,7 @@ class PlayerView : FrameLayout {
             mStudioPlayer = createMediaPlayer()
             // set listener
             mStudioPlayer!!.setOnPreparedListener(mPreparedListener)
+            mStudioPlayer!!.setOnVideoRenderStartListener(mVideoRenderStartListener)
             mStudioPlayer!!.setOnVideoSizeChangedListener(mSizeChangedListener)
             mStudioPlayer!!.setOnCompletionListener(mCompleteListener)
             mStudioPlayer!!.setOnErrorListener(mErrorListener)
@@ -259,6 +261,10 @@ class PlayerView : FrameLayout {
         true
     }
 
+    private val mVideoRenderStartListener = IPlayer.OnVideoRenderStartListener { mp ->
+        mOnVideoRenderStartListener?.onVideoRenderStart(mp)
+    }
+
     private val mErrorListener: IPlayer.OnErrorListener = object : IPlayer.OnErrorListener {
         override fun onError(kernelError: Int, sdkError: Int): Boolean {
             Log.e(TAG, "Error: $kernelError, $sdkError")
@@ -313,6 +319,10 @@ class PlayerView : FrameLayout {
 
     fun setOnPlayingListener(onPlayingListener: IPlayer.OnPlayingListener) {
         mOnPlayingListener = onPlayingListener
+    }
+
+    fun setOnVideoRenderStartListener(videoRenderStartListener: IPlayer.OnVideoRenderStartListener) {
+        mOnVideoRenderStartListener = videoRenderStartListener
     }
 
     /******************************player control***********************************/

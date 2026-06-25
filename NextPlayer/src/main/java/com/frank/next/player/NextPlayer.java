@@ -353,14 +353,12 @@ public class NextPlayer extends BasePlayer {
                         player.onComplete();
                     }
                     return;
-
+                case MSG_VIDEO_RENDER_START:
+                    player.onVideoRenderStart();
+                    break;
                 case MSG_MEDIA_INFO:
-                    if (msg.arg1 == MSG_VIDEO_RENDER_START) {
-                        Log.i(TAG, "videoRenderStart...");
-                    }
                     player.onInfo(msg.arg1, msg.arg2);
                     return;
-
                 case MSG_SET_VIDEO_SAR:
                     player.mVideoSarNum = msg.arg1;
                     player.mVideoSarDen = msg.arg2;

@@ -197,6 +197,11 @@ class PlayerPresenter {
         videoPlayerView.setOnPreparedListener { mp ->
             Log.i(TAG, "onPrepared, duration=" + mp.duration)
         }
+        videoPlayerView.setOnVideoRenderStartListener { mp ->
+            Log.i(TAG, "OnVideoRenderStart...")
+            textDuration.text = TimeUtil.getVideoTime(videoPlayerView.getDuration().toLong())
+            progressSeekBar.max = videoPlayerView.getDuration()
+        }
         videoPlayerView.setOnInfoListener { what, extra ->
             handleVideoInfoEvent(what, extra)
         }
@@ -254,10 +259,6 @@ class PlayerPresenter {
             }
             IPlayer.MSG_VIDEO_DECODE_START -> {
 
-            }
-            IPlayer.MSG_VIDEO_RENDER_START -> {
-                textDuration.text = TimeUtil.getVideoTime(videoPlayerView.getDuration().toLong())
-                progressSeekBar.max = videoPlayerView.getDuration()
             }
         }
         return true

@@ -14,6 +14,7 @@ public abstract class BasePlayer implements IPlayer {
     private OnBufferUpdateListener     mOnBufferUpdateListener;
     private OnSeekCompleteListener     mOnSeekCompleteListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
+    private OnVideoRenderStartListener mOnVideoRenderStartListener;
 
     public BasePlayer() {
     }
@@ -21,6 +22,11 @@ public abstract class BasePlayer implements IPlayer {
     @Override
     public final void setOnPreparedListener(IPlayer.OnPreparedListener listener) {
         this.mOnPreparedListener = listener;
+    }
+
+    @Override
+    public void setOnVideoRenderStartListener(OnVideoRenderStartListener listener) {
+        this.mOnVideoRenderStartListener = listener;
     }
 
     @Override
@@ -77,6 +83,12 @@ public abstract class BasePlayer implements IPlayer {
     protected void onVideoSizeChanged(int width, int height, int sarNum, int sarDen) {
         if (this.mOnVideoSizeChangedListener != null) {
             this.mOnVideoSizeChangedListener.onVideoSizeChanged( width, height);
+        }
+    }
+
+    protected void onVideoRenderStart() {
+        if (this.mOnVideoRenderStartListener != null) {
+            this.mOnVideoRenderStartListener.onVideoRenderStart(this);
         }
     }
 

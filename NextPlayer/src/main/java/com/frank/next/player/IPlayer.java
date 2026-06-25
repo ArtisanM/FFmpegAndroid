@@ -137,6 +137,8 @@ public interface IPlayer {
 
     void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener);
 
+    void setOnVideoRenderStartListener(OnVideoRenderStartListener listener);
+
     void setOnSeekCompleteListener(OnSeekCompleteListener listener);
 
     void setOnCompletionListener(OnCompleteListener listener);
@@ -153,6 +155,10 @@ public interface IPlayer {
 
     interface OnVideoSizeChangedListener {
         void onVideoSizeChanged(int width, int height);
+    }
+
+    interface OnVideoRenderStartListener {
+        void onVideoRenderStart(IPlayer mp);
     }
 
     interface OnInfoListener {
