@@ -26,16 +26,6 @@ struct MediaCodecBufferContext {
     void (*release_output_buffer)(MediaCodecBufferContext *context, bool render);
 };
 
-struct HarmonyMediaBufferContext {
-    void *opaque;
-    void *decoder;
-    int buffer_index;
-    void *video_decoder;
-    int decoder_serial;
-
-    void (*release_output_buffer)(HarmonyMediaBufferContext *context, bool render);
-};
-
 struct FFmpegBufferContext {
     void *opaque;
     void *av_frame;
@@ -49,10 +39,8 @@ struct VideoToolBufferContext {
 
 enum class BufferType {
     BUFFER_VIDEO_FRAME  = 1,
-    BUFFER_AUDIO_FRAME  = 2,
-    BUFFER_VIDEO_PACKET = 3,
-    BUFFER_AUDIO_PACKET = 4,
-    BUFFER_VIDEO_FORMAT = 5
+    BUFFER_VIDEO_PACKET = 2,
+    BUFFER_VIDEO_FORMAT = 3
 };
 
 struct VideoFrameMetadata {
@@ -74,38 +62,11 @@ struct VideoFrameMetadata {
 
 };
 
-const int MAX_PLANAR = 8;
-
-struct AudioFrameMetadata {
-    int64_t pts; // ms
-    int sample_rate;
-    int num_samples;
-    int num_channels;
-    int sample_format;
-    AVChannelLayout *channel_layout;
-
-    uint8_t *channel[MAX_PLANAR];
-    void *buffer_context = nullptr; // release buffer
-};
-
-enum VideoPacketFormat {
-    PKT_FORMAT_AVCC      = 1,
-    PKT_FORMAT_ANNEXB    = 2,
-    PKT_FORMAT_EXTRADATA = 3
-};
-
 struct VideoPacketMetadata {
     int offset = 0;
     int64_t pts; // ms
     int64_t dts; // ms
     uint32_t decode_flags;
-    VideoPacketFormat format;
-};
-
-struct AudioPacketMetadata {
-    int64_t pts; // ms
-    int sample_rate;
-    int num_channels;
 };
 
 struct VideoFormatMetadata {
@@ -151,15 +112,9 @@ public:
 
     VideoFrameMetadata *getVideoFrameMetadata() const;
 
-    AudioFrameMetadata *getAudioFrameMetadata() const;
-
     VideoPacketMetadata *getVideoPacketMetadata() const;
 
-    AudioPacketMetadata *getAudioPacketMetadata() const;
-
     VideoFormatMetadata *getVideoFormatMetadata() const;
-
-    void updateBuffer(uint8_t *data, int size, bool ownData);
 
 private:
     void initType(BufferType type);
@@ -170,9 +125,7 @@ private:
     BufferType mBufferType;
 
     std::unique_ptr<VideoFrameMetadata>  mVideoFrameMetadata;
-    std::unique_ptr<AudioFrameMetadata>  mAudioFrameMetadata;
     std::unique_ptr<VideoPacketMetadata> mVideoPacketMetadata;
-    std::unique_ptr<AudioPacketMetadata> mAudioPacketMetadata;
     std::unique_ptr<VideoFormatMetadata> mVideoFormatMetadata;
 };
 

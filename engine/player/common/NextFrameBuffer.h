@@ -60,13 +60,6 @@ public:
                     delete reinterpret_cast<FFmpegBufferContext *>(opaque);
                     break;
                 }
-                case PIXEL_FORMAT_HARMONY: {
-                    auto *ctx = reinterpret_cast<HarmonyMediaBufferContext *>(opaque);
-                    ctx->release_output_buffer(ctx, false);
-                    delete reinterpret_cast<HarmonyMediaBufferContext *>(opaque);
-                    break;
-                }
-
                 default:
                     break;
             }

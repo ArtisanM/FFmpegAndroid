@@ -27,17 +27,11 @@ void MixedBuffer::initType(BufferType type) {
         case BufferType::BUFFER_VIDEO_FRAME:
             mVideoFrameMetadata = std::make_unique<VideoFrameMetadata>();
             break;
-        case BufferType::BUFFER_AUDIO_FRAME:
-            mAudioFrameMetadata = std::make_unique<AudioFrameMetadata>();
-            break;
         case BufferType::BUFFER_VIDEO_FORMAT:
             mVideoFormatMetadata = std::make_unique<VideoFormatMetadata>();
             break;
         case BufferType::BUFFER_VIDEO_PACKET:
             mVideoPacketMetadata = std::make_unique<VideoPacketMetadata>();
-            break;
-        case BufferType::BUFFER_AUDIO_PACKET:
-            mAudioPacketMetadata = std::make_unique<AudioPacketMetadata>();
             break;
         default:
             break;
@@ -68,28 +62,10 @@ VideoFrameMetadata *MixedBuffer::getVideoFrameMetadata() const {
     return mVideoFrameMetadata.get();
 }
 
-AudioFrameMetadata *MixedBuffer::getAudioFrameMetadata() const {
-    return mAudioFrameMetadata.get();
-}
-
 VideoPacketMetadata *MixedBuffer::getVideoPacketMetadata() const {
     return mVideoPacketMetadata.get();
 }
 
-AudioPacketMetadata *MixedBuffer::getAudioPacketMetadata() const {
-    return mAudioPacketMetadata.get();
-}
-
 VideoFormatMetadata *MixedBuffer::getVideoFormatMetadata() const {
     return mVideoFormatMetadata.get();
-}
-
-void MixedBuffer::updateBuffer(uint8_t *data, int size, bool ownData) {
-    if (bOwnData) {
-        delete[] mData;
-    }
-
-    mData    = data;
-    mSize    = size;
-    bOwnData = ownData;
 }
