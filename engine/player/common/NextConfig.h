@@ -126,9 +126,9 @@ static const AvConfig AvConfigs[] = {
         {"enable-video-hdr", "enable video hdr", CONFIG_OFFSET(video_hdr_enable),
                 CONFIG_INT(0, 0, 1)},
         // iOS options
-        {"enable_vtb", "use VideoToolbox to decode video", CONFIG_OFFSET(enable_vtb),
+        {"enable-vtb", "use VideoToolbox to decode video", CONFIG_OFFSET(enable_vtb),
                 CONFIG_INT(0, 0, 1)},
-        {"enable_vtb-max-error-count", "VideoToolbox: max error count",
+        {"enable-vtb-max-error-count", "VideoToolbox: max error count",
                 CONFIG_OFFSET(vtb_max_error_count), CONFIG_INT(5, 0, INT_MAX)},
         // Android options
         {"enable-mediacodec", "use MediaCodec to decode video", CONFIG_OFFSET(enable_ndkvdec),

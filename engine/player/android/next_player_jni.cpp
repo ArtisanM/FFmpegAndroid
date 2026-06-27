@@ -322,63 +322,6 @@ static sp<NextPlayer> getPlayer(JNIEnv *env, jobject thiz) {
     return mp;
 }
 
-static jstring getVideoCodecInfo(JNIEnv *env, jobject thiz) {
-    jstring jcodec_info = nullptr;
-    int32_t ret = RESULT_OK;
-    std::string codec_info;
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-
-    JNI_CHECK_RET(mp, "getVideoCodecInfo: player is nullptr", jcodec_info);
-    ret = mp->getVideoCodecInfo(codec_info);
-    if (ret != RESULT_OK || codec_info.empty())
-        return jcodec_info;
-
-    jcodec_info = env->NewStringUTF(codec_info.c_str());
-
-    return jcodec_info;
-}
-
-static jstring getAudioCodecInfo(JNIEnv *env, jobject thiz) {
-    jstring jcodec_info = nullptr;
-    int32_t ret = RESULT_OK;
-    std::string codec_info;
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-
-    JNI_CHECK_RET(mp, "getAudioCodecInfo: player is nullptr", jcodec_info);
-    ret = mp->getAudioCodecInfo(codec_info);
-    if (ret != RESULT_OK || codec_info.empty())
-        return jcodec_info;
-
-    jcodec_info = env->NewStringUTF(codec_info.c_str());
-
-    return jcodec_info;
-}
-
-static jstring getPlayUrl(JNIEnv *env, jobject thiz) {
-    jstring jurl = nullptr;
-    int32_t ret = RESULT_OK;
-    std::string url;
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-
-    JNI_CHECK_RET(mp, "getPlayUrl: player is nullptr", jurl);
-    ret = mp->getPlayUrl(url);
-    if (ret != RESULT_OK || url.empty())
-        return jurl;
-
-    jurl = env->NewStringUTF(url.c_str());
-
-    return jurl;
-}
-
-static jint getPlayerState(JNIEnv *env, jobject thiz) {
-    int state = -1;
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getPlayerState: player is nullptr", state);
-    state = mp->getPlayerState();
-
-    return state;
-}
-
 static void nativeInit(JNIEnv *env, jclass thiz) {
     jclass clazz;
 
@@ -499,22 +442,6 @@ static void nativeSeekTo(JNIEnv *env, jobject thiz, jlong msec) {
     mp->seekTo(msec);
 }
 
-static jlong nativeGetCurrentPosition(JNIEnv *env, jobject thiz) {
-    jlong position = 0;
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getCurrentPosition: player is nullptr", 0);
-    mp->getCurrentPosition(position);
-    return position;
-}
-
-static jlong nativeGetDuration(JNIEnv *env, jobject thiz) {
-    jlong duration = 0;
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getDuration: player is nullptr", 0);
-    mp->getDuration(duration);
-    return duration;
-}
-
 static void nativeRelease(JNIEnv *env, jobject thiz) {
     sp<NextPlayer> mp = getPlayer(env, thiz);
     if (!mp) {
@@ -544,6 +471,23 @@ static void nativeReset(JNIEnv *env, jobject thiz) {
     nativeSetup(env, thiz, weakObj);
 }
 
+static void nativeSetHeaders(JNIEnv *env, jobject thiz, jstring headers) {
+    sp<NextPlayer> mp = getPlayer(env, thiz);
+    JNI_CHECK_RET_VOID(headers, "setHeaders: headers is nullptr");
+    JNI_CHECK_RET_VOID(mp, "setHeaders: player is nullptr");
+
+    std::string c_headers = JniGetStringUTFChars(env, headers);
+    JNI_CHECK_RET_VOID(!c_headers.empty(), "setHeaders: headers oom");
+    mp->setConfig(CONFIG_TYPE_FORMAT, "headers", c_headers);
+}
+
+static void nativeSetSpeed(JNIEnv *env, jobject thiz, jfloat speed) {
+    sp<NextPlayer> mp = getPlayer(env, thiz);
+    JNI_CHECK_RET_VOID(mp, "setSpeed: player is nullptr");
+
+    mp->setOption(OPTION_FLOAT_PLAYBACK_RATE, speed);
+}
+
 static void nativeSetVolume(JNIEnv *env, jobject thiz, jfloat left_volume, jfloat right_volume) {
     sp<NextPlayer> mp = getPlayer(env, thiz);
     JNI_CHECK_RET_VOID(mp, "setVolume: player is nullptr");
@@ -568,6 +512,22 @@ static void nativeSetCacheDir(JNIEnv *env, jobject thiz, jstring dir) {
     mp->setConfig(CONFIG_TYPE_FORMAT, "cache_file_dir", c_dir);
 }
 
+static jlong nativeGetCurrentPosition(JNIEnv *env, jobject thiz) {
+    jlong position = 0;
+    sp<NextPlayer> mp = getPlayer(env, thiz);
+    JNI_CHECK_RET(mp, "getCurrentPosition: player is nullptr", 0);
+    mp->getCurrentPosition(position);
+    return position;
+}
+
+static jlong nativeGetDuration(JNIEnv *env, jobject thiz) {
+    jlong duration = 0;
+    sp<NextPlayer> mp = getPlayer(env, thiz);
+    JNI_CHECK_RET(mp, "getDuration: player is nullptr", 0);
+    mp->getDuration(duration);
+    return duration;
+}
+
 static jfloat nativeGetVideoFileFps(JNIEnv *env, jobject thiz) {
     jfloat ret = 0.0;
     sp<NextPlayer> mp = getPlayer(env, thiz);
@@ -578,21 +538,61 @@ static jfloat nativeGetVideoFileFps(JNIEnv *env, jobject thiz) {
     return ret;
 }
 
-static void nativeSetHeaders(JNIEnv *env, jobject thiz, jstring headers) {
+static jstring getVideoCodecInfo(JNIEnv *env, jobject thiz) {
+    jstring jcodec_info = nullptr;
+    int32_t ret = RESULT_OK;
+    std::string codec_info;
     sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET_VOID(headers, "setHeaders: headers is nullptr");
-    JNI_CHECK_RET_VOID(mp, "setHeaders: player is nullptr");
 
-    std::string c_headers = JniGetStringUTFChars(env, headers);
-    JNI_CHECK_RET_VOID(!c_headers.empty(), "setHeaders: headers oom");
-    mp->setConfig(CONFIG_TYPE_FORMAT, "headers", c_headers);
+    JNI_CHECK_RET(mp, "getVideoCodecInfo: player is nullptr", jcodec_info);
+    ret = mp->getVideoCodecInfo(codec_info);
+    if (ret != RESULT_OK || codec_info.empty())
+        return jcodec_info;
+
+    jcodec_info = env->NewStringUTF(codec_info.c_str());
+
+    return jcodec_info;
 }
 
-static void nativeSetSpeed(JNIEnv *env, jobject thiz, jfloat speed) {
+static jstring getAudioCodecInfo(JNIEnv *env, jobject thiz) {
+    jstring jcodec_info = nullptr;
+    int32_t ret = RESULT_OK;
+    std::string codec_info;
     sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET_VOID(mp, "setSpeed: player is nullptr");
 
-    mp->setOption(OPTION_FLOAT_PLAYBACK_RATE, speed);
+    JNI_CHECK_RET(mp, "getAudioCodecInfo: player is nullptr", jcodec_info);
+    ret = mp->getAudioCodecInfo(codec_info);
+    if (ret != RESULT_OK || codec_info.empty())
+        return jcodec_info;
+
+    jcodec_info = env->NewStringUTF(codec_info.c_str());
+
+    return jcodec_info;
+}
+
+static jstring getPlayUrl(JNIEnv *env, jobject thiz) {
+    jstring jurl = nullptr;
+    int32_t ret = RESULT_OK;
+    std::string url;
+    sp<NextPlayer> mp = getPlayer(env, thiz);
+
+    JNI_CHECK_RET(mp, "getPlayUrl: player is nullptr", jurl);
+    ret = mp->getPlayUrl(url);
+    if (ret != RESULT_OK || url.empty())
+        return jurl;
+
+    jurl = env->NewStringUTF(url.c_str());
+
+    return jurl;
+}
+
+static jint getPlayerState(JNIEnv *env, jobject thiz) {
+    int state = -1;
+    sp<NextPlayer> mp = getPlayer(env, thiz);
+    JNI_CHECK_RET(mp, "getPlayerState: player is nullptr", state);
+    state = mp->getPlayerState();
+
+    return state;
 }
 
 static jint nativeGetVideoDecoder(JNIEnv *env, jobject thiz) {
