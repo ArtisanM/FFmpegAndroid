@@ -586,20 +586,13 @@ static jstring getPlayUrl(JNIEnv *env, jobject thiz) {
     return jurl;
 }
 
-static jint getPlayerState(JNIEnv *env, jobject thiz) {
+static jint nativeGetPlayerState(JNIEnv *env, jobject thiz) {
     int state = -1;
     sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getPlayerState: player is nullptr", state);
+    JNI_CHECK_RET(mp, "nativeGetPlayerState: player is nullptr", state);
     state = mp->getPlayerState();
 
     return state;
-}
-
-static jint nativeGetVideoDecoder(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getVideoDecoder: player is nullptr", 0);
-
-    return static_cast<jint>(mp->getOption(OPTION_INT64_VIDEO_DECODER, 0L));
 }
 
 static jfloat nativeGetRenderFrameRate(JNIEnv *env, jobject thiz) {
@@ -616,53 +609,10 @@ static jfloat nativeGetDecodeFrameRate(JNIEnv *env, jobject thiz) {
     return static_cast<jfloat>(mp->getOption(OPTION_FLOAT_VIDEO_DECODE_RATE, 0L));
 }
 
-static jlong nativeGetVideoCachedTime(JNIEnv *env, jobject thiz) {
+static jlong nativeGetOptionLong(JNIEnv *env, jobject thiz, int option) {
     sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getVideoCachedTime: player is nullptr", 0);
-
-    return static_cast<jlong>(mp->getOption(OPTION_INT64_VIDEO_CACHE_DUR, 0L));
-}
-
-static jlong nativeGetAudioCachedTime(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getAudioCachedTime: player is nullptr", 0);
-
-    return static_cast<jlong>(mp->getOption(OPTION_INT64_AUDIO_CACHE_DUR, 0L));
-}
-
-static jlong nativeGetVideoCachedSize(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getVideoCachedSize: player is nullptr", 0);
-
-    return static_cast<jlong>(mp->getOption(OPTION_INT64_VIDEO_CACHE_BYTES, 0L));
-}
-
-static jlong nativeGetAudioCachedSize(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getAudioCachedSize: player is nullptr", 0);
-
-    return static_cast<jlong>(mp->getOption(OPTION_INT64_AUDIO_CACHE_BYTES, 0L));
-}
-
-static jlong nativeGetFileSize(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getFileSize: player is nullptr", 0);
-
-    return static_cast<jlong>(mp->getOption(OPTION_INT64_FILE_SIZE, 0L));
-}
-
-static jlong nativeGetBitRate(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getBitRate: player is nullptr", 0);
-
-    return static_cast<jlong>(mp->getOption(OPTION_INT64_BIT_RATE, 0L));
-}
-
-static jlong nativeGetSeekCostTime(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getSeekCostTime: player is nullptr", 0);
-
-    return static_cast<jlong>(mp->getOption(OPTION_INT64_SEEK_LOAD_TIME, 0L));
+    JNI_CHECK_RET(mp, "nativeGetOptionLong: player is nullptr", 0);
+    return mp->getOption(option, 0L);
 }
 
 static JNINativeMethod g_methods[] = {
@@ -683,23 +633,16 @@ static JNINativeMethod g_methods[] = {
         {"_getVideoCodecInfo",             "()Ljava/lang/String;", reinterpret_cast<void *>(getVideoCodecInfo)},
         {"_getAudioCodecInfo",             "()Ljava/lang/String;", reinterpret_cast<void *>(getAudioCodecInfo)},
         {"_getPlayUrl",                    "()Ljava/lang/String;", reinterpret_cast<void *>(getPlayUrl)},
-        {"_getPlayerState",                "()I", reinterpret_cast<void *>(getPlayerState)},
+        {"_getPlayerState",                "()I", reinterpret_cast<void *>(nativeGetPlayerState)},
         {"_setVolume",                     "(FF)V", reinterpret_cast<void *>(nativeSetVolume)},
         {"_setEnableMediaCodec",           "(Z)V", reinterpret_cast<void *>(nativeSetEnableMediaCodec)},
         {"_setVideoCacheDir",              "(Ljava/lang/String;)V", reinterpret_cast<void *>(nativeSetCacheDir)},
         {"_getVideoFileFps",               "()F", reinterpret_cast<void *>(nativeGetVideoFileFps)},
         {"_setHeaders",                    "(Ljava/lang/String;)V", reinterpret_cast<void *>(nativeSetHeaders)},
         {"_setSpeed",                      "(F)V", reinterpret_cast<void *>(nativeSetSpeed)},
-        {"_getVideoDecoder",               "()I", reinterpret_cast<void *>(nativeGetVideoDecoder)},
         {"_getVideoRenderFrameRate",       "()F", reinterpret_cast<void *>(nativeGetRenderFrameRate)},
         {"_getVideoDecodeFrameRate",       "()F", reinterpret_cast<void *>(nativeGetDecodeFrameRate)},
-        {"_getVideoCachedTime",            "()J", reinterpret_cast<void *>(nativeGetVideoCachedTime)},
-        {"_getAudioCachedTime",            "()J", reinterpret_cast<void *>(nativeGetAudioCachedTime)},
-        {"_getVideoCachedSize",            "()J", reinterpret_cast<void *>(nativeGetVideoCachedSize)},
-        {"_getAudioCachedSize",            "()J", reinterpret_cast<void *>(nativeGetAudioCachedSize)},
-        {"_getFileSize",                   "()J", reinterpret_cast<void *>(nativeGetFileSize)},
-        {"_getBitRate",                    "()J", reinterpret_cast<void *>(nativeGetBitRate)},
-        {"_getSeekCostTime",               "()J", reinterpret_cast<void *>(nativeGetSeekCostTime)}};
+        {"_getOptionLong",                 "(I)J", reinterpret_cast<void *>(nativeGetOptionLong)}};
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;

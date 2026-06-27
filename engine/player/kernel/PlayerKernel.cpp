@@ -575,13 +575,13 @@ int64_t PlayerKernel::getOption(int key, int64_t defaultVal) {
             }
             break;
         }
-        case OPTION_INT64_VIDEO_CACHE_DUR:
+        case OPTION_INT64_VIDEO_CACHE_TIME:
             return mVideoState->stat.video_cache.duration;
-        case OPTION_INT64_AUDIO_CACHE_DUR:
+        case OPTION_INT64_AUDIO_CACHE_TIME:
             return mVideoState->stat.audio_cache.duration;
-        case OPTION_INT64_VIDEO_CACHE_BYTES:
+        case OPTION_INT64_VIDEO_CACHE_SIZE:
             return mVideoState->stat.video_cache.bytes;
-        case OPTION_INT64_AUDIO_CACHE_BYTES:
+        case OPTION_INT64_AUDIO_CACHE_SIZE:
             return mVideoState->stat.audio_cache.bytes;
         case OPTION_INT64_VIDEO_CACHE_PKT:
             return mVideoState->stat.video_cache.packets;
@@ -614,6 +614,7 @@ int64_t PlayerKernel::getOption(int key, int64_t defaultVal) {
         case OPTION_INT64_VIDEO_HEIGHT:
             return mVideoState->height;
         default:
+            NEXT_LOGE(TAG, "unknown option: %d", key);
             break;
     }
     return defaultVal;

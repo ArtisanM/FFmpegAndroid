@@ -254,7 +254,7 @@ public class NextPlayer extends BasePlayer {
 
     @Override
     public int getVideoDecoder() {
-        return _getVideoDecoder();
+        return (int)_getOptionLong(OPTION_INT64_VIDEO_DECODER);
     }
 
     @Override
@@ -269,37 +269,37 @@ public class NextPlayer extends BasePlayer {
 
     @Override
     public long getVideoCacheTime() {
-        return _getVideoCachedTime();
+        return _getOptionLong(OPTION_INT64_VIDEO_CACHE_TIME);
     }
 
     @Override
     public long getAudioCacheTime() {
-        return _getAudioCachedTime();
+        return _getOptionLong(OPTION_INT64_AUDIO_CACHE_TIME);
     }
 
     @Override
     public long getVideoCacheSize() {
-        return _getVideoCachedSize();
+        return _getOptionLong(OPTION_INT64_VIDEO_CACHE_SIZE);
     }
 
     @Override
     public long getAudioCacheSize() {
-        return _getAudioCachedSize();
+        return _getOptionLong(OPTION_INT64_AUDIO_CACHE_SIZE);
     }
 
     @Override
     public long getFileSize() {
-        return _getFileSize();
+        return _getOptionLong(OPTION_INT64_FILE_SIZE);
     }
 
     @Override
     public long getBitRate() {
-        return _getBitRate();
+        return _getOptionLong(OPTION_INT64_BIT_RATE);
     }
 
     @Override
     public long getSeekCostTime() {
-        return _getSeekCostTime();
+        return _getOptionLong(OPTION_INT64_SEEK_LOAD_TIME);
     }
 
     @Override
@@ -466,28 +466,56 @@ public class NextPlayer extends BasePlayer {
 
     private native void _setSpeed(float speed);
 
-    private native int _getVideoDecoder();
-
     private native float _getVideoRenderFrameRate();
 
     private native float _getVideoDecodeFrameRate();
 
-    private native long _getVideoCachedTime(); // ms
-
-    private native long _getAudioCachedTime();
-
-    private native long _getVideoCachedSize(); // byte
-
-    private native long _getAudioCachedSize();
-
-    private native long _getFileSize();
-
-    private native long _getBitRate();
-
-    private native long _getSeekCostTime();
-
     private native int _getPlayerState();
 
     private native void _release();
+
+    private native long _getOptionLong(int option);
+
+
+    /*********************** option define ***********************/
+
+    private static final int OPTION_FLOAT_AV_DIFF           = 1001;
+    private static final int OPTION_FLOAT_AV_DELAY          = 1002;
+    private static final int OPTION_FLOAT_PLAYBACK_RATE     = 1003;
+    private static final int OPTION_FLOAT_PLAYBACK_VOLUME   = 1004;
+    private static final int OPTION_FLOAT_DROP_FRAME_RATE   = 1005;
+    private static final int OPTION_FLOAT_DROP_PACKET_RATE  = 1006;
+    private static final int OPTION_FLOAT_VIDEO_FRAME_RATE  = 1007;
+    private static final int OPTION_FLOAT_VIDEO_DECODE_RATE = 1008;
+    private static final int OPTION_FLOAT_VIDEO_RENDER_RATE = 1009;
+
+    private static final int OPTION_INT64_BIT_RATE          = 2001;
+    private static final int OPTION_INT64_FILE_SIZE         = 2002;
+    private static final int OPTION_INT64_TCP_SPEED         = 2003;
+    private static final int OPTION_INT64_PIXEL_FORMAT      = 2004;
+    private static final int OPTION_INT64_VIDEO_DECODER     = 2005;
+    private static final int OPTION_INT64_AUDIO_DECODER     = 2006;
+    private static final int OPTION_INT64_LAST_TCP_SPEED    = 2007;
+    private static final int OPTION_INT64_CACHE_SIZE        = 2008;
+    private static final int OPTION_INT64_CACHE_POSITION    = 2009; // cache relative position
+    private static final int OPTION_INT64_CACHE_FILE_POS    = 2010; // cache position in file
+    private static final int OPTION_INT64_SEEK_LOAD_TIME    = 2011;
+    private static final int OPTION_INT64_TRANSFER_BYTES    = 2012;
+    private static final int OPTION_INT64_MAX_BUFFER_SIZE   = 2013;
+    private static final int OPTION_INT64_CUR_VIDEO_STREAM  = 2014;
+    private static final int OPTION_INT64_CUR_AUDIO_STREAM  = 2015;
+    private static final int OPTION_INT64_VIDEO_CACHE_PKT   = 2016;
+    private static final int OPTION_INT64_AUDIO_CACHE_PKT   = 2017;
+    private static final int OPTION_INT64_VIDEO_CACHE_TIME  = 2018;
+    private static final int OPTION_INT64_AUDIO_CACHE_TIME  = 2019;
+    private static final int OPTION_INT64_VIDEO_CACHE_SIZE  = 2020;
+    private static final int OPTION_INT64_AUDIO_CACHE_SIZE  = 2021;
+    private static final int OPTION_INT64_VIDEO_WIDTH       = 2022;
+    private static final int OPTION_INT64_VIDEO_HEIGHT      = 2023;
+
+    private static final int OPTION_STR_DECODER_AVCODEC     = 3001; // ffmpeg avcodec
+    private static final int OPTION_STR_DECODER_MEDIACODEC  = 3002; // android MediaCodec
+    private static final int OPTION_STR_DECODER_VTB         = 3003; // iOS VideoToolBox
+    private static final int OPTION_STR_DECODER_HARMONY     = 3004; // HarmonyOS decoder
 
 }
