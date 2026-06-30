@@ -528,16 +528,6 @@ static jlong nativeGetDuration(JNIEnv *env, jobject thiz) {
     return duration;
 }
 
-static jfloat nativeGetVideoFileFps(JNIEnv *env, jobject thiz) {
-    jfloat ret = 0.0;
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getVideoFileFps: player is nullptr", ret);
-
-    ret = static_cast<jfloat>(
-            mp->getOption(OPTION_FLOAT_VIDEO_FRAME_RATE, 0.0f));
-    return ret;
-}
-
 static jstring getVideoCodecInfo(JNIEnv *env, jobject thiz) {
     jstring jcodec_info = nullptr;
     int32_t ret = RESULT_OK;
@@ -595,18 +585,28 @@ static jint nativeGetPlayerState(JNIEnv *env, jobject thiz) {
     return state;
 }
 
+static jfloat nativeGetVideoFileFps(JNIEnv *env, jobject thiz) {
+    jfloat ret = 0.0;
+    sp<NextPlayer> mp = getPlayer(env, thiz);
+    JNI_CHECK_RET(mp, "getVideoFileFps: player is nullptr", ret);
+
+    ret = static_cast<jfloat>(
+            mp->getOption(OPTION_FLOAT_VIDEO_FRAME_RATE, 0.0f));
+    return ret;
+}
+
 static jfloat nativeGetRenderFrameRate(JNIEnv *env, jobject thiz) {
     sp<NextPlayer> mp = getPlayer(env, thiz);
     JNI_CHECK_RET(mp, "getVideoRenderFrameRate: player is nullptr", 0);
 
-    return static_cast<jfloat>(mp->getOption(OPTION_FLOAT_VIDEO_RENDER_RATE, 0L));
+    return static_cast<jfloat>(mp->getOption(OPTION_FLOAT_VIDEO_RENDER_RATE, 0.0f));
 }
 
 static jfloat nativeGetDecodeFrameRate(JNIEnv *env, jobject thiz) {
     sp<NextPlayer> mp = getPlayer(env, thiz);
     JNI_CHECK_RET(mp, "getVideoDecodeFrameRate: player is nullptr", 0);
 
-    return static_cast<jfloat>(mp->getOption(OPTION_FLOAT_VIDEO_DECODE_RATE, 0L));
+    return static_cast<jfloat>(mp->getOption(OPTION_FLOAT_VIDEO_DECODE_RATE, 0.0f));
 }
 
 static jlong nativeGetOptionLong(JNIEnv *env, jobject thiz, int option) {
