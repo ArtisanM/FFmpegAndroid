@@ -18,7 +18,7 @@ void VideoSpeedMeter::reset() {
     memset(mSamples, 0, sizeof(mSamples));
 }
 
-float VideoSpeedMeter::add() {
+long VideoSpeedMeter::add() {
     int64_t now = CurrentTimeMs();
     mSamples[mNextIndex] = now;
     mNextIndex++;
@@ -34,7 +34,7 @@ float VideoSpeedMeter::add() {
         return 0.0f;
     }
 
-    return 1000.0f * static_cast<float>((mCount - 1) / (now - mSamples[mFirstIndex]));
+    return 1000 * (mCount - 1) / (now - mSamples[mFirstIndex]);
 }
 
 void NetworkSpeedMeter::reset(int sampleRange) {

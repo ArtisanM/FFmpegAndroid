@@ -14,7 +14,7 @@ public:
 
     void reset();
 
-    float add();
+    long add();
 
 private:
     int mCount      = 0;

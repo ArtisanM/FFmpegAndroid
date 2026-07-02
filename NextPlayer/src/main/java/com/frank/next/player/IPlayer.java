@@ -100,9 +100,9 @@ public interface IPlayer {
 
     float getVideoFrameRate();
 
-    float getVideoDecodeFrameRate();
+    int getVideoDecodeFrameRate();
 
-    float getVideoRenderFrameRate();
+    int getVideoRenderFrameRate();
 
     long getVideoCacheTime();
 

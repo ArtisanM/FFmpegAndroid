@@ -50,8 +50,8 @@ object PlayerUtil {
         val fps = String.format(
             Locale.ENGLISH,
             "%d / %d / %d",
-            player.videoDecodeFrameRate.toInt(),
-            player.videoRenderFrameRate.toInt(),
+            player.videoDecodeFrameRate,
+            player.videoRenderFrameRate,
             player.videoFrameRate.toInt()
         )
         val bitRate = String.format(Locale.US, "%.2f kbps", player.bitRate / 1000f)

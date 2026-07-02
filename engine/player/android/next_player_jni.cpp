@@ -585,28 +585,14 @@ static jint nativeGetPlayerState(JNIEnv *env, jobject thiz) {
     return state;
 }
 
-static jfloat nativeGetVideoFileFps(JNIEnv *env, jobject thiz) {
+static jfloat nativeGetFrameRate(JNIEnv *env, jobject thiz) {
     jfloat ret = 0.0;
     sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getVideoFileFps: player is nullptr", ret);
+    JNI_CHECK_RET(mp, "nativeGetFrameRate: player is nullptr", ret);
 
     ret = static_cast<jfloat>(
             mp->getOption(OPTION_FLOAT_VIDEO_FRAME_RATE, 0.0f));
     return ret;
-}
-
-static jfloat nativeGetRenderFrameRate(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getVideoRenderFrameRate: player is nullptr", 0);
-
-    return static_cast<jfloat>(mp->getOption(OPTION_FLOAT_VIDEO_RENDER_RATE, 0.0f));
-}
-
-static jfloat nativeGetDecodeFrameRate(JNIEnv *env, jobject thiz) {
-    sp<NextPlayer> mp = getPlayer(env, thiz);
-    JNI_CHECK_RET(mp, "getVideoDecodeFrameRate: player is nullptr", 0);
-
-    return static_cast<jfloat>(mp->getOption(OPTION_FLOAT_VIDEO_DECODE_RATE, 0.0f));
 }
 
 static jlong nativeGetOptionLong(JNIEnv *env, jobject thiz, int option) {
@@ -637,11 +623,9 @@ static JNINativeMethod g_methods[] = {
         {"_setVolume",                     "(FF)V", reinterpret_cast<void *>(nativeSetVolume)},
         {"_setEnableMediaCodec",           "(Z)V", reinterpret_cast<void *>(nativeSetEnableMediaCodec)},
         {"_setVideoCacheDir",              "(Ljava/lang/String;)V", reinterpret_cast<void *>(nativeSetCacheDir)},
-        {"_getVideoFileFps",               "()F", reinterpret_cast<void *>(nativeGetVideoFileFps)},
+        {"_getVideoFileFps",               "()F", reinterpret_cast<void *>(nativeGetFrameRate)},
         {"_setHeaders",                    "(Ljava/lang/String;)V", reinterpret_cast<void *>(nativeSetHeaders)},
         {"_setSpeed",                      "(F)V", reinterpret_cast<void *>(nativeSetSpeed)},
-        {"_getVideoRenderFrameRate",       "()F", reinterpret_cast<void *>(nativeGetRenderFrameRate)},
-        {"_getVideoDecodeFrameRate",       "()F", reinterpret_cast<void *>(nativeGetDecodeFrameRate)},
         {"_getOptionLong",                 "(I)J", reinterpret_cast<void *>(nativeGetOptionLong)}};
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {

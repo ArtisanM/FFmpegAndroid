@@ -613,6 +613,10 @@ int64_t PlayerKernel::getOption(int key, int64_t defaultVal) {
             return mVideoState->width;
         case OPTION_INT64_VIDEO_HEIGHT:
             return mVideoState->height;
+        case OPTION_INT64_VIDEO_DECODE_RATE:
+            return mVideoState->stat.decode_rate;
+        case OPTION_INT64_VIDEO_RENDER_RATE:
+            return mVideoState->stat.render_rate;
         default:
             NEXT_LOGE(TAG, "unknown option: %d", key);
             break;
@@ -622,10 +626,6 @@ int64_t PlayerKernel::getOption(int key, int64_t defaultVal) {
 
 float PlayerKernel::getOption(int key, const float defaultVal) {
     switch (key) {
-        case OPTION_FLOAT_VIDEO_DECODE_RATE:
-            return mVideoState->stat.decode_rate;
-        case OPTION_FLOAT_VIDEO_RENDER_RATE:
-            return mVideoState->stat.render_rate;
         case OPTION_FLOAT_AV_DELAY:
             return mVideoState->stat.av_delay;
         case OPTION_FLOAT_AV_DIFF:

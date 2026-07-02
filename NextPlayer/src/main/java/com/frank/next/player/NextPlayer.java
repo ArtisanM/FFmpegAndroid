@@ -258,13 +258,13 @@ public class NextPlayer extends BasePlayer {
     }
 
     @Override
-    public float getVideoRenderFrameRate() {
-        return _getVideoRenderFrameRate();
+    public int getVideoRenderFrameRate() {
+        return (int)_getOptionLong(OPTION_INT64_VIDEO_RENDER_RATE);
     }
 
     @Override
-    public float getVideoDecodeFrameRate() {
-        return _getVideoDecodeFrameRate();
+    public int getVideoDecodeFrameRate() {
+        return (int)_getOptionLong(OPTION_INT64_VIDEO_DECODE_RATE);
     }
 
     @Override
@@ -466,10 +466,6 @@ public class NextPlayer extends BasePlayer {
 
     private native void _setSpeed(float speed);
 
-    private native float _getVideoRenderFrameRate();
-
-    private native float _getVideoDecodeFrameRate();
-
     private native int _getPlayerState();
 
     private native void _release();
@@ -486,8 +482,6 @@ public class NextPlayer extends BasePlayer {
     private static final int OPTION_FLOAT_DROP_FRAME_RATE   = 1005;
     private static final int OPTION_FLOAT_DROP_PACKET_RATE  = 1006;
     private static final int OPTION_FLOAT_VIDEO_FRAME_RATE  = 1007;
-    private static final int OPTION_FLOAT_VIDEO_DECODE_RATE = 1008;
-    private static final int OPTION_FLOAT_VIDEO_RENDER_RATE = 1009;
 
     private static final int OPTION_INT64_BIT_RATE          = 2001;
     private static final int OPTION_INT64_FILE_SIZE         = 2002;
@@ -512,6 +506,8 @@ public class NextPlayer extends BasePlayer {
     private static final int OPTION_INT64_AUDIO_CACHE_SIZE  = 2021;
     private static final int OPTION_INT64_VIDEO_WIDTH       = 2022;
     private static final int OPTION_INT64_VIDEO_HEIGHT      = 2023;
+    private static final int OPTION_INT64_VIDEO_DECODE_RATE = 2024;
+    private static final int OPTION_INT64_VIDEO_RENDER_RATE = 2025;
 
     private static final int OPTION_STR_DECODER_AVCODEC     = 3001; // ffmpeg avcodec
     private static final int OPTION_STR_DECODER_MEDIACODEC  = 3002; // android MediaCodec

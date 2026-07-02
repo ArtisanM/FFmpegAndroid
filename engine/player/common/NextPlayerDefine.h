@@ -65,10 +65,10 @@ typedef struct AVStatistic {
 
     float av_diff         = 0.0; // diff of clock
     float av_delay        = 0.0; // delay of clock
-    float render_rate     = 0.0;
-    float decode_rate     = 0.0;
     float drop_frame_rate = 0.0;
 
+    int64_t render_rate     = 0;
+    int64_t decode_rate     = 0;
     int64_t bit_rate        = 0;
     int64_t last_seek_time  = 0;
     int64_t transfer_bytes  = 0;
