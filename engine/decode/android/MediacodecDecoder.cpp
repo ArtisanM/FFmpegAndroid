@@ -231,9 +231,9 @@ int MediaCodecVideoDecoder::initMediaFormat(const MetaData *metadata) {
     releaseMediaFormatDesc();
     mMediaFormat.reset(AMediaFormat_new());
 
-    size_t sps_pps_size = 0;
-    size_t convert_size = extradata_size + 20;
-    uint8_t *convert_buffer =
+    size_t sps_pps_size  = 0;
+    size_t convert_size  = extradata_size + 20;
+    auto *convert_buffer =
             reinterpret_cast<uint8_t *>(calloc(1, convert_size));
     if (!convert_buffer) {
         return ERROR_OTHER_OOM;
@@ -345,14 +345,6 @@ int MediaCodecVideoDecoder::setVideoFormat(const MetaData *metadata) {
         NEXT_LOGE(MEDIACODEC_TAG, "metadata is invalid");
         return ERROR_DECODE_INVALID;
     }
-
-//    AndroidHardWareContext *ctx =
-//            reinterpret_cast<AndroidHardWareContext *>(
-//            buffer->getVideoFormatMetadata()->hardware_context);
-//    if (ctx) {
-//        mNativeWindow = reinterpret_cast<ANativeWindow *>(ctx->native_window);
-//        RS_LOGI(MEDIACODEC_TAG, "set native window %p\n", mNativeWindow);
-//    }
 
     int ret = initMediaFormat(metadata);
     if (ret != RESULT_OK) {
