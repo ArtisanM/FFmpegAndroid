@@ -61,7 +61,9 @@ class MainActivity : BaseActivity() {
                 getString(R.string.video_preview),
                 getString(R.string.media_probe),
                 getString(R.string.audio_effect),
-                getString(R.string.camera_filter))
+                getString(R.string.camera_filter),
+                getString(R.string.video_play)
+        )
 
         val viewWaterfall: RecyclerView = findViewById(R.id.list_main_item)
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -95,6 +97,8 @@ class MainActivity : BaseActivity() {
             -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
             7 //camera filter
             -> intent.setClass(this@MainActivity, CameraFilterActivity::class.java)
+            8 //player
+            -> intent.setClass(this@MainActivity, PlayerActivity::class.java)
             else -> {
             }
         }
